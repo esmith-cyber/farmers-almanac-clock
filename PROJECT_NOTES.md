@@ -544,17 +544,18 @@ Users can add, edit, and delete events via the EventManager component:
   - Minimum size enforced to prevent illegibility on small screens
 
 ## SunTimes Component (Detailed Time Display)
-Located below the main clock display, shows comprehensive sun and moon information.
+Split into two side panels positioned in the negative space flanking the clock display.
 
-**Sun Information Section:**
+**Sun Information Panel (Left Side):**
 - Current period display with emoji (Dawn 🌅, Morning ☀️, Afternoon ☀️, Dusk 🌇, Night 🌙)
-- Current date display (e.g., "Monday, January 6, 2026")
-- Primary times: Dawn, Sunrise, Sunset, Dusk
-  - Sunrise and sunset emphasized with larger, colored text (amber/orange)
-- Secondary times: Solar Noon, Golden Hour, Day Length
-  - Day length calculated as hours and minutes between sunrise and sunset
+- Current date display (e.g., "Jan 6, 2026")
+- Sunrise time (highlighted amber)
+- Sunset time (highlighted orange)
+- Day length (hours and minutes between sunrise and sunset)
+- Dawn time (nautical twilight)
+- Dusk time (nautical twilight)
 
-**Moon Information Section:**
+**Moon Information Panel (Right Side):**
 - Moon phase emoji display (🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘)
 - Traditional monthly moon name:
   - January: Wolf Moon
@@ -571,20 +572,27 @@ Located below the main clock display, shows comprehensive sun and moon informati
   - December: Cold Moon
 - Current phase name (New Moon, Waxing Crescent, First Quarter, Waxing Gibbous, Full Moon, Waning Gibbous, Last Quarter, Waning Crescent)
 - Illumination percentage (0-100%)
-- Moonrise and moonset times (when available)
+- Moonrise time (when available)
+- Moonset time (when available)
+- Moon altitude (height in sky, 0-90°)
+- Moon azimuth (compass direction, 0-360°)
 
 **Data Sources:**
 - Uses SunCalc library for all calculations
 - `SunCalc.getTimes()` for sun events
 - `SunCalc.getMoonIllumination()` for phase and illumination
 - `SunCalc.getMoonTimes()` for moonrise/moonset
+- `SunCalc.getMoonPosition()` for altitude and azimuth
 - date-fns for time formatting
 
 **Visual Design:**
-- Dark card with rounded corners (bg-slate-800)
-- Grid layout for organized information display
-- Hierarchical typography for emphasis
+- Two separate semi-transparent panels (bg-slate-800/90 with backdrop blur)
+- Positioned absolutely from bottom (60px from bottom edge)
+- Max width 200px each to fit in negative space
+- Rounded on clock-facing edges (right side of left panel, left side of right panel)
+- Compact vertical layout with hierarchical typography
 - Consistent slate color scheme matching main UI
+- Shadow-xl for depth
 
 ## Development Notes
 - Project created: 2026-01-06
@@ -661,3 +669,14 @@ Located below the main clock display, shows comprehensive sun and moon informati
   - Creates proper angular "slices" for each sign's duration
   - Constellations positioned at midpoint, centered within their slice boundaries
   - Aligns visual structure with actual zodiac calendar periods
+- Sun/Moon info layout reimagined (2026-01-06)
+  - Completely redesigned from single centered component below clock to split side panels
+  - **Sun panel (left)**: Period name, date, sunrise/sunset times (highlighted), day length, dawn/dusk
+  - **Moon panel (right)**: Moon name, phase, illumination %, moonrise/moonset, altitude, azimuth
+  - Both panels: Semi-transparent (bg-slate-800/90) with backdrop blur
+  - Positioned from bottom up (bottom: 60px) instead of from midpoint down
+  - Float in negative space beside the clock, max-width 200px
+  - Rounded on clock-facing edges (rounded-r-2xl for left, rounded-l-2xl for right)
+  - Added moon position data: altitude (height in sky 0-90°) and azimuth (compass direction 0-360°)
+  - Entire interface now fits on one screen without scrolling
+  - Main container adjusted: calc(100vh - 100px) height, relative positioning for absolute child panels

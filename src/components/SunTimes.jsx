@@ -1,27 +1,21 @@
-import { useEffect, useState } from 'react'
-import SunCalc from 'suncalc'
+import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
+import SunCalc from 'suncalc'
 
 function SunTimes({ location, currentDate }) {
   const [sunTimes, setSunTimes] = useState(null)
   const [moonData, setMoonData] = useState(null)
 
   useEffect(() => {
-    if (location) {
-      const times = SunCalc.getTimes(
-        currentDate,
-        location.latitude,
-        location.longitude
-      )
-      setSunTimes(times)
+    if (!location) return
 
-      const illumination = SunCalc.getMoonIllumination(currentDate)
-      const moonTimes = SunCalc.getMoonTimes(currentDate, location.latitude, location.longitude)
-      setMoonData({
-        ...illumination,
-        ...moonTimes
-      })
-    }
+    const times = SunCalc.getTimes(currentDate, location.latitude, location.longitude)
+    setSunTimes(times)
+
+    const illumination = SunCalc.getMoonIllumination(currentDate)
+    const moonTimes = SunCalc.getMoonTimes(currentDate, location.latitude, location.longitude)
+    const moonPosition = SunCalc.getMoonPosition(currentDate, location.latitude, location.longitude)
+    setMoonData({ ...illumination, ...moonTimes, ...moonPosition })
   }, [location, currentDate])
 
   if (!sunTimes || !moonData) return null
@@ -32,9 +26,9 @@ function SunTimes({ location, currentDate }) {
 
   const getCurrentPeriod = () => {
     const now = currentDate.getTime()
+    const dawn = sunTimes.dawn.getTime()
     const sunrise = sunTimes.sunrise.getTime()
     const sunset = sunTimes.sunset.getTime()
-    const dawn = sunTimes.dawn.getTime()
     const dusk = sunTimes.dusk.getTime()
 
     if (now < dawn) return { name: 'Night', emoji: '🌙' }
@@ -45,9 +39,6 @@ function SunTimes({ location, currentDate }) {
     return { name: 'Night', emoji: '🌙' }
   }
 
-  const period = getCurrentPeriod()
-
-  // Get moon phase name
   const getMoonPhaseName = () => {
     const phase = moonData.phase
     if (phase < 0.03 || phase > 0.97) return 'New Moon'
@@ -60,22 +51,21 @@ function SunTimes({ location, currentDate }) {
     return 'Waning Crescent'
   }
 
-  // Get traditional moon name based on month
   const getMoonName = () => {
     const month = currentDate.getMonth()
     const moonNames = [
-      'Wolf Moon',        // January
-      'Snow Moon',        // February
-      'Worm Moon',        // March
-      'Pink Moon',        // April
-      'Flower Moon',      // May
-      'Strawberry Moon',  // June
-      'Buck Moon',        // July
-      'Sturgeon Moon',    // August
-      'Harvest Moon',     // September
-      'Hunter\'s Moon',   // October
-      'Beaver Moon',      // November
-      'Cold Moon'         // December
+      'Wolf Moon',
+      'Snow Moon',
+      'Worm Moon',
+      'Pink Moon',
+      'Flower Moon',
+      'Strawberry Moon',
+      'Buck Moon',
+      'Sturgeon Moon',
+      'Harvest Moon',
+      "Hunter's Moon",
+      'Beaver Moon',
+      'Cold Moon'
     ]
     return moonNames[month]
   }
@@ -93,90 +83,91 @@ function SunTimes({ location, currentDate }) {
     return '🌘'
   }
 
+  const period = getCurrentPeriod()
   const moonPhaseName = getMoonPhaseName()
   const moonName = getMoonName()
   const moonEmoji = getMoonEmoji()
   const illuminationPercent = Math.round(moonData.fraction * 100)
 
   return (
-    <div className="bg-slate-800 rounded-2xl p-8 shadow-2xl">
-      <div className="text-center mb-8">
-        <div className="text-6xl mb-4">{period.emoji}</div>
-        <h2 className="text-3xl font-bold text-white mb-2">{period.name}</h2>
-        <p className="text-slate-400">{format(currentDate, 'EEEE, MMMM d, yyyy')}</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="text-center">
-          <div className="text-slate-400 text-sm mb-2">Dawn</div>
-          <div className="text-white text-xl font-semibold">
-            {formatTime(sunTimes.dawn)}
-          </div>
+    <>
+      {/* Sun Info Panel - Left Side */}
+      <div className="absolute left-0 bg-slate-800/90 backdrop-blur rounded-r-2xl p-4 shadow-xl" style={{
+        maxWidth: '200px',
+        bottom: '60px'
+      }}>
+        <div className="mb-3">
+          <div className="text-3xl mb-1">{period.emoji}</div>
+          <h3 className="text-lg font-bold text-white">{period.name}</h3>
+          <p className="text-slate-400 text-xs">{format(currentDate, 'MMM d, yyyy')}</p>
         </div>
 
-        <div className="text-center">
-          <div className="text-slate-400 text-sm mb-2">Sunrise</div>
-          <div className="text-amber-400 text-2xl font-bold">
-            {formatTime(sunTimes.sunrise)}
+        <div className="space-y-2 text-sm">
+          <div>
+            <div className="text-slate-400 text-xs">Sunrise</div>
+            <div className="text-amber-400 font-bold">
+              {formatTime(sunTimes.sunrise)}
+            </div>
           </div>
-        </div>
 
-        <div className="text-center">
-          <div className="text-slate-400 text-sm mb-2">Sunset</div>
-          <div className="text-orange-400 text-2xl font-bold">
-            {formatTime(sunTimes.sunset)}
+          <div>
+            <div className="text-slate-400 text-xs">Sunset</div>
+            <div className="text-orange-400 font-bold">
+              {formatTime(sunTimes.sunset)}
+            </div>
           </div>
-        </div>
 
-        <div className="text-center">
-          <div className="text-slate-400 text-sm mb-2">Dusk</div>
-          <div className="text-white text-xl font-semibold">
-            {formatTime(sunTimes.dusk)}
+          <div className="pt-2 border-t border-slate-700/50">
+            <div className="text-slate-400 text-xs">Day Length</div>
+            <div className="text-slate-300 text-xs font-semibold">
+              {(() => {
+                const duration = sunTimes.sunset - sunTimes.sunrise
+                const hours = Math.floor(duration / (1000 * 60 * 60))
+                const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
+                return `${hours}h ${minutes}m`
+              })()}
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="mt-8 pt-6 border-t border-slate-700 grid grid-cols-3 gap-4 text-center">
-        <div>
-          <div className="text-slate-400 text-xs mb-1">Solar Noon</div>
-          <div className="text-slate-300 text-sm font-semibold">
-            {formatTime(sunTimes.solarNoon)}
+          <div>
+            <div className="text-slate-400 text-xs">Dawn</div>
+            <div className="text-slate-300 text-xs">
+              {formatTime(sunTimes.dawn)}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <div className="text-slate-400 text-xs mb-1">Golden Hour</div>
-          <div className="text-slate-300 text-sm font-semibold">
-            {formatTime(sunTimes.goldenHour)}
-          </div>
-        </div>
-
-        <div>
-          <div className="text-slate-400 text-xs mb-1">Day Length</div>
-          <div className="text-slate-300 text-sm font-semibold">
-            {(() => {
-              const duration = sunTimes.sunset - sunTimes.sunrise
-              const hours = Math.floor(duration / (1000 * 60 * 60))
-              const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
-              return `${hours}h ${minutes}m`
-            })()}
+          <div>
+            <div className="text-slate-400 text-xs">Dusk</div>
+            <div className="text-slate-300 text-xs">
+              {formatTime(sunTimes.dusk)}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Moon Information Section */}
-      <div className="mt-8 pt-6 border-t border-slate-700">
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-3">{moonEmoji}</div>
-          <h3 className="text-2xl font-bold text-white mb-1">{moonName}</h3>
-          <p className="text-slate-400 text-sm">{moonPhaseName} • {illuminationPercent}% illuminated</p>
+      {/* Moon Info Panel - Right Side */}
+      <div className="absolute right-0 bg-slate-800/90 backdrop-blur rounded-l-2xl p-4 shadow-xl" style={{
+        maxWidth: '200px',
+        bottom: '60px'
+      }}>
+        <div className="mb-3">
+          <div className="text-3xl mb-1">{moonEmoji}</div>
+          <h3 className="text-lg font-bold text-white">{moonName}</h3>
+          <p className="text-slate-400 text-xs">{moonPhaseName}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-center">
+        <div className="space-y-2 text-sm">
+          <div>
+            <div className="text-slate-400 text-xs">Illumination</div>
+            <div className="text-slate-300 text-xs font-semibold">
+              {illuminationPercent}%
+            </div>
+          </div>
+
           {moonData.rise && (
-            <div>
-              <div className="text-slate-400 text-xs mb-1">Moonrise</div>
-              <div className="text-slate-300 text-sm font-semibold">
+            <div className="pt-2 border-t border-slate-700/50">
+              <div className="text-slate-400 text-xs">Moonrise</div>
+              <div className="text-slate-300 text-xs">
                 {formatTime(moonData.rise)}
               </div>
             </div>
@@ -184,15 +175,29 @@ function SunTimes({ location, currentDate }) {
 
           {moonData.set && (
             <div>
-              <div className="text-slate-400 text-xs mb-1">Moonset</div>
-              <div className="text-slate-300 text-sm font-semibold">
+              <div className="text-slate-400 text-xs">Moonset</div>
+              <div className="text-slate-300 text-xs">
                 {formatTime(moonData.set)}
               </div>
             </div>
           )}
+
+          <div className="pt-2 border-t border-slate-700/50">
+            <div className="text-slate-400 text-xs">Altitude</div>
+            <div className="text-slate-300 text-xs font-semibold">
+              {Math.round(moonData.altitude * (180 / Math.PI))}°
+            </div>
+          </div>
+
+          <div>
+            <div className="text-slate-400 text-xs">Azimuth</div>
+            <div className="text-slate-300 text-xs">
+              {Math.round(moonData.azimuth * (180 / Math.PI))}°
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

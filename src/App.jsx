@@ -114,7 +114,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-8 relative">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 relative">
       {/* Location Display - Top Left */}
       <div className="fixed top-6 left-6 z-50">
         {location && !isEditingLocation ? (
@@ -152,7 +152,7 @@ function App() {
       )}
 
       <div className="max-w-6xl w-full">
-        <header className="text-center mb-6">
+        <header className="text-center mb-3">
           <h1 className="text-3xl font-bold text-white">
             Farmer's Almanac Clock
           </h1>
@@ -160,15 +160,17 @@ function App() {
 
         {/* Main Clock Display */}
         {location ? (
-          <div className="space-y-8">
-
+          <div className="relative flex items-center justify-center" style={{
+            width: '100%',
+            height: 'calc(100vh - 100px)',
+            minHeight: '600px'
+          }}>
             {/* Layered Clock Display - Responsive sizing */}
             <div className="relative flex items-center justify-center" style={{
-              width: 'min(90vw, calc(100vh - 200px), 1200px)',
-              height: 'min(90vw, calc(100vh - 200px), 1200px)',
+              width: 'min(85vw, calc(100vh - 280px), 1000px)',
+              height: 'min(85vw, calc(100vh - 280px), 1000px)',
               minWidth: '400px',
-              minHeight: '400px',
-              margin: '0 auto'
+              minHeight: '400px'
             }}>
               {/* NOW indicator - positioned outside and above the annual disc */}
               <div className="absolute left-1/2 z-30" style={{
@@ -213,6 +215,7 @@ function App() {
               </div>
             </div>
 
+            {/* Sun & Moon Info Panels - Positioned in negative space */}
             <SunTimes
               location={location}
               currentDate={currentDate}
