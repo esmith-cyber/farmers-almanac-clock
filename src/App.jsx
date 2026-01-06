@@ -12,18 +12,80 @@ function App() {
   const [locationError, setLocationError] = useState(null)
   const [isEditingLocation, setIsEditingLocation] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [events, setEvents] = useState([])
+  const [events, setEvents] = useState(() => {
+    // Load events from localStorage
+    const saved = localStorage.getItem('annualEvents')
+    return saved ? JSON.parse(saved) : [
+      { id: 1, name: 'New Year', month: 1, day: 1, color: '#60a5fa' },
+      { id: 2, name: 'Valentine\'s Day', month: 2, day: 14, color: '#f472b6' },
+      { id: 3, name: 'Spring Equinox', month: 3, day: 20, color: '#4ade80' },
+      { id: 4, name: 'Summer Solstice', month: 6, day: 21, color: '#fbbf24' },
+      { id: 5, name: 'Autumn Equinox', month: 9, day: 22, color: '#fb923c' },
+      { id: 6, name: 'Winter Solstice', month: 12, day: 21, color: '#a78bfa' },
+    ]
+  })
+
+  // Save events to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('annualEvents', JSON.stringify(events))
+  }, [events])
 
   // Auto-detect location on mount
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            name: 'Your Location'
-          })
+        async (position) => {
+          const lat = position.coords.latitude
+          const lng = position.coords.longitude
+
+          // Try to reverse geocode the coordinates to get location name
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+              {
+                headers: {
+                  'User-Agent': 'FarmersAlmanacClock/1.0'
+                }
+              }
+            )
+            const data = await response.json()
+
+            // Build a readable location name
+            const address = data.address || {}
+            const city = address.city || address.town || address.village || address.hamlet
+            const state = address.state
+            const country = address.country
+
+            let locationName = ''
+            if (city && state) {
+              locationName = `${city}, ${state}`
+            } else if (city && country) {
+              locationName = `${city}, ${country}`
+            } else if (state && country) {
+              locationName = `${state}, ${country}`
+            } else if (city) {
+              locationName = city
+            } else if (country) {
+              locationName = country
+            } else {
+              locationName = 'Your Location'
+            }
+
+            setLocation({
+              latitude: lat,
+              longitude: lng,
+              name: locationName
+            })
+          } catch (error) {
+            console.error('Geocoding error:', error)
+            // Fallback to generic name if geocoding fails
+            setLocation({
+              latitude: lat,
+              longitude: lng,
+              name: 'Your Location'
+            })
+          }
+
           setLocationError(null)
         },
         (error) => {
@@ -90,13 +152,10 @@ function App() {
       )}
 
       <div className="max-w-6xl w-full">
-        <header className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-white mb-4">
+        <header className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-white">
             Farmer's Almanac Clock
           </h1>
-          <p className="text-slate-300 text-lg">
-            Time measured by nature's rhythms
-          </p>
         </header>
 
         {/* Main Clock Display */}
@@ -105,8 +164,8 @@ function App() {
 
             {/* Layered Clock Display - Responsive sizing */}
             <div className="relative flex items-center justify-center" style={{
-              width: 'min(85vw, calc(100vh - 300px), 1000px)',
-              height: 'min(85vw, calc(100vh - 300px), 1000px)',
+              width: 'min(90vw, calc(100vh - 200px), 1200px)',
+              height: 'min(90vw, calc(100vh - 200px), 1200px)',
               minWidth: '400px',
               minHeight: '400px',
               margin: '0 auto'
@@ -127,7 +186,7 @@ function App() {
               <div className="absolute z-0 w-full h-full">
                 <AnnualEventsClock
                   currentDate={currentDate}
-                  onEventsChange={setEvents}
+                  events={events}
                 />
               </div>
 

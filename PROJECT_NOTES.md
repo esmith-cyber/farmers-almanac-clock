@@ -340,7 +340,11 @@ rotation = currentAngle  // Positive for clockwise
   - **Position:** 320px radius (inner half of ring)
   - **Offset:** 15° to sit neatly between month division lines (not overlapping)
   - **Rotation:** Counter-rotated to stay upright as disk rotates
-- **Event markers:** Colored dots (6px radius) positioned at 410px radius (outer edge of ring)
+- **Event markers:** Colored dots positioned at 410px radius (outer edge of ring)
+  - Regular events: 6px radius, 2px white stroke, 90% opacity
+  - **Today's events (magnified)**: 10px radius, 3px white stroke, 100% opacity
+  - **Pulse animation**: Today's events pulse between 10px and 12px over 2 seconds
+  - **Enhanced labels**: Today's events have brighter white text, larger font (13px vs 11px), bold weight
 - **Event labels:** Radial sunburst layout
   - Event name only (no date labels)
   - Positioned radially between dot and outer edge of ring
@@ -481,24 +485,36 @@ const y = 450 + radius * Math.sin(rad)
 Users can add, edit, and delete events via the EventManager component:
 - **Add Event**: Opens modal with form for name, date, and color selection
 - **Edit Event**: Click "Edit" to modify existing event
-- **Delete Event**: Click "Delete" with confirmation dialog
+- **Delete Event**: Click "Delete" with confirmation dialog, automatically closes modal after deletion
 - **Color Options**: 8 preset colors (Blue, Pink, Green, Yellow, Orange, Purple, Red, Cyan)
 - **Date Validation**: Ensures valid day for selected month
 - **Sorted List**: Events displayed chronologically by date
 - **Persistence**: All changes saved to localStorage automatically
 
 **Event Manager UI:**
-- Accessible via "+ Add Event" button above clock display
+- Accessible via single "Events (N)" button in top-right corner
 - Modal interface with dark theme (bg-slate-800)
+- **Two-state interface**:
+  - **List view** (default): Shows all events with "+ Add New Event" button and close (×) button
+  - **Form view**: Shows form for adding/editing with Save and Cancel buttons
 - Form fields: Event name (text), Month (dropdown), Day (number), Color (color picker grid)
 - Event list shows all events sorted by date with Edit/Delete actions
+- Click outside modal (when in list view) to close
 - Responsive design with max-height scrollable areas
+
+**State Management:**
+- Events state managed in App.jsx (top-level)
+- Loaded from localStorage on mount with default seasonal events
+- Saved to localStorage whenever events change
+- Passed down as prop to AnnualEventsClock (read-only)
+- EventManager receives events prop and onEventsChange callback
+- Single source of truth ensures UI stays synchronized
 
 **Integration:**
 - Component: `src/components/AnnualEventsClock.jsx` (includes zodiac constellations)
 - Event Manager: `src/components/EventManager.jsx`
-- Props: `currentDate` (Date object), `onEventsChange` (callback)
-- State management: Events stored in App.jsx and passed down
+- Props for AnnualEventsClock: `currentDate` (Date object), `events` (array)
+- Props for EventManager: `events` (array), `onEventsChange` (callback)
 - Z-index: 0 (outermost layer)
 - Storage: localStorage key 'annualEvents'
 - SVG viewBox: 0 0 900 900 (matches component size)
@@ -512,8 +528,14 @@ Users can add, edit, and delete events via the EventManager component:
 - **No descriptive labels**: Clock labels removed for cleaner aesthetic (previously showed "Lunar Cycle (~29.5 days)", "Zodiac Cycle", etc.)
 - **Minimal text**: Only essential information shown in center displays
 - **UI controls repositioned**: Location display and event manager moved from center to corners (2026-01-06)
-  - Location display: Fixed position top-left with semi-transparent background
-  - Event manager: Fixed position top-right with semi-transparent background
+  - **Location display**: Fixed position top-left with semi-transparent background
+    - Uses reverse geocoding (OpenStreetMap Nominatim API) to show readable location
+    - Format preference: "City, State" or "City, Country"
+    - Falls back gracefully through State/Country, City only, Country only, or "Your Location"
+    - No authentication required, free API
+  - **Event manager**: Fixed position top-right with semi-transparent background
+    - Single "Events (N)" button shows event count
+    - Simplified UI with list/form toggle
   - Both use backdrop-blur effect and subtle styling to stay out of the way
   - Keeps clock display front and center without clutter
 - **Responsive design**: Clock scales with viewport size (2026-01-06)
@@ -598,3 +620,44 @@ Located below the main clock display, shows comprehensive sun and moon informati
   - Phase-appropriate emoji display
   - Moonrise and moonset times
   - Comprehensive moon data section added below sun times
+- Today's event magnification (2026-01-06)
+  - Events occurring on current date are visually magnified on annual ring
+  - 10px radius vs 6px for regular events, 3px stroke vs 2px
+  - Subtle pulse animation (10px to 12px over 2 seconds)
+  - Enhanced labels: brighter white text, larger font (13px), bold weight
+  - Makes it immediately clear which events are happening today
+- Event state management refactored (2026-01-06)
+  - Events state moved from AnnualEventsClock to App.jsx (top-level)
+  - Single source of truth ensures synchronization between EventManager and clock display
+  - Events loaded from localStorage on mount, saved on every change
+  - AnnualEventsClock receives events as read-only prop
+- EventManager UI simplified (2026-01-06)
+  - Consolidated from two buttons ("+ Add Event" and "Events") to single "Events (N)" button
+  - Two-state modal: list view (default) and form view (when adding/editing)
+  - Close button (×) and click-outside-to-close in list view
+  - Delete now automatically closes modal after confirmation
+  - Cleaner, more intuitive workflow
+- Reverse geocoding for location display (2026-01-06)
+  - Uses OpenStreetMap Nominatim API to convert lat/lng to readable location name
+  - Shows "City, State" or "City, Country" instead of generic "Your Location"
+  - Graceful fallbacks: State/Country → City → Country → "Your Location"
+  - Free API, no authentication required, fits no-backend design philosophy
+- Event and zodiac tooltips (2026-01-06)
+  - Added SVG `<title>` elements for native browser tooltips
+  - Event markers show: "Event Name (Date)" on hover
+  - Zodiac constellations show: "Sign Name: Date Range" on hover
+  - Eliminated event label clutter - only today's events show persistent labels
+  - All other event info accessed via hover tooltips
+- Zodiac positioning fix (2026-01-06)
+  - Bug: Zodiac signs were positioned at fixed 30-degree intervals regardless of actual dates
+  - Symptom: Capricorn appeared in wrong position, showed "Aries" as current sign in January
+  - Root cause: Signs used hardcoded angle values (0°, 30°, 60°, etc.) instead of date-based calculation
+  - Fix: Calculate each sign's position based on midpoint of its actual date range
+  - Special handling for Capricorn which crosses year boundary (Dec 22 - Jan 19)
+  - Now accurately reflects current zodiac sign based on actual calendar dates
+- Radial division lines updated (2026-01-06)
+  - Changed from fixed monthly intervals to zodiac sign boundaries
+  - Lines now drawn at the START date of each zodiac sign
+  - Creates proper angular "slices" for each sign's duration
+  - Constellations positioned at midpoint, centered within their slice boundaries
+  - Aligns visual structure with actual zodiac calendar periods

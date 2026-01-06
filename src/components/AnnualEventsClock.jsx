@@ -1,42 +1,22 @@
 import { useEffect, useState } from 'react'
 
-function AnnualEventsClock({ currentDate, onEventsChange }) {
+function AnnualEventsClock({ currentDate, events }) {
   const [rotation, setRotation] = useState(0)
-  const [events, setEvents] = useState(() => {
-    // Load events from localStorage
-    const saved = localStorage.getItem('annualEvents')
-    return saved ? JSON.parse(saved) : [
-      { id: 1, name: 'New Year', month: 1, day: 1, color: '#60a5fa' },
-      { id: 2, name: 'Valentine\'s Day', month: 2, day: 14, color: '#f472b6' },
-      { id: 3, name: 'Spring Equinox', month: 3, day: 20, color: '#4ade80' },
-      { id: 4, name: 'Summer Solstice', month: 6, day: 21, color: '#fbbf24' },
-      { id: 5, name: 'Autumn Equinox', month: 9, day: 22, color: '#fb923c' },
-      { id: 6, name: 'Winter Solstice', month: 12, day: 21, color: '#a78bfa' },
-    ]
-  })
-
-  // Save events to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('annualEvents', JSON.stringify(events))
-    if (onEventsChange) {
-      onEventsChange(events)
-    }
-  }, [events, onEventsChange])
 
   // Zodiac sign data with date ranges and colors
   const zodiacSigns = [
-    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, angle: 0, color: '#ef4444' },
-    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, angle: 30, color: '#4ade80' },
-    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, angle: 60, color: '#fbbf24' },
-    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, angle: 90, color: '#e0e7ff' },
-    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, angle: 120, color: '#fb923c' },
-    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, angle: 150, color: '#a78bfa' },
-    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, angle: 180, color: '#f472b6' },
-    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, angle: 210, color: '#dc2626' },
-    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, angle: 240, color: '#a855f7' },
-    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, angle: 270, color: '#94a3b8' },
-    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, angle: 300, color: '#22d3ee' },
-    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, angle: 330, color: '#2dd4bf' },
+    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, color: '#ef4444' },
+    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, color: '#4ade80' },
+    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, color: '#fbbf24' },
+    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, color: '#e0e7ff' },
+    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, color: '#fb923c' },
+    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, color: '#a78bfa' },
+    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, color: '#f472b6' },
+    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, color: '#dc2626' },
+    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, color: '#a855f7' },
+    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, color: '#94a3b8' },
+    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, color: '#22d3ee' },
+    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, color: '#2dd4bf' },
   ]
 
   // Helper functions
@@ -156,7 +136,7 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
           <div className="relative w-full h-full rounded-full border-2 border-slate-700/20 shadow-2xl overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #0a1628, #1e293b)' }}>
 
             {/* Star field background */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 900 900">
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 900 900">
               {stars.map((star, i) => (
                 <circle
                   key={i}
@@ -165,13 +145,14 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                   r={star.r}
                   fill="#e0f2fe"
                   opacity={star.opacity}
+                  style={{ pointerEvents: 'none' }}
                 />
               ))}
 
-              {/* Month division markers - subtle lines */}
-              {Array.from({ length: 12 }).map((_, i) => {
-                // Reverse time direction for month markers
-                const angle = -(i / 12) * 360
+              {/* Zodiac division markers - subtle lines at sign boundaries */}
+              {zodiacSigns.map((sign, i) => {
+                // Draw line at the START of each zodiac sign
+                const angle = dateToAngle(sign.startMonth, sign.startDay)
                 const innerRadius = 250
                 const outerRadius = 450
                 const rad = ((angle - 90) * Math.PI) / 180
@@ -190,26 +171,50 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                     stroke="#475569"
                     strokeWidth="1"
                     opacity="0.3"
+                    style={{ pointerEvents: 'none' }}
                   />
                 )
               })}
 
               {/* Zodiac Constellations */}
               {zodiacSigns.map((sign) => {
-                // Reverse time direction and offset by 15° to position between month division lines
-                const signAngle = -(sign.angle + 15)
-                const radius = 320 // Inner part of ring for constellations
+                // Calculate the midpoint date of this zodiac sign for positioning
+                const year = currentDate.getFullYear()
+                const startDate = new Date(year, sign.startMonth - 1, sign.startDay)
+                const endDate = new Date(year, sign.endMonth - 1, sign.endDay)
+
+                // Handle Capricorn which crosses year boundary
+                if (sign.endMonth < sign.startMonth) {
+                  endDate.setFullYear(year + 1)
+                }
+
+                const midDate = new Date((startDate.getTime() + endDate.getTime()) / 2)
+                const startOfYear = new Date(year, 0, 1)
+                const dayOfYear = Math.floor((midDate - startOfYear) / (1000 * 60 * 60 * 24)) + 1
+                const totalDays = 365 + (isLeapYear(year) ? 1 : 0)
+
+                // Calculate angle for this zodiac's midpoint (negative for counterclockwise)
+                const signAngle = -(dayOfYear / totalDays) * 360
+                const radius = 340 // Adjusted to center in ring area (250-450 range)
                 const rad = ((signAngle - 90) * Math.PI) / 180
                 const x = 450 + radius * Math.cos(rad)
                 const y = 450 + radius * Math.sin(rad)
+
+                // Format date range for tooltip
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                const startMonth = months[sign.startMonth - 1]
+                const endMonth = months[sign.endMonth - 1]
+                const dateRange = `${startMonth} ${sign.startDay} - ${endMonth} ${sign.endDay}`
 
                 return (
                   <g
                     key={sign.name}
                     transform={`translate(${x}, ${y}) rotate(${-rotation - signAngle}) scale(6.5)`}
                     opacity="0.18"
-                    style={{ color: sign.color }}
+                    style={{ color: sign.color, cursor: 'pointer' }}
+                    className="zodiac-sign"
                   >
+                    <title>{sign.name}: {dateRange}</title>
                     {constellations[sign.name]}
                   </g>
                 )
@@ -220,6 +225,14 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                 const angle = dateToAngle(event.month, event.day)
                 const pos = getEventPosition(angle)
 
+                // Check if this event is today
+                const isToday = event.month === currentDate.getMonth() + 1 &&
+                                event.day === currentDate.getDate()
+
+                // Format date for tooltip
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                const eventDate = `${months[event.month - 1]} ${event.day}`
+
                 // For radial labels: rotate by angle to point outward
                 // Normalize angle to 0-360 range
                 const normalizedAngle = ((angle % 360) + 360) % 360
@@ -228,32 +241,46 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                 const radialRotation = needsFlip ? normalizedAngle - 180 : normalizedAngle
 
                 return (
-                  <g key={event.id}>
-                    {/* Event dot */}
+                  <g key={event.id} className="event-marker" style={{ cursor: 'pointer' }}>
+                    <title>{event.name} ({eventDate})</title>
+
+                    {/* Event dot - magnified if today */}
                     <circle
                       cx={pos.x}
                       cy={pos.y}
-                      r="6"
+                      r={isToday ? "10" : "6"}
                       fill={event.color}
                       stroke="#fff"
-                      strokeWidth="2"
-                      opacity="0.9"
-                    />
+                      strokeWidth={isToday ? "3" : "2"}
+                      opacity={isToday ? "1" : "0.9"}
+                    >
+                      {/* Pulse animation for today's events */}
+                      {isToday && (
+                        <animate
+                          attributeName="r"
+                          values="10;12;10"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                      )}
+                    </circle>
 
-                    {/* Event label - radial (pointing outward from center) */}
-                    <g transform={`translate(${pos.x}, ${pos.y}) rotate(${radialRotation})`}>
-                      <text
-                        x="0"
-                        y={needsFlip ? "22" : "-22"}
-                        textAnchor="middle"
-                        fill="#e2e8f0"
-                        fontSize="11"
-                        fontWeight="500"
-                        style={{ userSelect: 'none' }}
-                      >
-                        {event.name}
-                      </text>
-                    </g>
+                    {/* Event label - only visible for today's events */}
+                    {isToday && (
+                      <g transform={`translate(${pos.x}, ${pos.y}) rotate(${radialRotation})`}>
+                        <text
+                          x="0"
+                          y={needsFlip ? "22" : "-22"}
+                          textAnchor="middle"
+                          fill="#ffffff"
+                          fontSize="13"
+                          fontWeight="700"
+                          style={{ userSelect: 'none', pointerEvents: 'none' }}
+                        >
+                          {event.name}
+                        </text>
+                      </g>
+                    )}
                   </g>
                 )
               })}

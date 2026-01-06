@@ -14,3 +14,13 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+
+/* Event label hover effect */
+.event-marker:hover .event-label {
+  opacity: 1 !important;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.event-label {
+  transition: opacity 0.2s ease-in-out;
+}

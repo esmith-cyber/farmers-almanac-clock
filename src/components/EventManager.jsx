@@ -3,6 +3,7 @@ import { useState } from 'react'
 function EventManager({ events, onEventsChange }) {
   const [isOpen, setIsOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState(null)
+  const [showForm, setShowForm] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     month: 1,
@@ -24,7 +25,7 @@ function EventManager({ events, onEventsChange }) {
   const handleAdd = () => {
     setEditingEvent(null)
     setFormData({ name: '', month: 1, day: 1, color: '#60a5fa' })
-    setIsOpen(true)
+    setShowForm(true)
   }
 
   const handleEdit = (event) => {
@@ -35,12 +36,16 @@ function EventManager({ events, onEventsChange }) {
       day: event.day,
       color: event.color
     })
-    setIsOpen(true)
+    setShowForm(true)
   }
 
   const handleDelete = (eventId) => {
     if (confirm('Are you sure you want to delete this event?')) {
       onEventsChange(events.filter(e => e.id !== eventId))
+      // Close modal and clear editing state after delete
+      setIsOpen(false)
+      setEditingEvent(null)
+      setShowForm(false)
     }
   }
 
@@ -79,12 +84,12 @@ function EventManager({ events, onEventsChange }) {
       onEventsChange([...events, newEvent])
     }
 
-    setIsOpen(false)
+    setShowForm(false)
     setEditingEvent(null)
   }
 
   const handleCancel = () => {
-    setIsOpen(false)
+    setShowForm(false)
     setEditingEvent(null)
   }
 
@@ -92,32 +97,34 @@ function EventManager({ events, onEventsChange }) {
     <div>
       <div className="bg-slate-800/90 backdrop-blur rounded-lg px-4 py-2 flex items-center gap-3">
         <button
-          onClick={handleAdd}
+          onClick={() => setIsOpen(!isOpen)}
           className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors"
         >
-          + Add Event
+          Events ({events.length})
         </button>
-
-        {events.length > 0 && (
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded-md transition-colors"
-          >
-            Events ({events.length})
-          </button>
-        )}
       </div>
 
       {/* Event Manager Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-white mb-4">
-              {editingEvent ? 'Edit Event' : 'Add New Event'}
-            </h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => !showForm && setIsOpen(false)}>
+          <div className="bg-slate-800 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-white">
+                {editingEvent ? 'Edit Event' : showForm ? 'Add New Event' : 'Manage Events'}
+              </h2>
+              {!showForm && (
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-slate-400 hover:text-white text-2xl leading-none"
+                >
+                  ×
+                </button>
+              )}
+            </div>
 
-            {/* Event Form */}
-            <div className="space-y-4 mb-6">
+            {/* Event Form - only show when adding/editing */}
+            {showForm && (
+              <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
                   Event Name
@@ -189,24 +196,37 @@ function EventManager({ events, onEventsChange }) {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={handleSave}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
+                  >
+                    {editingEvent ? 'Save Changes' : 'Add Event'}
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Add Event Button - show when not editing */}
+            {!showForm && (
+              <div className="mb-4">
                 <button
-                  onClick={handleSave}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
+                  onClick={handleAdd}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
                 >
-                  {editingEvent ? 'Save Changes' : 'Add Event'}
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md transition-colors font-medium"
-                >
-                  Cancel
+                  + Add New Event
                 </button>
               </div>
-            </div>
+            )}
 
-            {/* Existing Events List */}
-            {!editingEvent && events.length > 0 && (
+            {/* Events List */}
+            {!showForm && events.length > 0 && (
               <div className="border-t border-slate-700 pt-4">
                 <h3 className="text-lg font-semibold text-white mb-3">Your Events</h3>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
