@@ -52,7 +52,43 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-8">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-8 relative">
+      {/* Location Display - Top Left */}
+      <div className="fixed top-6 left-6 z-50">
+        {location && !isEditingLocation ? (
+          <div className="bg-slate-800/90 backdrop-blur rounded-lg px-4 py-2 flex items-center gap-3">
+            <div className="text-slate-300 text-sm">
+              <span className="text-xs">Location: </span>
+              <span className="font-semibold text-white">
+                {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
+              </span>
+            </div>
+            <button
+              onClick={() => setIsEditingLocation(true)}
+              className="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded-md transition-colors"
+            >
+              Change
+            </button>
+          </div>
+        ) : (
+          <LocationInput
+            onLocationUpdate={handleLocationUpdate}
+            initialLocation={location}
+            error={locationError}
+          />
+        )}
+      </div>
+
+      {/* Event Manager - Top Right */}
+      {location && (
+        <div className="fixed top-6 right-6 z-50">
+          <EventManager
+            events={events}
+            onEventsChange={setEvents}
+          />
+        </div>
+      )}
+
       <div className="max-w-6xl w-full">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold text-white mb-4">
@@ -63,40 +99,9 @@ function App() {
           </p>
         </header>
 
-        {/* Location Display and Edit */}
-        <div className="mb-8 flex items-center justify-center gap-4">
-          {location && !isEditingLocation ? (
-            <div className="bg-slate-800 rounded-lg px-6 py-3 flex items-center gap-4">
-              <div className="text-slate-300">
-                <span className="text-sm">Location: </span>
-                <span className="font-semibold text-white">
-                  {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
-                </span>
-              </div>
-              <button
-                onClick={() => setIsEditingLocation(true)}
-                className="text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md transition-colors"
-              >
-                Change
-              </button>
-            </div>
-          ) : (
-            <LocationInput
-              onLocationUpdate={handleLocationUpdate}
-              initialLocation={location}
-              error={locationError}
-            />
-          )}
-        </div>
-
         {/* Main Clock Display */}
         {location ? (
           <div className="space-y-8">
-            {/* Event Manager */}
-            <EventManager
-              events={events}
-              onEventsChange={setEvents}
-            />
 
             {/* Layered Clock Display */}
             <div className="relative flex items-center justify-center" style={{ minHeight: '900px' }}>

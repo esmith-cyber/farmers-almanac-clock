@@ -402,14 +402,15 @@ const dayOfYear = calculateDayOfYear(currentDate)
 const totalDays = 365 + (isLeapYear(currentDate.getFullYear()) ? 1 : 0)
 
 // Convert to degrees (full circle = full year)
-// Use negative angle to position events counterclockwise around the circle
-// This makes future events appear on the left (approaching) side
-const currentAngle = -(dayOfYear / totalDays) * 360
+// Use POSITIVE angle for CLOCKWISE disk rotation
+// Events are positioned with negative angles (counterclockwise around circle)
+// Clockwise rotation brings future events from left side to top
+const currentAngle = (dayOfYear / totalDays) * 360
 
 // Apply rotation to disk (positive = clockwise rotation)
 // Disk rotates CLOCKWISE with events pinned to it
 // Future events approach from left, past events recede to right
-rotation = currentAngle
+rotation = currentAngle  // Positive value = clockwise rotation
 ```
 
 **Event Position Calculation:**
@@ -472,6 +473,11 @@ Users can add, edit, and delete events via the EventManager component:
 - **Single NOW marker**: Only the outermost ring (Annual Events) displays the NOW indicator arrow at 12:00
 - **No descriptive labels**: Clock labels removed for cleaner aesthetic (previously showed "Lunar Cycle (~29.5 days)", "Zodiac Cycle", etc.)
 - **Minimal text**: Only essential information shown in center displays
+- **UI controls repositioned**: Location display and event manager moved from center to corners (2026-01-06)
+  - Location display: Fixed position top-left with semi-transparent background
+  - Event manager: Fixed position top-right with semi-transparent background
+  - Both use backdrop-blur effect and subtle styling to stay out of the way
+  - Keeps clock display front and center without clutter
 
 ## Development Notes
 - Project created: 2026-01-06
@@ -482,3 +488,10 @@ Users can add, edit, and delete events via the EventManager component:
   - Expanded annual ring to 200px width for better spacing
   - Changed event positioning to counterclockwise arrangement so future events approach from left
   - All disks rotate CLOCKWISE with events pinned to them (rotating with the disk)
+- Bug fix: Annual Events disk rotation direction (2026-01-06)
+  - Issue: Disk was rotating counterclockwise (negative angle) instead of clockwise
+  - Symptom: New Year (Jan 1) appeared to the left of NOW on Jan 6, when it should be to the right
+  - Root cause: Rotation angle was negative (counterclockwise) instead of positive (clockwise)
+  - Fix: Changed rotation from `-(dayOfYear / totalDays) * 360` to `(dayOfYear / totalDays) * 360`
+  - Also updated counter-rotation for event labels and zodiac constellations to account for clockwise disk rotation
+  - Now properly displays: past events (like Jan 1) recede to the right, future events approach from the left

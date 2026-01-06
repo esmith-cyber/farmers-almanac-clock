@@ -23,20 +23,20 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
     }
   }, [events, onEventsChange])
 
-  // Zodiac sign data with date ranges
+  // Zodiac sign data with date ranges and colors
   const zodiacSigns = [
-    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, angle: 0 },
-    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, angle: 30 },
-    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, angle: 60 },
-    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, angle: 90 },
-    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, angle: 120 },
-    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, angle: 150 },
-    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, angle: 180 },
-    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, angle: 210 },
-    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, angle: 240 },
-    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, angle: 270 },
-    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, angle: 300 },
-    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, angle: 330 },
+    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, angle: 0, color: '#ef4444' },
+    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, angle: 30, color: '#4ade80' },
+    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, angle: 60, color: '#fbbf24' },
+    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, angle: 90, color: '#e0e7ff' },
+    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, angle: 120, color: '#fb923c' },
+    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, angle: 150, color: '#a78bfa' },
+    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, angle: 180, color: '#f472b6' },
+    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, angle: 210, color: '#dc2626' },
+    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, angle: 240, color: '#a855f7' },
+    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, angle: 270, color: '#94a3b8' },
+    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, angle: 300, color: '#22d3ee' },
+    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, angle: 330, color: '#2dd4bf' },
   ]
 
   // Helper functions
@@ -76,11 +76,13 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
     const totalDays = 365 + (isLeapYear(currentDate.getFullYear()) ? 1 : 0)
 
     // Convert day of year to degrees (full circle = full year)
-    // Use negative angle to reverse time direction (counterclockwise progression)
-    const currentAngle = -(dayOfYear / totalDays) * 360
+    // Use POSITIVE angle for CLOCKWISE rotation
+    // Events are positioned counterclockwise (negative angles)
+    // Clockwise rotation brings future events from left to top
+    const currentAngle = (dayOfYear / totalDays) * 360
 
     // Rotate CLOCKWISE to put current day at top
-    // With reversed time direction, future events approach from left, past recede to right
+    // Future events approach from left, past recede to right
     setRotation(currentAngle)
   }, [currentDate])
 
@@ -107,18 +109,18 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
 
   // Constellation patterns - simplified star maps
   const constellations = {
-    Aries: <g><circle cx="0" cy="-8" r="1.5" fill="#e0f2fe" /><circle cx="2" cy="-4" r="1.5" fill="#e0f2fe" /><circle cx="0" cy="0" r="2" fill="#bae6fd" /><circle cx="-2" cy="4" r="1.5" fill="#e0f2fe" /><line x1="0" y1="-8" x2="2" y2="-4" stroke="#94a3b8" strokeWidth="0.5" /><line x1="2" y1="-4" x2="0" y2="0" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="0" x2="-2" y2="4" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Taurus: <g><circle cx="0" cy="6" r="2" fill="#bae6fd" /><circle cx="-5" cy="-4" r="1.5" fill="#e0f2fe" /><circle cx="5" cy="-4" r="1.5" fill="#e0f2fe" /><circle cx="-6" cy="-8" r="1" fill="#e0f2fe" /><circle cx="6" cy="-8" r="1" fill="#e0f2fe" /><line x1="-5" y1="-4" x2="0" y2="6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="5" y1="-4" x2="0" y2="6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-5" y1="-4" x2="-6" y2="-8" stroke="#94a3b8" strokeWidth="0.5" /><line x1="5" y1="-4" x2="6" y2="-8" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Gemini: <g><circle cx="-4" cy="-8" r="1.5" fill="#e0f2fe" /><circle cx="-4" cy="0" r="1.5" fill="#e0f2fe" /><circle cx="-4" cy="8" r="1.5" fill="#e0f2fe" /><circle cx="4" cy="-8" r="1.5" fill="#e0f2fe" /><circle cx="4" cy="0" r="1.5" fill="#e0f2fe" /><circle cx="4" cy="8" r="1.5" fill="#e0f2fe" /><line x1="-4" y1="-8" x2="-4" y2="8" stroke="#94a3b8" strokeWidth="0.5" /><line x1="4" y1="-8" x2="4" y2="8" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-4" y1="8" x2="4" y2="8" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-4" y1="-8" x2="4" y2="-8" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Cancer: <g><circle cx="0" cy="0" r="2" fill="#bae6fd" /><circle cx="-5" cy="-3" r="1.5" fill="#e0f2fe" /><circle cx="5" cy="-3" r="1.5" fill="#e0f2fe" /><circle cx="-7" cy="-6" r="1" fill="#e0f2fe" /><circle cx="7" cy="-6" r="1" fill="#e0f2fe" /><circle cx="0" cy="5" r="1.5" fill="#e0f2fe" /><line x1="0" y1="0" x2="-5" y2="-3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="-3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-5" y1="-3" x2="-7" y2="-6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="5" y1="-3" x2="7" y2="-6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="0" x2="0" y2="5" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Leo: <g><circle cx="0" cy="-6" r="2" fill="#bae6fd" /><circle cx="-4" cy="-3" r="1.5" fill="#e0f2fe" /><circle cx="4" cy="-3" r="1.5" fill="#e0f2fe" /><circle cx="0" cy="2" r="1.5" fill="#e0f2fe" /><circle cx="-3" cy="6" r="1.5" fill="#e0f2fe" /><circle cx="3" cy="6" r="1.5" fill="#e0f2fe" /><line x1="0" y1="-6" x2="-4" y2="-3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="-6" x2="4" y2="-3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="-6" x2="0" y2="2" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="2" x2="-3" y2="6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Virgo: <g><circle cx="-6" cy="-6" r="1.5" fill="#e0f2fe" /><circle cx="-3" cy="-2" r="1.5" fill="#e0f2fe" /><circle cx="0" cy="2" r="1.5" fill="#e0f2fe" /><circle cx="3" cy="6" r="1.5" fill="#e0f2fe" /><circle cx="6" cy="4" r="1" fill="#e0f2fe" /><line x1="-6" y1="-6" x2="-3" y2="-2" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-3" y1="-2" x2="0" y2="2" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="3" y1="6" x2="6" y2="4" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Libra: <g><circle cx="-5" cy="3" r="1.5" fill="#e0f2fe" /><circle cx="5" cy="3" r="1.5" fill="#e0f2fe" /><circle cx="0" cy="-5" r="1.5" fill="#bae6fd" /><circle cx="-6" cy="6" r="1" fill="#e0f2fe" /><circle cx="6" cy="6" r="1" fill="#e0f2fe" /><line x1="-5" y1="3" x2="5" y2="3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="-5" x2="0" y2="3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-5" y1="3" x2="-6" y2="6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="5" y1="3" x2="6" y2="6" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Scorpio: <g><circle cx="-6" cy="-4" r="1.5" fill="#e0f2fe" /><circle cx="-3" cy="0" r="1.5" fill="#e0f2fe" /><circle cx="0" cy="3" r="1.5" fill="#bae6fd" /><circle cx="3" cy="5" r="1.5" fill="#e0f2fe" /><circle cx="6" cy="3" r="1.5" fill="#e0f2fe" /><line x1="-6" y1="-4" x2="-3" y2="0" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="3" x2="3" y2="5" stroke="#94a3b8" strokeWidth="0.5" /><line x1="3" y1="5" x2="6" y2="3" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Sagittarius: <g><circle cx="-6" cy="6" r="1.5" fill="#e0f2fe" /><circle cx="-2" cy="2" r="1.5" fill="#e0f2fe" /><circle cx="2" cy="-2" r="1.5" fill="#bae6fd" /><circle cx="6" cy="-6" r="1.5" fill="#e0f2fe" /><circle cx="4" cy="-8" r="1" fill="#e0f2fe" /><circle cx="8" cy="-4" r="1" fill="#e0f2fe" /><line x1="-6" y1="6" x2="6" y2="-6" stroke="#94a3b8" strokeWidth="0.5" /><line x1="6" y1="-6" x2="4" y2="-8" stroke="#94a3b8" strokeWidth="0.5" /><line x1="6" y1="-6" x2="8" y2="-4" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Capricorn: <g><circle cx="-5" cy="-5" r="1.5" fill="#e0f2fe" /><circle cx="0" cy="-3" r="1.5" fill="#bae6fd" /><circle cx="3" cy="0" r="1.5" fill="#e0f2fe" /><circle cx="5" cy="4" r="1.5" fill="#e0f2fe" /><circle cx="2" cy="7" r="1" fill="#e0f2fe" /><line x1="-5" y1="-5" x2="0" y2="-3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="#94a3b8" strokeWidth="0.5" /><line x1="3" y1="0" x2="5" y2="4" stroke="#94a3b8" strokeWidth="0.5" /><line x1="5" y1="4" x2="2" y2="7" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Aquarius: <g><circle cx="-6" cy="-3" r="1.5" fill="#e0f2fe" /><circle cx="-3" cy="0" r="1.5" fill="#e0f2fe" /><circle cx="0" cy="-3" r="1.5" fill="#e0f2fe" /><circle cx="3" cy="0" r="1.5" fill="#e0f2fe" /><circle cx="6" cy="-3" r="1.5" fill="#e0f2fe" /><circle cx="-3" cy="5" r="1.5" fill="#e0f2fe" /><circle cx="3" cy="5" r="1.5" fill="#e0f2fe" /><line x1="-6" y1="-3" x2="-3" y2="0" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="-3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="#94a3b8" strokeWidth="0.5" /><line x1="3" y1="0" x2="6" y2="-3" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-3" y1="5" x2="3" y2="5" stroke="#94a3b8" strokeWidth="0.5" /></g>,
-    Pisces: <g><circle cx="-5" cy="-5" r="1.5" fill="#e0f2fe" /><circle cx="-3" cy="-2" r="1" fill="#e0f2fe" /><circle cx="0" cy="0" r="1.5" fill="#bae6fd" /><circle cx="3" cy="2" r="1" fill="#e0f2fe" /><circle cx="5" cy="5" r="1.5" fill="#e0f2fe" /><circle cx="-6" cy="-7" r="1" fill="#e0f2fe" /><circle cx="6" cy="7" r="1" fill="#e0f2fe" /><line x1="-5" y1="-5" x2="0" y2="0" stroke="#94a3b8" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="5" stroke="#94a3b8" strokeWidth="0.5" /><line x1="-5" y1="-5" x2="-6" y2="-7" stroke="#94a3b8" strokeWidth="0.5" /><line x1="5" y1="5" x2="6" y2="7" stroke="#94a3b8" strokeWidth="0.5" /></g>,
+    Aries: <g><circle cx="0" cy="-8" r="1.5" fill="currentColor" /><circle cx="2" cy="-4" r="1.5" fill="currentColor" /><circle cx="0" cy="0" r="2" fill="currentColor" /><circle cx="-2" cy="4" r="1.5" fill="currentColor" /><line x1="0" y1="-8" x2="2" y2="-4" stroke="currentColor" strokeWidth="0.5" /><line x1="2" y1="-4" x2="0" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="-2" y2="4" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Taurus: <g><circle cx="0" cy="6" r="2" fill="currentColor" /><circle cx="-5" cy="-4" r="1.5" fill="currentColor" /><circle cx="5" cy="-4" r="1.5" fill="currentColor" /><circle cx="-6" cy="-8" r="1" fill="currentColor" /><circle cx="6" cy="-8" r="1" fill="currentColor" /><line x1="-5" y1="-4" x2="0" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-4" x2="0" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-4" x2="-6" y2="-8" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-4" x2="6" y2="-8" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Gemini: <g><circle cx="-4" cy="-8" r="1.5" fill="currentColor" /><circle cx="-4" cy="0" r="1.5" fill="currentColor" /><circle cx="-4" cy="8" r="1.5" fill="currentColor" /><circle cx="4" cy="-8" r="1.5" fill="currentColor" /><circle cx="4" cy="0" r="1.5" fill="currentColor" /><circle cx="4" cy="8" r="1.5" fill="currentColor" /><line x1="-4" y1="-8" x2="-4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="4" y1="-8" x2="4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="-4" y1="8" x2="4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="-4" y1="-8" x2="4" y2="-8" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Cancer: <g><circle cx="0" cy="0" r="2" fill="currentColor" /><circle cx="-5" cy="-3" r="1.5" fill="currentColor" /><circle cx="5" cy="-3" r="1.5" fill="currentColor" /><circle cx="-7" cy="-6" r="1" fill="currentColor" /><circle cx="7" cy="-6" r="1" fill="currentColor" /><circle cx="0" cy="5" r="1.5" fill="currentColor" /><line x1="0" y1="0" x2="-5" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-3" x2="-7" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-3" x2="7" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Leo: <g><circle cx="0" cy="-6" r="2" fill="currentColor" /><circle cx="-4" cy="-3" r="1.5" fill="currentColor" /><circle cx="4" cy="-3" r="1.5" fill="currentColor" /><circle cx="0" cy="2" r="1.5" fill="currentColor" /><circle cx="-3" cy="6" r="1.5" fill="currentColor" /><circle cx="3" cy="6" r="1.5" fill="currentColor" /><line x1="0" y1="-6" x2="-4" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-6" x2="4" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-6" x2="0" y2="2" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="-3" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Virgo: <g><circle cx="-6" cy="-6" r="1.5" fill="currentColor" /><circle cx="-3" cy="-2" r="1.5" fill="currentColor" /><circle cx="0" cy="2" r="1.5" fill="currentColor" /><circle cx="3" cy="6" r="1.5" fill="currentColor" /><circle cx="6" cy="4" r="1" fill="currentColor" /><line x1="-6" y1="-6" x2="-3" y2="-2" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="-2" x2="0" y2="2" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="6" x2="6" y2="4" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Libra: <g><circle cx="-5" cy="3" r="1.5" fill="currentColor" /><circle cx="5" cy="3" r="1.5" fill="currentColor" /><circle cx="0" cy="-5" r="1.5" fill="currentColor" /><circle cx="-6" cy="6" r="1" fill="currentColor" /><circle cx="6" cy="6" r="1" fill="currentColor" /><line x1="-5" y1="3" x2="5" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-5" x2="0" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="3" x2="-6" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="3" x2="6" y2="6" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Scorpio: <g><circle cx="-6" cy="-4" r="1.5" fill="currentColor" /><circle cx="-3" cy="0" r="1.5" fill="currentColor" /><circle cx="0" cy="3" r="1.5" fill="currentColor" /><circle cx="3" cy="5" r="1.5" fill="currentColor" /><circle cx="6" cy="3" r="1.5" fill="currentColor" /><line x1="-6" y1="-4" x2="-3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="3" x2="3" y2="5" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="5" x2="6" y2="3" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Sagittarius: <g><circle cx="-6" cy="6" r="1.5" fill="currentColor" /><circle cx="-2" cy="2" r="1.5" fill="currentColor" /><circle cx="2" cy="-2" r="1.5" fill="currentColor" /><circle cx="6" cy="-6" r="1.5" fill="currentColor" /><circle cx="4" cy="-8" r="1" fill="currentColor" /><circle cx="8" cy="-4" r="1" fill="currentColor" /><line x1="-6" y1="6" x2="6" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="6" y1="-6" x2="4" y2="-8" stroke="currentColor" strokeWidth="0.5" /><line x1="6" y1="-6" x2="8" y2="-4" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Capricorn: <g><circle cx="-5" cy="-5" r="1.5" fill="currentColor" /><circle cx="0" cy="-3" r="1.5" fill="currentColor" /><circle cx="3" cy="0" r="1.5" fill="currentColor" /><circle cx="5" cy="4" r="1.5" fill="currentColor" /><circle cx="2" cy="7" r="1" fill="currentColor" /><line x1="-5" y1="-5" x2="0" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="0" x2="5" y2="4" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="4" x2="2" y2="7" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Aquarius: <g><circle cx="-6" cy="-3" r="1.5" fill="currentColor" /><circle cx="-3" cy="0" r="1.5" fill="currentColor" /><circle cx="0" cy="-3" r="1.5" fill="currentColor" /><circle cx="3" cy="0" r="1.5" fill="currentColor" /><circle cx="6" cy="-3" r="1.5" fill="currentColor" /><circle cx="-3" cy="5" r="1.5" fill="currentColor" /><circle cx="3" cy="5" r="1.5" fill="currentColor" /><line x1="-6" y1="-3" x2="-3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="0" x2="6" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="5" x2="3" y2="5" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Pisces: <g><circle cx="-5" cy="-5" r="1.5" fill="currentColor" /><circle cx="-3" cy="-2" r="1" fill="currentColor" /><circle cx="0" cy="0" r="1.5" fill="currentColor" /><circle cx="3" cy="2" r="1" fill="currentColor" /><circle cx="5" cy="5" r="1.5" fill="currentColor" /><circle cx="-6" cy="-7" r="1" fill="currentColor" /><circle cx="6" cy="7" r="1" fill="currentColor" /><line x1="-5" y1="-5" x2="0" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="5" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-5" x2="-6" y2="-7" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="5" x2="6" y2="7" stroke="currentColor" strokeWidth="0.5" /></g>,
   }
 
   // Generate star field for background
@@ -156,7 +158,7 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
           style={{ transform: `rotate(${rotation}deg)` }}
         >
           {/* Main Annual Circle */}
-          <div className="relative w-full h-full rounded-full border-4 border-slate-700/30 shadow-2xl overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #0a1628, #1e293b)' }}>
+          <div className="relative w-full h-full rounded-full border-2 border-slate-700/20 shadow-2xl overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #0a1628, #1e293b)' }}>
 
             {/* Star field background */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 900 900">
@@ -209,7 +211,9 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                 return (
                   <g
                     key={sign.name}
-                    transform={`translate(${x}, ${y}) rotate(${-signAngle}) scale(3.2)`}
+                    transform={`translate(${x}, ${y}) rotate(${-rotation - signAngle}) scale(6.5)`}
+                    opacity="0.18"
+                    style={{ color: sign.color }}
                   >
                     {constellations[sign.name]}
                   </g>
@@ -220,6 +224,13 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
               {events.map((event) => {
                 const angle = dateToAngle(event.month, event.day)
                 const pos = getEventPosition(angle)
+
+                // For radial labels: rotate by angle to point outward
+                // Normalize angle to 0-360 range
+                const normalizedAngle = ((angle % 360) + 360) % 360
+                // Flip text if it's on the left half (would be upside down or sideways)
+                const needsFlip = normalizedAngle > 90 && normalizedAngle < 270
+                const radialRotation = needsFlip ? normalizedAngle - 180 : normalizedAngle
 
                 return (
                   <g key={event.id}>
@@ -234,11 +245,11 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                       opacity="0.9"
                     />
 
-                    {/* Event label - counter-rotated to stay upright */}
-                    <g transform={`translate(${pos.x}, ${pos.y}) rotate(${-angle})`}>
+                    {/* Event label - radial (pointing outward from center) */}
+                    <g transform={`translate(${pos.x}, ${pos.y}) rotate(${radialRotation})`}>
                       <text
                         x="0"
-                        y="-15"
+                        y={needsFlip ? "22" : "-22"}
                         textAnchor="middle"
                         fill="#e2e8f0"
                         fontSize="11"
@@ -246,16 +257,6 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                         style={{ userSelect: 'none' }}
                       >
                         {event.name}
-                      </text>
-                      <text
-                        x="0"
-                        y="25"
-                        textAnchor="middle"
-                        fill="#94a3b8"
-                        fontSize="9"
-                        style={{ userSelect: 'none' }}
-                      >
-                        {event.month}/{event.day}
                       </text>
                     </g>
                   </g>

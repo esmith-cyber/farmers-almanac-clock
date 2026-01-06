@@ -89,11 +89,11 @@ function EventManager({ events, onEventsChange }) {
   }
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-center gap-4">
+    <div>
+      <div className="bg-slate-800/90 backdrop-blur rounded-lg px-4 py-2 flex items-center gap-3">
         <button
           onClick={handleAdd}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium"
+          className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors"
         >
           + Add Event
         </button>
@@ -101,9 +101,9 @@ function EventManager({ events, onEventsChange }) {
         {events.length > 0 && (
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium"
+            className="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded-md transition-colors"
           >
-            Manage Events ({events.length})
+            Events ({events.length})
           </button>
         )}
       </div>

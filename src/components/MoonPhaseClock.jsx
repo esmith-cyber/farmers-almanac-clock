@@ -95,15 +95,50 @@ function MoonPhaseClock({ location, currentDate }) {
         >
           {/* Main Moon Circle - larger than day/night clock */}
           <div
-            className="relative w-full h-full rounded-full border-4 border-slate-500/50 shadow-xl overflow-hidden"
+            className="relative w-full h-full rounded-full border-2 border-slate-500/30 shadow-xl overflow-hidden"
             style={{ background: moonGradient }}
           >
             {/* Quarter Phase Markers - Elegant Visual Representations */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 500 500">
+              {/* Background stars in lunar track - fade with moon phase */}
+              {(() => {
+                const stars = []
+                const center = 250
+                const innerRadius = 175  // Inner edge of lunar ring
+                const outerRadius = 250  // Outer edge of lunar ring
+                const starCount = 80
+
+                for (let i = 0; i < starCount; i++) {
+                  const angle = (i / starCount) * 360
+                  const radius = innerRadius + Math.random() * (outerRadius - innerRadius)
+                  const rad = ((angle - 90) * Math.PI) / 180
+                  const x = center + radius * Math.cos(rad)
+                  const y = center + radius * Math.sin(rad)
+
+                  // Calculate opacity based on angle - brightest at 0° (new moon), dimmest at 180° (full moon)
+                  // Use cosine for smooth fade
+                  const normalizedAngle = angle * Math.PI / 180
+                  const phaseOpacity = (Math.cos(normalizedAngle) + 1) / 2  // 0-1, highest at 0°/360°, lowest at 180°
+                  const starOpacity = phaseOpacity * 0.6 + 0.1  // Range from 0.1 to 0.7
+
+                  stars.push(
+                    <circle
+                      key={`star-${i}`}
+                      cx={x}
+                      cy={y}
+                      r={Math.random() * 1.2 + 0.5}
+                      fill="#e0f2fe"
+                      opacity={starOpacity}
+                    />
+                  )
+                }
+                return stars
+              })()}
+
               {/* Calculate positions for each phase marker */}
               {(() => {
-                const radius = 210
-                const moonSize = 40
+                const radius = 212.5  // Centered in the 75px ring (175 inner + 37.5)
+                const moonSize = 32   // Smaller to fit comfortably in ring
                 const center = 250
 
                 // Helper to get position - fixed positions in the rotating disk
@@ -125,37 +160,66 @@ function MoonPhaseClock({ location, currentDate }) {
                 return (
                   <>
                     <defs>
-                      {/* Clip path for first quarter - positioned at its location */}
+                      {/* Clip path for first quarter - right half */}
                       <clipPath id="firstQuarterClip">
                         <rect x={firstPos.x} y={firstPos.y - moonSize} width={moonSize} height={moonSize * 2} />
                       </clipPath>
-                      {/* Clip path for last quarter - positioned at its location */}
+                      {/* Clip path for last quarter - left half */}
                       <clipPath id="lastQuarterClip">
                         <rect x={lastPos.x - moonSize} y={lastPos.y - moonSize} width={moonSize} height={moonSize * 2} />
                       </clipPath>
                     </defs>
 
-                    {/* New Moon - dark circle with glow */}
-                    <circle cx={newPos.x} cy={newPos.y} r={moonSize} fill="#0f172a" stroke="#64748b" strokeWidth="2" />
-                    <circle cx={newPos.x} cy={newPos.y} r={moonSize - 5} fill="#1e293b" />
+                    {/* New Moon - dark circle with subtle glow and dark texture */}
+                    <circle cx={newPos.x} cy={newPos.y} r={moonSize} fill="#0f172a" stroke="#4a5568" strokeWidth="1.5" />
+                    <circle cx={newPos.x} cy={newPos.y} r={moonSize - 4} fill="#1e293b" />
+                    {/* Dark side craters */}
+                    <circle cx={newPos.x - 8} cy={newPos.y - 6} r="2.5" fill="#0f172a" opacity="0.5" />
+                    <circle cx={newPos.x + 6} cy={newPos.y + 8} r="2" fill="#0f172a" opacity="0.5" />
+                    <circle cx={newPos.x - 2} cy={newPos.y + 10} r="1.5" fill="#0f172a" opacity="0.5" />
+                    <circle cx={newPos.x + 10} cy={newPos.y - 4} r="1.8" fill="#0f172a" opacity="0.5" />
 
-                    {/* First Quarter - Right half bright, left half dark */}
-                    <circle cx={firstPos.x} cy={firstPos.y} r={moonSize} fill="#1e293b" stroke="#64748b" strokeWidth="2" />
+                    {/* First Quarter - Right half bright with smooth terminator */}
+                    <circle cx={firstPos.x} cy={firstPos.y} r={moonSize} fill="#1e293b" stroke="#64748b" strokeWidth="1.5" />
+                    {/* Right half bright */}
                     <circle cx={firstPos.x} cy={firstPos.y} r={moonSize} fill="#e2e8f0" clipPath="url(#firstQuarterClip)" />
-                    <line x1={firstPos.x} y1={firstPos.y - moonSize} x2={firstPos.x} y2={firstPos.y + moonSize} stroke="#94a3b8" strokeWidth="2" />
+                    {/* Light side craters (on right) */}
+                    <circle cx={firstPos.x + 8} cy={firstPos.y - 8} r="2.5" fill="#cbd5e1" opacity="0.6" clipPath="url(#firstQuarterClip)" />
+                    <circle cx={firstPos.x + 6} cy={firstPos.y + 10} r="2" fill="#cbd5e1" opacity="0.6" clipPath="url(#firstQuarterClip)" />
+                    <circle cx={firstPos.x + 12} cy={firstPos.y + 3} r="1.5" fill="#cbd5e1" opacity="0.6" clipPath="url(#firstQuarterClip)" />
+                    {/* Dark side craters (on left) */}
+                    <circle cx={firstPos.x - 10} cy={firstPos.y - 6} r="2" fill="#0f172a" opacity="0.5" />
+                    <circle cx={firstPos.x - 8} cy={firstPos.y + 8} r="1.5" fill="#0f172a" opacity="0.5" />
+                    {/* Soft terminator blend - gradient overlay */}
+                    <ellipse cx={firstPos.x} cy={firstPos.y} rx="2" ry={moonSize} fill="#94a3b8" opacity="0.3" />
 
-                    {/* Full Moon - bright circle */}
-                    <circle cx={fullPos.x} cy={fullPos.y} r={moonSize} fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" />
-                    <circle cx={fullPos.x} cy={fullPos.y} r={moonSize - 5} fill="#e2e8f0" />
-                    {/* Subtle texture */}
-                    <circle cx={fullPos.x - 10} cy={fullPos.y - 8} r="3" fill="#d1d5db" opacity="0.4" />
-                    <circle cx={fullPos.x + 8} cy={fullPos.y + 10} r="2.5" fill="#d1d5db" opacity="0.4" />
-                    <circle cx={fullPos.x - 3} cy={fullPos.y + 12} r="2" fill="#d1d5db" opacity="0.4" />
+                    {/* Full Moon - bright circle with detailed texture */}
+                    <circle cx={fullPos.x} cy={fullPos.y} r={moonSize} fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="1.5" />
+                    <circle cx={fullPos.x} cy={fullPos.y} r={moonSize - 3} fill="#e2e8f0" />
+                    {/* Maria (dark patches) */}
+                    <ellipse cx={fullPos.x - 8} cy={fullPos.y - 6} rx="5" ry="4" fill="#cbd5e1" opacity="0.5" />
+                    <ellipse cx={fullPos.x + 6} cy={fullPos.y + 8} rx="4" ry="3.5" fill="#cbd5e1" opacity="0.5" />
+                    <ellipse cx={fullPos.x - 2} cy={fullPos.y + 12} rx="3" ry="2.5" fill="#cbd5e1" opacity="0.5" />
+                    {/* Craters */}
+                    <circle cx={fullPos.x - 10} cy={fullPos.y - 10} r="2.5" fill="#cbd5e1" opacity="0.7" />
+                    <circle cx={fullPos.x + 10} cy={fullPos.y - 6} r="2" fill="#cbd5e1" opacity="0.7" />
+                    <circle cx={fullPos.x + 8} cy={fullPos.y + 12} r="1.8" fill="#cbd5e1" opacity="0.7" />
+                    <circle cx={fullPos.x - 6} cy={fullPos.y + 6} r="1.5" fill="#cbd5e1" opacity="0.7" />
+                    <circle cx={fullPos.x + 2} cy={fullPos.y - 8} r="1.3" fill="#cbd5e1" opacity="0.7" />
 
-                    {/* Last Quarter - Left half bright, right half dark */}
-                    <circle cx={lastPos.x} cy={lastPos.y} r={moonSize} fill="#1e293b" stroke="#64748b" strokeWidth="2" />
+                    {/* Last Quarter - Left half bright with smooth terminator */}
+                    <circle cx={lastPos.x} cy={lastPos.y} r={moonSize} fill="#1e293b" stroke="#64748b" strokeWidth="1.5" />
+                    {/* Left half bright */}
                     <circle cx={lastPos.x} cy={lastPos.y} r={moonSize} fill="#e2e8f0" clipPath="url(#lastQuarterClip)" />
-                    <line x1={lastPos.x} y1={lastPos.y - moonSize} x2={lastPos.x} y2={lastPos.y + moonSize} stroke="#94a3b8" strokeWidth="2" />
+                    {/* Light side craters (on left) */}
+                    <circle cx={lastPos.x - 8} cy={lastPos.y - 8} r="2.5" fill="#cbd5e1" opacity="0.6" clipPath="url(#lastQuarterClip)" />
+                    <circle cx={lastPos.x - 6} cy={lastPos.y + 10} r="2" fill="#cbd5e1" opacity="0.6" clipPath="url(#lastQuarterClip)" />
+                    <circle cx={lastPos.x - 12} cy={lastPos.y + 3} r="1.5" fill="#cbd5e1" opacity="0.6" clipPath="url(#lastQuarterClip)" />
+                    {/* Dark side craters (on right) */}
+                    <circle cx={lastPos.x + 10} cy={lastPos.y - 6} r="2" fill="#0f172a" opacity="0.5" />
+                    <circle cx={lastPos.x + 8} cy={lastPos.y + 8} r="1.5" fill="#0f172a" opacity="0.5" />
+                    {/* Soft terminator blend - gradient overlay */}
+                    <ellipse cx={lastPos.x} cy={lastPos.y} rx="2" ry={moonSize} fill="#94a3b8" opacity="0.3" />
                   </>
                 )
               })()}
