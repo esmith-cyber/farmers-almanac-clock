@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer's Almanac Clock - Sizing Options</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: #0f172a;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .option h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .specs {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .specs div {
+            margin: 4px 0;
+        }
+
+        .clock-stack {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .disk {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .day-night {
+            background: linear-gradient(135deg, #fbbf24, #f97316, #6366f1, #1e40af);
+            z-index: 4;
+        }
+
+        .lunar {
+            background: linear-gradient(135deg, #0f172a, #334155, #64748b, #334155, #0f172a);
+            z-index: 3;
+        }
+
+        .zodiac {
+            background: linear-gradient(135deg, #312e81, #4c1d95, #6b21a8, #581c87);
+            z-index: 2;
+        }
+
+        .annual {
+            background: linear-gradient(135deg, #14532d, #166534, #15803d, #166534);
+            z-index: 1;
+        }
+
+        .total {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; margin-bottom: 40px; font-size: 32px;">Farmer's Almanac Clock - Sizing Options</h1>
+
+    <div class="container">
+        <!-- Option 1 -->
+        <div class="option">
+            <h2>Option 1: Equal Ring Widths</h2>
+            <div class="specs">
+                <div>Day/Night:   500px (center)</div>
+                <div>Lunar:       650px (75px ring)</div>
+                <div>Zodiac:      800px (75px ring)</div>
+                <div>Annual:      950px (75px ring)</div>
+            </div>
+            <div class="clock-stack" style="width: 950px; height: 950px;">
+                <div class="disk annual" style="width: 950px; height: 950px;">
+                    Annual<br>Custom Events
+                </div>
+                <div class="disk zodiac" style="width: 800px; height: 800px;">
+                    Monthly<br>Zodiac
+                </div>
+                <div class="disk lunar" style="width: 650px; height: 650px;">
+                    Lunar<br>Phases
+                </div>
+                <div class="disk day-night" style="width: 500px; height: 500px;">
+                    Day/Night<br>Cycle
+                </div>
+            </div>
+            <div class="total">Total Size: 950px</div>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="option">
+            <h2>Option 2: Progressive (Original)</h2>
+            <div class="specs">
+                <div>Day/Night:   450px (center)</div>
+                <div>Lunar:       600px (75px ring)</div>
+                <div>Zodiac:      780px (90px ring)</div>
+                <div>Annual:     1000px (110px ring)</div>
+            </div>
+            <div class="clock-stack" style="width: 1000px; height: 1000px;">
+                <div class="disk annual" style="width: 1000px; height: 1000px;">
+                    Annual<br>Custom Events
+                </div>
+                <div class="disk zodiac" style="width: 780px; height: 780px;">
+                    Monthly<br>Zodiac
+                </div>
+                <div class="disk lunar" style="width: 600px; height: 600px;">
+                    Lunar<br>Phases
+                </div>
+                <div class="disk day-night" style="width: 450px; height: 450px;">
+                    Day/Night<br>Cycle
+                </div>
+            </div>
+            <div class="total">Total Size: 1000px</div>
+        </div>
+
+        <!-- Option 2B - Smaller Center -->
+        <div class="option">
+            <h2>Option 2B: Smaller Center ⭐</h2>
+            <div class="specs">
+                <div>Day/Night:   350px (center)</div>
+                <div>Lunar:       500px (75px ring)</div>
+                <div>Zodiac:      680px (90px ring)</div>
+                <div>Annual:      900px (110px ring)</div>
+            </div>
+            <div class="clock-stack" style="width: 900px; height: 900px;">
+                <div class="disk annual" style="width: 900px; height: 900px;">
+                    Annual<br>Custom Events
+                </div>
+                <div class="disk zodiac" style="width: 680px; height: 680px;">
+                    Monthly<br>Zodiac
+                </div>
+                <div class="disk lunar" style="width: 500px; height: 500px;">
+                    Lunar<br>Phases
+                </div>
+                <div class="disk day-night" style="width: 350px; height: 350px;">
+                    Day/Night<br>Cycle
+                </div>
+            </div>
+            <div class="total">Total Size: 900px</div>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="option">
+            <h2>Option 3: Compact Scaled</h2>
+            <div class="specs">
+                <div>Day/Night:   400px (center)</div>
+                <div>Lunar:       550px (75px ring)</div>
+                <div>Zodiac:      725px (87.5px ring)</div>
+                <div>Annual:      925px (100px ring)</div>
+            </div>
+            <div class="clock-stack" style="width: 925px; height: 925px;">
+                <div class="disk annual" style="width: 925px; height: 925px;">
+                    Annual<br>Custom Events
+                </div>
+                <div class="disk zodiac" style="width: 725px; height: 725px;">
+                    Monthly<br>Zodiac
+                </div>
+                <div class="disk lunar" style="width: 550px; height: 550px;">
+                    Lunar<br>Phases
+                </div>
+                <div class="disk day-night" style="width: 400px; height: 400px;">
+                    Day/Night<br>Cycle
+                </div>
+            </div>
+            <div class="total">Total Size: 925px</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 60px; padding: 30px; background: #1e293b; border-radius: 12px; max-width: 900px; margin-left: auto; margin-right: auto;">
+        <h3 style="margin-top: 0;">Considerations:</h3>
+        <ul style="line-height: 1.8;">
+            <li><strong>Option 1 (Equal):</strong> Clean, symmetrical. Each ring gets same space. Good for consistency.</li>
+            <li><strong>Option 2 (Progressive):</strong> Gives more room where needed - annual events get most space for labels. Most practical.</li>
+            <li><strong>Option 2B (Smaller Center) ⭐:</strong> Makes outer rings more prominent. Day/night at 350px still has room for sun event markers. Total size only 900px - more compact than Option 2.</li>
+            <li><strong>Option 3 (Compact):</strong> Smallest overall footprint. Still gives outer rings more space. Best for mobile/smaller screens.</li>
+        </ul>
+        <div style="margin-top: 20px; padding: 15px; background: #334155; border-radius: 8px; border-left: 4px solid #3b82f6;">
+            <strong>Option 2B Benefits:</strong>
+            <ul style="margin: 10px 0 0 0;">
+                <li>110px for annual events - plenty of room for custom labels</li>
+                <li>90px for zodiac symbols - good space for constellation art</li>
+                <li>75px for lunar phases - adequate for 40px moon icons</li>
+                <li>350px day/night still shows gradient and sun markers clearly</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>
