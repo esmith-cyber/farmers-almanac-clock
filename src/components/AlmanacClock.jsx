@@ -76,11 +76,19 @@ function AlmanacClock({ location, currentDate }) {
       { angle: duskAngle, color: '#6b5b95' }, // Dusk - purple
       { angle: duskAngle + (nightAngle - duskAngle) * 0.5, color: '#2a2f4a' }, // Early night
       { angle: nightAngle, color: '#1a1f3a' }, // Night
+      // Fill the gap between night and midnight with multiple stops
+      { angle: nightAngle + (360 - nightAngle) * 0.2, color: '#141d2e' },
+      { angle: nightAngle + (360 - nightAngle) * 0.4, color: '#111825' },
+      { angle: nightAngle + (360 - nightAngle) * 0.6, color: '#0e141f' },
+      { angle: nightAngle + (360 - nightAngle) * 0.8, color: '#0b1019' },
       { angle: 360, color: '#0a0e27' }, // Back to midnight
     ]
 
+    // Sort stops by angle to ensure proper ordering
+    stops.sort((a, b) => a.angle - b.angle)
+
     const stopStrings = stops.map(stop => `${stop.color} ${stop.angle}deg`)
-    return `conic-gradient(from 0deg, ${stopStrings.join(', ')})`
+    return `conic-gradient(${stopStrings.join(', ')})`
   }
 
   const conicGradient = createConicGradient()
@@ -107,79 +115,6 @@ function AlmanacClock({ location, currentDate }) {
             className="relative w-full h-full rounded-full border-2 border-slate-600/30 shadow-2xl overflow-hidden"
             style={{ background: conicGradient }}
           >
-
-            {/* Event Markers - subtle lines */}
-            {/* Dawn */}
-            <div
-              className="absolute w-px h-12 bg-purple-300/60 transform -translate-x-1/2"
-              style={{
-                left: '50%',
-                top: '0',
-                transformOrigin: 'center 175px',
-                transform: `translateX(-50%) rotate(${dawnAngle}deg)`,
-              }}
-              title={`Dawn: ${formatTime(sunTimes.dawn)}`}
-            />
-
-            {/* Sunrise - more prominent */}
-            <div
-              className="absolute w-0.5 h-16 bg-amber-400/80 transform -translate-x-1/2"
-              style={{
-                left: '50%',
-                top: '0',
-                transformOrigin: 'center 175px',
-                transform: `translateX(-50%) rotate(${sunriseAngle}deg)`,
-              }}
-              title={`Sunrise: ${formatTime(sunTimes.sunrise)}`}
-            />
-
-            {/* Solar Noon - subtle bright line */}
-            <div
-              className="absolute w-px h-8 bg-yellow-100/70 transform -translate-x-1/2"
-              style={{
-                left: '50%',
-                top: '0',
-                transformOrigin: 'center 175px',
-                transform: `translateX(-50%) rotate(${solarNoonAngle}deg)`,
-              }}
-              title={`Solar Noon: ${formatTime(sunTimes.solarNoon)}`}
-            />
-
-            {/* Sunset - more prominent */}
-            <div
-              className="absolute w-0.5 h-16 bg-orange-500/80 transform -translate-x-1/2"
-              style={{
-                left: '50%',
-                top: '0',
-                transformOrigin: 'center 175px',
-                transform: `translateX(-50%) rotate(${sunsetAngle}deg)`,
-              }}
-              title={`Sunset: ${formatTime(sunTimes.sunset)}`}
-            />
-
-            {/* Dusk */}
-            <div
-              className="absolute w-px h-12 bg-indigo-300/60 transform -translate-x-1/2"
-              style={{
-                left: '50%',
-                top: '0',
-                transformOrigin: 'center 175px',
-                transform: `translateX(-50%) rotate(${duskAngle}deg)`,
-              }}
-              title={`Dusk: ${formatTime(sunTimes.dusk)}`}
-            />
-
-            {/* Midnight - very subtle */}
-            <div
-              className="absolute w-px h-6 bg-slate-400/40 transform -translate-x-1/2"
-              style={{
-                left: '50%',
-                top: '0',
-                transformOrigin: 'center 175px',
-                transform: `translateX(-50%) rotate(0deg)`,
-              }}
-              title="Midnight"
-            />
           </div>
         </div>
       </div>

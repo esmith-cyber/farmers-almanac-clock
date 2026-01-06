@@ -199,12 +199,14 @@ The annual ring is extra wide (200px) to accommodate both zodiac constellations 
 **Time Scale:** 24 hours (one full rotation per day)
 
 **Design Philosophy:**
-- No artificial 24-hour tick marks - only natural celestial events matter
+- No artificial 24-hour tick marks or markers - pure gradient visualization
 - Colors blend smoothly around the entire circle following the actual light cycle
+- Clean, minimal design with no visual clutter
 
 **Gradient Implementation:**
 - Uses CSS `conic-gradient` for seamless color transitions
 - Gradient stops positioned at actual sun event times (calculated via SunCalc)
+- Multiple intermediate stops between night and midnight to smooth the gradient wrapping
 - Color progression follows the natural light cycle:
   - Midnight: Deep night blue/black (#0a0e27)
   - Dawn: Purple transition (#4a4a7d)
@@ -216,14 +218,12 @@ The annual ring is extra wide (200px) to accommodate both zodiac constellations 
   - Sunset: Coral (#ff7f50)
   - Dusk: Purple (#6b5b95)
   - Night: Dark blue (#1a1f3a)
+  - Late night: Progressive darkening back to midnight (#141d2e → #111825 → #0e141f → #0b1019)
 
-**Event Markers:**
-- Sunrise & Sunset: Prominent radial lines (amber/orange, h-16)
-- Dawn & Dusk: Subtle radial lines (purple/indigo, h-12)
-- Solar Noon: Very subtle bright line (h-8)
-- Midnight: Barely visible line (h-6)
-- All markers are semi-transparent lines emanating from center
-- No dots, emojis, or artificial decorations
+**Visual Style:**
+- No event markers or radial lines
+- Subtle border (2px, 30% opacity)
+- Pure gradient representation of the day/night cycle
 
 **Rotation Calculation:**
 ```javascript
@@ -243,15 +243,24 @@ rotation = currentAngle  // Positive for clockwise
 **Design Philosophy:**
 - Quarter moon phases are "pinned" to the disk at fixed positions and rotate WITH the gradient
 - No artificial weekly divisions - only natural lunar phases matter
+- Phase-based star field creates atmospheric depth
 
 **Data Source:**
 - Uses SunCalc library's `getMoonIllumination()` function
 - Returns `phase` (0-1) and `fraction` (illumination percentage)
 - Phase values: 0 = New Moon, 0.25 = First Quarter, 0.5 = Full Moon, 0.75 = Last Quarter
 
+**Background Stars:**
+- 80 stars scattered throughout the lunar ring (175px-250px radius)
+- **Phase-based opacity**: Stars brightest near New Moon position (~70% opacity), fade toward Full Moon (~10% opacity)
+- Uses cosine curve for smooth fading: `opacity = (cos(angle) + 1) / 2 * 0.6 + 0.1`
+- Stars rotate WITH the disk, reinforcing that more stars are visible during new moon than full moon
+- Random sizes (0.5-1.7px radius)
+
 **Gradient Implementation:**
 - CSS `conic-gradient` synchronized to moon phases
 - Gradient is "pinned" to disk - rotates WITH the phase icons
+- Multiple intermediate stops between 315° and 360° for smoother wrapping
 - Color progression follows illumination intensity:
   - 0° (New Moon): Darkest (#0f172a)
   - 45°: Waxing crescent transition (#1e293b)
@@ -261,16 +270,21 @@ rotation = currentAngle  // Positive for clockwise
   - 225°: Waning gibbous transition (#475569)
   - 270° (Last Quarter): Medium dark (#334155)
   - 315°: Waning crescent transition (#1e293b)
+  - 326.25°, 337.5°, 348.75°: Progressive blending stops
   - 360° (Back to New Moon): Darkest (#0f172a)
 
 **Phase Marker Icons:**
-- **New Moon** (0° position): Dark circle with subtle glow, layered fills (#0f172a, #1e293b)
-- **First Quarter** (90° position): Right half illuminated (#e2e8f0), left half dark (#1e293b), vertical terminator line
-- **Full Moon** (180° position): Bright circle (#f1f5f9, #e2e8f0) with subtle crater texture
-- **Last Quarter** (270° position): Left half illuminated (#e2e8f0), right half dark (#1e293b), vertical terminator line
-- All icons: 40px diameter, positioned at 210px radius from center
-- SVG-based with clip paths for accurate half-moon representations
-- No emojis or artificial decorations
+- **New Moon** (0° position): Dark circle with subtle glow and dark craters (4 crater textures)
+- **First Quarter** (90° position): Right half illuminated with smooth elliptical terminator, 3 light-side craters, 2 dark-side craters
+- **Full Moon** (180° position): Bright circle with detailed maria (3 elliptical dark patches) and 5 crater textures
+- **Last Quarter** (270° position): Left half illuminated with smooth elliptical terminator, 3 light-side craters, 2 dark-side craters
+- All icons: 32px diameter (reduced to fit comfortably in ring), positioned at 212.5px radius (centered in ring)
+- SVG-based with smooth terminator lines (no harsh clip paths, uses ellipses for natural curvature)
+- Realistic surface textures on all moons
+
+**Visual Style:**
+- Subtle border (2px, 30% opacity)
+- Atmospheric depth with phase-synced starfield
 
 **Rotation Calculation:**
 ```javascript
@@ -300,33 +314,39 @@ rotation = currentAngle  // Positive for clockwise
 
 **Visual Design:**
 - **Background:** Deep blue gradient (#0a1628 to #1e293b) - lighter than previous solid black
-- **Border:** Subtle translucent border (slate-700/30)
+- **Border:** Very subtle translucent border (2px, slate-700/20 opacity)
 - **Star field:** 150 randomly positioned stars (0.5-2.5px radius, 30-100% opacity) filling entire 200px ring
 - **Ring dimensions:** Inner radius 250px, outer radius 450px (200px wide)
 - **Month markers:** 12 subtle radial lines dividing the year (opacity 0.3, #475569)
-- **Zodiac constellations:** Custom SVG star maps for each sign
-  - Stars: White/blue dots (1-2px, #e0f2fe for minor stars, #bae6fd for major stars)
-  - Connecting lines: Thin blue-white lines (0.5px, #94a3b8)
-  - Patterns positioned at 320px radius (inner half of ring), scaled 3.2x
-  - Offset by 15° to sit neatly between month division lines (not overlapping)
-  - Counter-rotated to stay upright as disk rotates
-- **Event markers:** Colored dots (6px radius) positioned at 410px radius (outer edge)
-- **Event labels:** Name above dot, date (M/D) below dot, counter-rotated to stay upright
+- **Zodiac constellations:** Custom SVG star maps for each sign with color theming
+  - **Size & Opacity:** Scaled 6.5x (large), 18% opacity (very subtle, ethereal)
+  - **Colors by sign:** Each constellation rendered in its traditional color (Aries: red, Taurus: green, Gemini: yellow, Cancer: lavender, Leo: orange, Virgo: purple, Libra: pink, Scorpio: deep red, Sagittarius: purple, Capricorn: grey, Aquarius: cyan, Pisces: turquoise)
+  - **Styling:** Uses `currentColor` for SVG elements to inherit group color
+  - **Position:** 320px radius (inner half of ring)
+  - **Offset:** 15° to sit neatly between month division lines (not overlapping)
+  - **Rotation:** Counter-rotated to stay upright as disk rotates
+- **Event markers:** Colored dots (6px radius) positioned at 410px radius (outer edge of ring)
+- **Event labels:** Radial sunburst layout
+  - Event name only (no date labels)
+  - Positioned radially between dot and outer edge of ring
+  - Points outward from center like sun rays
+  - Text flips for left-half events to remain readable
+  - Creates clean, organized visual pattern
 
 **Zodiac Sign Data:**
-All 12 signs with accurate date ranges:
-- Aries: Mar 21 - Apr 19 (0°)
-- Taurus: Apr 20 - May 20 (30°)
-- Gemini: May 21 - Jun 20 (60°)
-- Cancer: Jun 21 - Jul 22 (90°)
-- Leo: Jul 23 - Aug 22 (120°)
-- Virgo: Aug 23 - Sep 22 (150°)
-- Libra: Sep 23 - Oct 22 (180°)
-- Scorpio: Oct 23 - Nov 21 (210°)
-- Sagittarius: Nov 22 - Dec 21 (240°)
-- Capricorn: Dec 22 - Jan 19 (270°)
-- Aquarius: Jan 20 - Feb 18 (300°)
-- Pisces: Feb 19 - Mar 20 (330°)
+All 12 signs with accurate date ranges and colors:
+- Aries: Mar 21 - Apr 19 (0°, #ef4444 red)
+- Taurus: Apr 20 - May 20 (30°, #4ade80 green)
+- Gemini: May 21 - Jun 20 (60°, #fbbf24 yellow)
+- Cancer: Jun 21 - Jul 22 (90°, #e0e7ff lavender)
+- Leo: Jul 23 - Aug 22 (120°, #fb923c orange)
+- Virgo: Aug 23 - Sep 22 (150°, #a78bfa purple)
+- Libra: Sep 23 - Oct 22 (180°, #f472b6 pink)
+- Scorpio: Oct 23 - Nov 21 (210°, #dc2626 deep red)
+- Sagittarius: Nov 22 - Dec 21 (240°, #a855f7 purple)
+- Capricorn: Dec 22 - Jan 19 (270°, #94a3b8 grey)
+- Aquarius: Jan 20 - Feb 18 (300°, #22d3ee cyan)
+- Pisces: Feb 19 - Mar 20 (330°, #2dd4bf turquoise)
 
 **Constellation Patterns (SVG Implementations):**
 
@@ -346,9 +366,10 @@ Each constellation is a custom SVG group with stars (circles) and connecting lin
 - **Pisces:** Two fish connected - 7 stars showing two fish joined by line
 
 All constellations use consistent styling:
-- Major stars (brightest): 2px radius, #bae6fd fill
-- Minor stars: 1-1.5px radius, #e0f2fe fill
-- Connecting lines: 0.5px stroke-width, #94a3b8 stroke
+- All stars and lines use `currentColor` (inherits from parent group's color)
+- Star sizes: 1-2px radius
+- Connecting lines: 0.5px stroke-width
+- Applied opacity: 18% at group level for ethereal effect
 
 **Current Sign Calculation:**
 ```javascript

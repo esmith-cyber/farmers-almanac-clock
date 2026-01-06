@@ -56,11 +56,15 @@ function MoonPhaseClock({ location, currentDate }) {
       { angle: 225, color: '#475569' },    // Waning gibbous
       { angle: 270, color: '#334155' },    // Last quarter position
       { angle: 315, color: '#1e293b' },    // Waning crescent
+      // Fill the gap between 315° and 360° with intermediate stops
+      { angle: 326.25, color: '#1a2534' },
+      { angle: 337.5, color: '#17212f' },
+      { angle: 348.75, color: '#131c2a' },
       { angle: 360, color: '#0f172a' },    // Back to new moon
     ]
 
     const stopStrings = stops.map(stop => `${stop.color} ${stop.angle}deg`)
-    return `conic-gradient(from 0deg, ${stopStrings.join(', ')})`
+    return `conic-gradient(${stopStrings.join(', ')})`
   }
 
   const moonGradient = createMoonGradient()
