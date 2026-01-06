@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 
 function SunTimes({ location, currentDate }) {
   const [sunTimes, setSunTimes] = useState(null)
+  const [moonData, setMoonData] = useState(null)
 
   useEffect(() => {
     if (location) {
@@ -12,12 +13,18 @@ function SunTimes({ location, currentDate }) {
         location.latitude,
         location.longitude
       )
-
       setSunTimes(times)
+
+      const illumination = SunCalc.getMoonIllumination(currentDate)
+      const moonTimes = SunCalc.getMoonTimes(currentDate, location.latitude, location.longitude)
+      setMoonData({
+        ...illumination,
+        ...moonTimes
+      })
     }
   }, [location, currentDate])
 
-  if (!sunTimes) return null
+  if (!sunTimes || !moonData) return null
 
   const formatTime = (date) => {
     return format(date, 'h:mm a')
@@ -39,6 +46,57 @@ function SunTimes({ location, currentDate }) {
   }
 
   const period = getCurrentPeriod()
+
+  // Get moon phase name
+  const getMoonPhaseName = () => {
+    const phase = moonData.phase
+    if (phase < 0.03 || phase > 0.97) return 'New Moon'
+    if (phase < 0.22) return 'Waxing Crescent'
+    if (phase < 0.28) return 'First Quarter'
+    if (phase < 0.47) return 'Waxing Gibbous'
+    if (phase < 0.53) return 'Full Moon'
+    if (phase < 0.72) return 'Waning Gibbous'
+    if (phase < 0.78) return 'Last Quarter'
+    return 'Waning Crescent'
+  }
+
+  // Get traditional moon name based on month
+  const getMoonName = () => {
+    const month = currentDate.getMonth()
+    const moonNames = [
+      'Wolf Moon',        // January
+      'Snow Moon',        // February
+      'Worm Moon',        // March
+      'Pink Moon',        // April
+      'Flower Moon',      // May
+      'Strawberry Moon',  // June
+      'Buck Moon',        // July
+      'Sturgeon Moon',    // August
+      'Harvest Moon',     // September
+      'Hunter\'s Moon',   // October
+      'Beaver Moon',      // November
+      'Cold Moon'         // December
+    ]
+    return moonNames[month]
+  }
+
+  // Get moon emoji based on phase
+  const getMoonEmoji = () => {
+    const phase = moonData.phase
+    if (phase < 0.03 || phase > 0.97) return '🌑'
+    if (phase < 0.22) return '🌒'
+    if (phase < 0.28) return '🌓'
+    if (phase < 0.47) return '🌔'
+    if (phase < 0.53) return '🌕'
+    if (phase < 0.72) return '🌖'
+    if (phase < 0.78) return '🌗'
+    return '🌘'
+  }
+
+  const moonPhaseName = getMoonPhaseName()
+  const moonName = getMoonName()
+  const moonEmoji = getMoonEmoji()
+  const illuminationPercent = Math.round(moonData.fraction * 100)
 
   return (
     <div className="bg-slate-800 rounded-2xl p-8 shadow-2xl">
@@ -103,6 +161,35 @@ function SunTimes({ location, currentDate }) {
               return `${hours}h ${minutes}m`
             })()}
           </div>
+        </div>
+      </div>
+
+      {/* Moon Information Section */}
+      <div className="mt-8 pt-6 border-t border-slate-700">
+        <div className="text-center mb-6">
+          <div className="text-5xl mb-3">{moonEmoji}</div>
+          <h3 className="text-2xl font-bold text-white mb-1">{moonName}</h3>
+          <p className="text-slate-400 text-sm">{moonPhaseName} • {illuminationPercent}% illuminated</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-center">
+          {moonData.rise && (
+            <div>
+              <div className="text-slate-400 text-xs mb-1">Moonrise</div>
+              <div className="text-slate-300 text-sm font-semibold">
+                {formatTime(moonData.rise)}
+              </div>
+            </div>
+          )}
+
+          {moonData.set && (
+            <div>
+              <div className="text-slate-400 text-xs mb-1">Moonset</div>
+              <div className="text-slate-300 text-sm font-semibold">
+                {formatTime(moonData.set)}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

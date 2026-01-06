@@ -73,14 +73,14 @@ body {
 ### Component Structure
 ```
 src/
-├── App.jsx (Main app with 3-layer clock display)
+├── App.jsx (Main app with 3-layer clock display, responsive sizing)
 ├── components/
-│   ├── AlmanacClock.jsx (Day/Night - 350px, z-20, innermost)
-│   ├── MoonPhaseClock.jsx (Lunar phases - 500px, z-10)
-│   ├── AnnualEventsClock.jsx (Annual events + Zodiac - 900px, z-0, outermost)
+│   ├── AlmanacClock.jsx (Day/Night - 38.89% of container, z-20, innermost)
+│   ├── MoonPhaseClock.jsx (Lunar phases - 55.56% of container, z-10)
+│   ├── AnnualEventsClock.jsx (Annual events + Zodiac - 100% of container, z-0, outermost)
 │   ├── EventManager.jsx (Event CRUD interface)
 │   ├── LocationInput.jsx (Location picker with validation)
-│   └── SunTimes.jsx (Detailed sun event times display)
+│   └── SunTimes.jsx (Detailed sun/moon event times display)
 ```
 
 ### App.jsx Structure
@@ -96,11 +96,17 @@ import SunTimes from './components/SunTimes'
 // useEffect: Auto-detect geolocation on mount
 // useEffect: Update currentDate every minute
 
+// Responsive sizing system:
+// Container: min(85vw, calc(100vh - 300px), 1000px)
+// - Scales with viewport while maintaining aspect ratio
+// - Min size: 400px to stay readable
+// - Accounts for header and UI elements
+
 // Layered clock structure (z-index order):
-// - AnnualEventsClock with Zodiac (z-0, outermost, 900px)
-// - MoonPhaseClock (z-10, middle, 500px)
-// - AlmanacClock (z-20, innermost, 350px)
-// Container: minHeight: 900px
+// - NOW indicator (z-30, positioned outside/above annual disc)
+// - AlmanacClock (z-20, innermost, 38.89% of container)
+// - MoonPhaseClock (z-10, middle, 55.56% of container)
+// - AnnualEventsClock with Zodiac (z-0, outermost, 100% of container)
 ```
 
 ### Key Dependencies & APIs
@@ -150,9 +156,11 @@ import SunTimes from './components/SunTimes'
 Unlike traditional clocks where hands move across a fixed face, the Farmer's Almanac Clock features rotating disks where the face itself turns. This creates an intuitive sense of time flowing toward and through you.
 
 ### The NOW Position
-- **NOW is always at 12:00** - A fixed arrow indicator at the top of each disk marks the current moment
-- The disk rotates beneath this fixed pointer
+- **NOW is always at 12:00** - A fixed blue arrow indicator positioned outside and above the annual disk marks the current moment
+- Positioned at the container level (z-30) rather than within individual clocks
+- The disks rotate beneath this fixed pointer
 - You watch events approach from one side, pass through NOW, and recede on the other side
+- Arrow scales responsively with the container (1.33vmin × 2.22vmin)
 
 ### Time Flow Direction
 
@@ -178,13 +186,20 @@ Unlike traditional clocks where hands move across a fixed face, the Farmer's Alm
 - Each disk rotates independently at its own rate
 - All disks share the same NOW position at 12:00
 
-**Sizing Specifications:**
-- Day/Night: 350px diameter (center disk, z-20)
-- Lunar: 500px diameter (75px ring width, z-10)
-- Annual Events + Zodiac: 900px diameter (200px ring width, z-0)
-- Total display size: 900px
+**Sizing Specifications (Responsive):**
+- Container size: `min(85vw, calc(100vh - 300px), 1000px)`
+  - Scales with viewport, accounting for header and UI
+  - Maximum: 1000px (prevents oversizing on large screens)
+  - Minimum: 400px (ensures readability on small screens)
+- Proportional disk sizing:
+  - Annual Events + Zodiac: 100% of container (outermost, z-0)
+  - Lunar: 55.56% of container (equivalent to 500px when container is 900px, z-10)
+  - Day/Night: 38.89% of container (equivalent to 350px when container is 900px, z-20)
+- Original design proportions maintained: 900:500:350 ratio
+- Text and UI elements scale using `vmin` units with max sizes for readability
+- Z-index values ensure proper layering with innermost disk on top
 
-The annual ring is extra wide (200px) to accommodate both zodiac constellations and custom event markers with plenty of breathing room. Z-index values ensure proper layering with innermost disk on top.
+The annual ring's 200px width accommodates both zodiac constellations and custom event markers with plenty of breathing room. All proportions scale together as the viewport changes size.
 
 ### Update Frequency
 - All clocks update every minute
@@ -491,7 +506,9 @@ Users can add, edit, and delete events via the EventManager component:
 - No location dependency (events and zodiac based on date only)
 
 ## UI/UX Design Notes
-- **Single NOW marker**: Only the outermost ring (Annual Events) displays the NOW indicator arrow at 12:00
+- **Single NOW marker**: Blue arrow indicator positioned outside and above the annual disc at 12:00 position
+  - Positioned at container level (z-30) rather than within individual clock components
+  - Scales responsively with viewport using vmin units
 - **No descriptive labels**: Clock labels removed for cleaner aesthetic (previously showed "Lunar Cycle (~29.5 days)", "Zodiac Cycle", etc.)
 - **Minimal text**: Only essential information shown in center displays
 - **UI controls repositioned**: Location display and event manager moved from center to corners (2026-01-06)
@@ -499,6 +516,53 @@ Users can add, edit, and delete events via the EventManager component:
   - Event manager: Fixed position top-right with semi-transparent background
   - Both use backdrop-blur effect and subtle styling to stay out of the way
   - Keeps clock display front and center without clutter
+- **Responsive design**: Clock scales with viewport size (2026-01-06)
+  - Container adapts to available space while maintaining proportions
+  - Text scales with vmin units for readability at all sizes
+  - Minimum size enforced to prevent illegibility on small screens
+
+## SunTimes Component (Detailed Time Display)
+Located below the main clock display, shows comprehensive sun and moon information.
+
+**Sun Information Section:**
+- Current period display with emoji (Dawn 🌅, Morning ☀️, Afternoon ☀️, Dusk 🌇, Night 🌙)
+- Current date display (e.g., "Monday, January 6, 2026")
+- Primary times: Dawn, Sunrise, Sunset, Dusk
+  - Sunrise and sunset emphasized with larger, colored text (amber/orange)
+- Secondary times: Solar Noon, Golden Hour, Day Length
+  - Day length calculated as hours and minutes between sunrise and sunset
+
+**Moon Information Section:**
+- Moon phase emoji display (🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘)
+- Traditional monthly moon name:
+  - January: Wolf Moon
+  - February: Snow Moon
+  - March: Worm Moon
+  - April: Pink Moon
+  - May: Flower Moon
+  - June: Strawberry Moon
+  - July: Buck Moon
+  - August: Sturgeon Moon
+  - September: Harvest Moon
+  - October: Hunter's Moon
+  - November: Beaver Moon
+  - December: Cold Moon
+- Current phase name (New Moon, Waxing Crescent, First Quarter, Waxing Gibbous, Full Moon, Waning Gibbous, Last Quarter, Waning Crescent)
+- Illumination percentage (0-100%)
+- Moonrise and moonset times (when available)
+
+**Data Sources:**
+- Uses SunCalc library for all calculations
+- `SunCalc.getTimes()` for sun events
+- `SunCalc.getMoonIllumination()` for phase and illumination
+- `SunCalc.getMoonTimes()` for moonrise/moonset
+- date-fns for time formatting
+
+**Visual Design:**
+- Dark card with rounded corners (bg-slate-800)
+- Grid layout for organized information display
+- Hierarchical typography for emphasis
+- Consistent slate color scheme matching main UI
 
 ## Development Notes
 - Project created: 2026-01-06
@@ -516,3 +580,21 @@ Users can add, edit, and delete events via the EventManager component:
   - Fix: Changed rotation from `-(dayOfYear / totalDays) * 360` to `(dayOfYear / totalDays) * 360`
   - Also updated counter-rotation for event labels and zodiac constellations to account for clockwise disk rotation
   - Now properly displays: past events (like Jan 1) recede to the right, future events approach from the left
+- Responsive sizing implementation (2026-01-06)
+  - Converted from fixed pixel sizes to viewport-relative sizing
+  - Container: `min(85vw, calc(100vh - 300px), 1000px)` with 400px minimum
+  - All clock components scale proportionally: 100%, 55.56%, 38.89%
+  - Text and UI elements scale using vmin units with max sizes
+  - Maintains original 900:500:350 proportions at all viewport sizes
+  - Clock now fully visible without scrolling on all screen sizes
+- NOW indicator repositioning (2026-01-06)
+  - Moved from inside AnnualEventsClock component to App.jsx container level
+  - Now positioned outside and above the annual disc (top: -2.5%)
+  - Z-index 30 to sit above all clock layers
+  - Scales responsively with container using vmin units
+- Moon information added to SunTimes component (2026-01-06)
+  - Traditional monthly moon names (Wolf Moon, Snow Moon, etc.)
+  - Current phase name and illumination percentage
+  - Phase-appropriate emoji display
+  - Moonrise and moonset times
+  - Comprehensive moon data section added below sun times

@@ -90,7 +90,7 @@ function App() {
       )}
 
       <div className="max-w-6xl w-full">
-        <header className="text-center mb-12">
+        <header className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-4">
             Farmer's Almanac Clock
           </h1>
@@ -103,10 +103,28 @@ function App() {
         {location ? (
           <div className="space-y-8">
 
-            {/* Layered Clock Display */}
-            <div className="relative flex items-center justify-center" style={{ minHeight: '900px' }}>
+            {/* Layered Clock Display - Responsive sizing */}
+            <div className="relative flex items-center justify-center" style={{
+              width: 'min(85vw, calc(100vh - 300px), 1000px)',
+              height: 'min(85vw, calc(100vh - 300px), 1000px)',
+              minWidth: '400px',
+              minHeight: '400px',
+              margin: '0 auto'
+            }}>
+              {/* NOW indicator - positioned outside and above the annual disc */}
+              <div className="absolute left-1/2 z-30" style={{
+                top: '-2.5%',
+                transform: 'translateX(-50%)'
+              }}>
+                <div className="w-0 h-0" style={{
+                  borderLeft: '1.33vmin solid transparent',
+                  borderRight: '1.33vmin solid transparent',
+                  borderTop: '2.22vmin solid rgb(96, 165, 250)'
+                }}></div>
+              </div>
+
               {/* Annual Events Clock with Zodiac - Outermost */}
-              <div className="absolute z-0">
+              <div className="absolute z-0 w-full h-full">
                 <AnnualEventsClock
                   currentDate={currentDate}
                   onEventsChange={setEvents}
@@ -114,7 +132,10 @@ function App() {
               </div>
 
               {/* Moon Phase Clock - Middle Layer */}
-              <div className="absolute z-10">
+              <div className="absolute z-10" style={{
+                width: '55.56%',
+                height: '55.56%'
+              }}>
                 <MoonPhaseClock
                   location={location}
                   currentDate={currentDate}
@@ -122,7 +143,10 @@ function App() {
               </div>
 
               {/* Day/Night Clock - Innermost */}
-              <div className="relative z-20">
+              <div className="relative z-20" style={{
+                width: '38.89%',
+                height: '38.89%'
+              }}>
                 <AlmanacClock
                   location={location}
                   currentDate={currentDate}

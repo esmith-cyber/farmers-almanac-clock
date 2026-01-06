@@ -103,8 +103,8 @@ function AlmanacClock({ location, currentDate }) {
   }
 
   return (
-    <div className="flex justify-center items-center py-12">
-      <div className="relative w-[350px] h-[350px]">
+    <div className="flex justify-center items-center w-full h-full">
+      <div className="relative w-full h-full">
         {/* Rotating Clock Face */}
         <div
           className="absolute inset-0 transition-transform duration-1000 ease-linear"

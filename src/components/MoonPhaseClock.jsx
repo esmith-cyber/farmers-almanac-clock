@@ -90,8 +90,8 @@ function MoonPhaseClock({ location, currentDate }) {
   console.log('Current moon phase:', moonData.phase, 'illumination:', illuminationPercent + '%', 'name:', currentPhaseName)
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="relative w-[500px] h-[500px]">
+    <div className="flex justify-center items-center w-full h-full">
+      <div className="relative w-full h-full">
         {/* Rotating Moon Phase Disk */}
         <div
           className="absolute inset-0 transition-transform duration-1000 ease-linear"
@@ -235,9 +235,12 @@ function MoonPhaseClock({ location, currentDate }) {
                 className="text-center"
                 style={{ transform: `rotate(${-rotation}deg)` }}
               >
-                <div className="text-slate-300 text-sm font-semibold bg-slate-800/80 px-4 py-3 rounded-lg backdrop-blur">
-                  <div className="text-base">{currentPhaseName}</div>
-                  <div className="text-xs text-slate-400 mt-1">{illuminationPercent}% illuminated</div>
+                <div className="text-slate-300 font-semibold bg-slate-800/80 rounded-lg backdrop-blur" style={{
+                  fontSize: 'min(2.8vmin, 14px)',
+                  padding: 'min(2.4vmin, 12px) min(3.2vmin, 16px)'
+                }}>
+                  <div style={{ fontSize: 'min(3.2vmin, 16px)' }}>{currentPhaseName}</div>
+                  <div className="text-slate-400" style={{ fontSize: 'min(2.4vmin, 12px)', marginTop: 'min(0.8vmin, 4px)' }}>{illuminationPercent}% illuminated</div>
                 </div>
               </div>
             </div>

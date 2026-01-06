@@ -145,13 +145,8 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
   const stars = generateStars()
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="relative w-[900px] h-[900px]">
-        {/* Fixed NOW indicator at top */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 z-20">
-          <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-blue-400"></div>
-        </div>
-
+    <div className="flex justify-center items-center w-full h-full">
+      <div className="relative w-full h-full">
         {/* Rotating Annual Events Disk */}
         <div
           className="absolute inset-0 transition-transform duration-1000 ease-linear"
@@ -270,13 +265,16 @@ function AnnualEventsClock({ currentDate, onEventsChange }) {
                 className="text-center"
                 style={{ transform: `rotate(${-rotation}deg)` }}
               >
-                <div className="text-slate-300 text-sm font-semibold bg-slate-900/80 px-4 py-3 rounded-lg backdrop-blur border border-slate-700/50">
-                  <div className="text-base">Annual Cycle</div>
-                  <div className="text-xs text-slate-400 mt-1">
+                <div className="text-slate-300 font-semibold bg-slate-900/80 rounded-lg backdrop-blur border border-slate-700/50" style={{
+                  fontSize: 'min(1.56vmin, 14px)',
+                  padding: 'min(1.33vmin, 12px) min(1.78vmin, 16px)'
+                }}>
+                  <div style={{ fontSize: 'min(1.78vmin, 16px)' }}>Annual Cycle</div>
+                  <div className="text-slate-400" style={{ fontSize: 'min(1.33vmin, 12px)', marginTop: 'min(0.44vmin, 4px)' }}>
                     Day {calculateDayOfYear(currentDate)} of {365 + (isLeapYear(currentDate.getFullYear()) ? 1 : 0)}
                   </div>
                   {currentSign && (
-                    <div className="text-xs text-slate-500 mt-1">
+                    <div className="text-slate-500" style={{ fontSize: 'min(1.33vmin, 12px)', marginTop: 'min(0.44vmin, 4px)' }}>
                       {currentSign.name}
                     </div>
                   )}
