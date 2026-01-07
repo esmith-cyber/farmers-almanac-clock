@@ -5,6 +5,7 @@ import AlmanacClock from './components/AlmanacClock'
 import MoonPhaseClock from './components/MoonPhaseClock'
 import AnnualEventsClock from './components/AnnualEventsClock'
 import EventManager from './components/EventManager'
+import CosmicBackground from './components/CosmicBackground'
 import { getEclipsesForYear } from './utils/eclipseCalculator'
 import './App.css'
 
@@ -132,28 +133,34 @@ function App() {
     <div className="min-h-screen w-full flex flex-col items-center justify-center relative" style={{
       padding: 'min(2vw, 16px)'
     }}>
+      {/* Cosmic Background Effects */}
+      <CosmicBackground />
+
       {/* Location Display - Top Left */}
       <div className="fixed z-50" style={{
         top: 'min(1.5vw, 24px)',
         left: 'min(1.5vw, 24px)'
       }}>
         {location && !isEditingLocation ? (
-          <div className="bg-slate-800/90 backdrop-blur rounded-lg flex items-center gap-3" style={{
-            padding: 'min(1vw, 12px) min(1.5vw, 18px)',
-            fontSize: 'min(1.5vw, 16px)'
+          <div className="ios-glass flex items-center gap-3" style={{
+            padding: '12px 16px',
+            fontSize: '15px',
+            borderRadius: '16px',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
-            <div className="text-slate-300">
-              <span style={{ fontSize: 'min(1.2vw, 14px)' }}>Location: </span>
-              <span className="font-semibold text-white">
-                {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
-              </span>
+            <div className="text-white font-semibold">
+              {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
             </div>
             <button
               onClick={() => setIsEditingLocation(true)}
-              className="bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors"
+              className="text-white hover:opacity-80 transition-opacity"
               style={{
-                fontSize: 'min(1.2vw, 14px)',
-                padding: 'min(0.5vw, 6px) min(1vw, 14px)'
+                fontSize: '13px',
+                padding: '6px 12px',
+                background: 'rgba(10, 132, 255, 0.8)',
+                borderRadius: '12px',
+                fontWeight: '600',
+                border: 'none'
               }}
             >
               Change
@@ -181,29 +188,18 @@ function App() {
         </div>
       )}
 
-      <div className="w-full">
-        <header className="text-center" style={{
-          marginTop: 'max(6vh, 50px)',
-          marginBottom: 'min(1.5vh, 12px)'
-        }}>
-          <h1 className="font-bold text-white" style={{
-            fontSize: 'min(3.5vw, 42px)'
-          }}>
-            Farmer's Almanac Clock
-          </h1>
-        </header>
-
+      <div className="w-full" style={{ position: 'relative', zIndex: 10 }}>
         {/* Main Clock Display */}
         {location ? (
           <div className="relative flex items-center justify-center" style={{
             width: '100%',
-            height: 'calc(100vh - 100px)',
+            height: '100vh',
             minHeight: '600px'
           }}>
             {/* Layered Clock Display - Responsive sizing */}
             <div className="relative flex items-center justify-center" style={{
-              width: 'min(85vw, 70vh, 1000px)',
-              height: 'min(85vw, 70vh, 1000px)',
+              width: 'min(85vw, 85vh, 1000px)',
+              height: 'min(85vw, 85vh, 1000px)',
               minWidth: '300px',
               minHeight: '300px'
             }}>

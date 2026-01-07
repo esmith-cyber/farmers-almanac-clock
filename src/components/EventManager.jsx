@@ -95,15 +95,21 @@ function EventManager({ events, onEventsChange }) {
 
   return (
     <div>
-      <div className="bg-slate-800/90 backdrop-blur rounded-lg flex items-center gap-3" style={{
-        padding: 'min(1vw, 12px) min(1.5vw, 18px)'
+      <div className="ios-glass" style={{
+        padding: '12px 16px',
+        borderRadius: '16px',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
       }}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          className="text-white hover:opacity-80 transition-opacity"
           style={{
-            fontSize: 'min(1.2vw, 14px)',
-            padding: 'min(0.5vw, 6px) min(1vw, 14px)'
+            fontSize: '13px',
+            padding: '6px 12px',
+            background: 'rgba(10, 132, 255, 0.8)',
+            borderRadius: '12px',
+            fontWeight: '600',
+            border: 'none'
           }}
         >
           Events ({events.length})
@@ -112,8 +118,15 @@ function EventManager({ events, onEventsChange }) {
 
       {/* Event Manager Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => !showForm && setIsOpen(false)}>
-          <div className="bg-slate-800 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{
+          background: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(10px)'
+        }} onClick={() => !showForm && setIsOpen(false)}>
+          <div className="ios-glass-thick max-w-2xl w-full max-h-[80vh] overflow-y-auto" style={{
+            borderRadius: '24px',
+            padding: '24px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+          }} onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-white">
                 {editingEvent ? 'Edit Event' : showForm ? 'Add New Event' : 'Manage Events'}
@@ -140,7 +153,14 @@ function EventManager({ events, onEventsChange }) {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g., Birthday, Anniversary"
-                  className="w-full bg-slate-700 text-white rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-white focus:outline-none"
+                  style={{
+                    padding: '12px 16px',
+                    background: 'rgba(58, 58, 60, 0.6)',
+                    borderRadius: '12px',
+                    border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                    fontSize: '15px'
+                  }}
                 />
               </div>
 
@@ -152,7 +172,14 @@ function EventManager({ events, onEventsChange }) {
                   <select
                     value={formData.month}
                     onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                    className="w-full bg-slate-700 text-white rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full text-white focus:outline-none"
+                    style={{
+                      padding: '12px 16px',
+                      background: 'rgba(58, 58, 60, 0.6)',
+                      borderRadius: '12px',
+                      border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                      fontSize: '15px'
+                    }}
                   >
                     {Array.from({ length: 12 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>
@@ -172,7 +199,14 @@ function EventManager({ events, onEventsChange }) {
                     max="31"
                     value={formData.day}
                     onChange={(e) => setFormData({ ...formData, day: e.target.value })}
-                    className="w-full bg-slate-700 text-white rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full text-white focus:outline-none"
+                    style={{
+                      padding: '12px 16px',
+                      background: 'rgba(58, 58, 60, 0.6)',
+                      borderRadius: '12px',
+                      border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                      fontSize: '15px'
+                    }}
                   />
                 </div>
               </div>
@@ -205,13 +239,29 @@ function EventManager({ events, onEventsChange }) {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={handleSave}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
+                    className="flex-1 text-white font-semibold hover:opacity-80 transition-opacity"
+                    style={{
+                      padding: '14px',
+                      background: 'rgba(10, 132, 255, 0.8)',
+                      borderRadius: '14px',
+                      border: 'none',
+                      fontSize: '15px',
+                      fontWeight: '600'
+                    }}
                   >
                     {editingEvent ? 'Save Changes' : 'Add Event'}
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md transition-colors font-medium"
+                    className="flex-1 text-white font-semibold hover:opacity-80 transition-opacity"
+                    style={{
+                      padding: '14px',
+                      background: 'rgba(142, 142, 147, 0.6)',
+                      borderRadius: '14px',
+                      border: 'none',
+                      fontSize: '15px',
+                      fontWeight: '600'
+                    }}
                   >
                     Cancel
                   </button>
@@ -224,7 +274,15 @@ function EventManager({ events, onEventsChange }) {
               <div className="mb-4">
                 <button
                   onClick={handleAdd}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
+                  className="w-full text-white font-semibold hover:opacity-80 transition-opacity"
+                  style={{
+                    padding: '14px',
+                    background: 'rgba(10, 132, 255, 0.8)',
+                    borderRadius: '14px',
+                    border: 'none',
+                    fontSize: '15px',
+                    fontWeight: '600'
+                  }}
                 >
                   + Add New Event
                 </button>
@@ -233,8 +291,11 @@ function EventManager({ events, onEventsChange }) {
 
             {/* Events List */}
             {!showForm && events.length > 0 && (
-              <div className="border-t border-slate-700 pt-4">
-                <h3 className="text-lg font-semibold text-white mb-3">Your Events</h3>
+              <div style={{
+                borderTop: '0.5px solid rgba(255, 255, 255, 0.1)',
+                paddingTop: '16px'
+              }}>
+                <h3 className="text-lg font-semibold text-white mb-3" style={{ fontWeight: '600' }}>Your Events</h3>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {events
                     .sort((a, b) => {
@@ -245,7 +306,13 @@ function EventManager({ events, onEventsChange }) {
                     .map((event) => (
                       <div
                         key={event.id}
-                        className="flex items-center justify-between bg-slate-700 rounded-md px-4 py-3"
+                        className="flex items-center justify-between"
+                        style={{
+                          background: 'rgba(58, 58, 60, 0.5)',
+                          borderRadius: '12px',
+                          padding: '12px 16px',
+                          border: '0.5px solid rgba(255, 255, 255, 0.1)'
+                        }}
                       >
                         <div className="flex items-center gap-3">
                           <div
@@ -265,13 +332,29 @@ function EventManager({ events, onEventsChange }) {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEdit(event)}
-                            className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                            className="hover:opacity-70 transition-opacity"
+                            style={{
+                              color: 'rgba(10, 132, 255, 1)',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                              background: 'none',
+                              border: 'none',
+                              padding: '4px 8px'
+                            }}
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(event.id)}
-                            className="text-red-400 hover:text-red-300 text-sm font-medium"
+                            className="hover:opacity-70 transition-opacity"
+                            style={{
+                              color: 'rgba(255, 69, 58, 1)',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                              background: 'none',
+                              border: 'none',
+                              padding: '4px 8px'
+                            }}
                           >
                             Delete
                           </button>

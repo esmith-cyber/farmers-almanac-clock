@@ -2,17 +2,158 @@
 @tailwind components;
 @tailwind utilities;
 
+/* iOS-style system font stack */
 body {
   margin: 0;
   min-height: 100vh;
   display: flex;
   place-items: center;
-  background: linear-gradient(to bottom, #0f172a, #1e293b);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow: hidden;
+  /* Animated aurora gradient background */
+  background: linear-gradient(125deg, #000000 0%, #0a0e27 25%, #1a1a2e 50%, #16213e 75%, #1e1b4b 100%);
+  background-size: 400% 400%;
+  animation: aurora 60s ease infinite;
+}
+
+/* Subtle grain texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+@keyframes aurora {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+  position: relative;
+  z-index: 2;
+}
+
+/* Cosmic background layers - More visible stars */
+#root::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  /* Twinkling starfield */
+  background-image:
+    radial-gradient(3px 3px at 20% 30%, white, transparent),
+    radial-gradient(2px 2px at 60% 70%, white, transparent),
+    radial-gradient(2px 2px at 50% 50%, white, transparent),
+    radial-gradient(2px 2px at 80% 10%, white, transparent),
+    radial-gradient(3px 3px at 90% 60%, white, transparent),
+    radial-gradient(2px 2px at 33% 80%, white, transparent),
+    radial-gradient(2px 2px at 15% 60%, white, transparent),
+    radial-gradient(3px 3px at 70% 40%, white, transparent),
+    radial-gradient(2px 2px at 40% 25%, white, transparent),
+    radial-gradient(2px 2px at 85% 85%, white, transparent),
+    radial-gradient(3px 3px at 25% 15%, white, transparent),
+    radial-gradient(2px 2px at 75% 55%, white, transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  animation: twinkle 8s ease-in-out infinite;
+  opacity: 1;
+}
+
+/* Additional star layers */
+#root::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  /* More stars at different positions */
+  background-image:
+    radial-gradient(2px 2px at 45% 20%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(2px 2px at 25% 45%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(3px 3px at 85% 75%, rgba(255, 255, 255, 1), transparent),
+    radial-gradient(2px 2px at 10% 25%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(2px 2px at 95% 45%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(3px 3px at 35% 90%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(2px 2px at 65% 15%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(2px 2px at 55% 65%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 12% 50%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(3px 3px at 88% 30%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(2px 2px at 48% 88%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 72% 12%, rgba(255, 255, 255, 0.7), transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  animation: twinkle 12s ease-in-out infinite reverse;
+  opacity: 1;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* iOS-style glassmorphism utility classes */
+.ios-glass {
+  background: rgba(28, 28, 30, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  animation: breathe 8s ease-in-out infinite;
+}
+
+.ios-glass-thick {
+  background: rgba(28, 28, 30, 0.85);
+  backdrop-filter: saturate(180%) blur(40px);
+  -webkit-backdrop-filter: saturate(180%) blur(40px);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  animation: breathe 8s ease-in-out infinite;
+}
+
+/* Subtle breathing animation for glass panels */
+@keyframes breathe {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* Glowing clock ring utility */
+.clock-glow {
+  box-shadow:
+    0 0 20px rgba(100, 116, 139, 0.15),
+    inset 0 0 20px rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 /* Event label hover effect */
@@ -23,4 +164,9 @@ body {
 
 .event-label {
   transition: opacity 0.2s ease-in-out;
+}
+
+/* iOS-style smooth transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
 }

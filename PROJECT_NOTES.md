@@ -795,3 +795,83 @@ Split into two side panels positioned in the negative space flanking the clock d
     - No overlapping at any viewport size
     - Clock fully visible from top to bottom
     - Panels gracefully hide on smaller screens
+- iOS native aesthetic implementation (2026-01-06)
+  - **Goal**: Transform app to feel like a native iOS app while preserving astronomy/nature theme
+  - **Typography**: SF Pro font stack (-apple-system, BlinkMacSystemFont, system-ui)
+    - Antialiased rendering for crisp text
+    - Proper weight hierarchy (600 semibold, 500 medium, 400 regular)
+  - **Glassmorphism** (iOS signature look):
+    - Heavy backdrop blur (20-40px saturation 180%)
+    - Semi-transparent backgrounds (rgba 0.72-0.85 opacity)
+    - Subtle borders (0.5px white at 10-15% opacity)
+    - Breathing animation (8s subtle opacity pulse 100%→95%→100%)
+  - **iOS Color System**:
+    - System Blue: rgba(10, 132, 255, 0.8) for primary actions
+    - System Purple: rgba(88, 86, 214, 0.8) for secondary actions
+    - System Red: rgba(255, 69, 58, 1) for destructive actions
+    - System Gray: rgba(142, 142, 147, 0.6) for cancel/neutral
+    - Deep space gradient: black → dark blue → indigo
+  - **Component Styling**:
+    - All panels use .ios-glass or .ios-glass-thick classes
+    - 12-24px border radius on all UI elements
+    - 14px button radius, 600 weight text
+    - Hover: opacity transitions instead of color changes
+    - Shadows: soft layered (0 8px 32px rgba(0,0,0,0.3))
+  - **UI Polish**:
+    - Removed "Location:" label - just shows location name
+    - Removed "Farmer's Almanac Clock" title for cleaner look
+    - Increased clock size from 70vh to 85vh (more space available)
+    - Container now uses full 100vh instead of calc(100vh - 100px)
+    - Glowing clock rings instead of harsh borders
+    - Sun/moon emoji glows (drop-shadow filters)
+  - **Files Modified**:
+    - src/index.css: Font stack, glass utilities, smooth transitions
+    - src/App.jsx: Removed title, updated location display
+    - src/components/SunTimes.jsx: iOS glass panels, glow effects
+    - src/components/LocationInput.jsx: iOS input styling, buttons
+    - src/components/EventManager.jsx: iOS modal, buttons, inputs
+    - src/components/AlmanacClock.jsx: Glowing clock ring
+    - src/components/MoonPhaseClock.jsx: Glowing clock ring, glass center
+    - src/components/AnnualEventsClock.jsx: Glowing clock ring, glass center
+- Cosmic background enhancements (2026-01-06)
+  - **Animated Aurora Background**:
+    - Slowly shifting gradient (60s cycle)
+    - Colors: black → deep blue → indigo → purple
+    - 400% background size with position animation
+    - Subtle, non-distracting movement
+  - **Grain Texture Overlay**:
+    - 3% opacity SVG noise filter
+    - Adds organic film-like quality
+    - Fixed position, full screen coverage
+  - **Twinkling Starfield** (24 stars total):
+    - Two layers with different twinkle speeds (8s and 12s)
+    - Star sizes: 2-3px with varying opacities (0.7-1.0)
+    - Radial gradient points scattered across screen
+    - Opacity animation: 0.5 → 1.0 → 0.5
+    - Z-index: 1 (in front of nebulas)
+  - **Nebula Clouds** (fills negative space):
+    - Purple nebula (top left, 40vw x 40vh)
+    - Blue nebula (top right, 35vw x 35vh)
+    - Teal nebula (bottom left, 45vw x 45vh)
+    - Pink nebula (bottom right, 38vw x 38vh)
+    - Cosmic dust (center, 60vw x 60vh)
+    - Heavy blur (60-100px) for dreamy effect
+    - Slow drift animations (100-150s cycles)
+    - Opacity 0.6-0.9 for visible but not distracting
+    - Z-index: 0 (behind stars)
+  - **Shooting Stars**:
+    - Random appearance every ~30 seconds
+    - 1.5s animation with fade out
+    - Realistic tail trailing behind (100px gradient)
+    - 30-60 degree angles across screen
+    - White glow with double box-shadow
+    - Delightful surprise moments
+  - **Implementation**:
+    - New component: src/components/CosmicBackground.jsx
+    - CSS animations in src/index.css
+    - Z-index layering: grain → aurora → nebulas (0) → stars (1) → clock (10+)
+  - **Result**: Rich cosmic atmosphere that fills negative space around clock
+    - Stars add life and depth
+    - Nebulas create colorful ambient glow
+    - Shooting stars provide occasional delight
+    - Nothing distracts from clock itself

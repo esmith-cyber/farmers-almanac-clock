@@ -133,7 +133,7 @@ function AnnualEventsClock({ currentDate, events }) {
           style={{ transform: `rotate(${rotation}deg)` }}
         >
           {/* Main Annual Circle */}
-          <div className="relative w-full h-full rounded-full border-2 border-slate-700/20 shadow-2xl overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #0a1628, #1e293b)' }}>
+          <div className="relative w-full h-full rounded-full clock-glow overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #0a1628, #1e293b)' }}>
 
             {/* Star field background */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 900 900">
@@ -386,9 +386,10 @@ function AnnualEventsClock({ currentDate, events }) {
                 className="text-center"
                 style={{ transform: `rotate(${-rotation}deg)` }}
               >
-                <div className="text-slate-300 font-semibold bg-slate-900/80 rounded-lg backdrop-blur border border-slate-700/50" style={{
+                <div className="text-slate-300 font-semibold ios-glass" style={{
                   fontSize: 'min(1.56vmin, 14px)',
-                  padding: 'min(1.33vmin, 12px) min(1.78vmin, 16px)'
+                  padding: 'min(1.33vmin, 12px) min(1.78vmin, 16px)',
+                  borderRadius: 'min(1.33vmin, 12px)'
                 }}>
                   <div style={{ fontSize: 'min(1.78vmin, 16px)' }}>Annual Cycle</div>
                   <div className="text-slate-400" style={{ fontSize: 'min(1.33vmin, 12px)', marginTop: 'min(0.44vmin, 4px)' }}>

@@ -135,7 +135,7 @@ function AlmanacClock({ location, currentDate }) {
         >
           {/* Main Clock Circle */}
           <div
-            className="relative w-full h-full rounded-full border-2 border-slate-600/30 shadow-2xl overflow-hidden"
+            className="relative w-full h-full rounded-full clock-glow overflow-hidden"
             style={{ background: conicGradient }}
           >
           </div>

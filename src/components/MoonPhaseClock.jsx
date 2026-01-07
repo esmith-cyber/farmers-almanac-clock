@@ -99,7 +99,7 @@ function MoonPhaseClock({ location, currentDate }) {
         >
           {/* Main Moon Circle - larger than day/night clock */}
           <div
-            className="relative w-full h-full rounded-full border-2 border-slate-500/30 shadow-xl overflow-hidden"
+            className="relative w-full h-full rounded-full clock-glow overflow-hidden"
             style={{ background: moonGradient }}
           >
             {/* Quarter Phase Markers - Elegant Visual Representations */}
@@ -235,9 +235,10 @@ function MoonPhaseClock({ location, currentDate }) {
                 className="text-center"
                 style={{ transform: `rotate(${-rotation}deg)` }}
               >
-                <div className="text-slate-300 font-semibold bg-slate-800/80 rounded-lg backdrop-blur" style={{
+                <div className="text-slate-300 font-semibold ios-glass" style={{
                   fontSize: 'min(2.8vmin, 14px)',
-                  padding: 'min(2.4vmin, 12px) min(3.2vmin, 16px)'
+                  padding: 'min(2.4vmin, 12px) min(3.2vmin, 16px)',
+                  borderRadius: 'min(2.4vmin, 12px)'
                 }}>
                   <div style={{ fontSize: 'min(3.2vmin, 16px)' }}>{currentPhaseName}</div>
                   <div className="text-slate-400" style={{ fontSize: 'min(2.4vmin, 12px)', marginTop: 'min(0.8vmin, 4px)' }}>{illuminationPercent}% illuminated</div>

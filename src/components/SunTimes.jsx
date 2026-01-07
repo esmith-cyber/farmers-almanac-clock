@@ -113,15 +113,20 @@ function SunTimes({ location, currentDate }) {
   return (
     <>
       {/* Sun Info Panel - Left Side */}
-      <div className="absolute left-0 bg-slate-800/90 backdrop-blur shadow-xl hidden md:block" style={{
+      <div className="absolute left-0 ios-glass hidden md:block" style={{
         width: 'min(15vw, 200px)',
         bottom: 'min(8vh, 80px)',
-        padding: 'min(1.5vw, 16px)',
-        borderTopRightRadius: 'min(1.5vw, 16px)',
-        borderBottomRightRadius: 'min(1.5vw, 16px)'
+        padding: 'min(1.5vw, 20px)',
+        borderTopRightRadius: '20px',
+        borderBottomRightRadius: '20px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
       }}>
         <div style={{ marginBottom: 'min(1.2vw, 12px)' }}>
-          <div style={{ fontSize: 'min(3vw, 32px)', marginBottom: 'min(0.5vw, 6px)' }}>{period.emoji}</div>
+          <div style={{
+            fontSize: 'min(3vw, 32px)',
+            marginBottom: 'min(0.5vw, 6px)',
+            filter: 'drop-shadow(0 0 8px rgba(255, 200, 100, 0.5))'
+          }}>{period.emoji}</div>
           <h3 className="font-bold text-white" style={{ fontSize: 'min(1.5vw, 18px)' }}>{period.name}</h3>
           <p className="text-slate-400" style={{ fontSize: 'min(1vw, 12px)' }}>{format(currentDate, 'MMM d, yyyy')}</p>
         </div>
@@ -175,15 +180,20 @@ function SunTimes({ location, currentDate }) {
       </div>
 
       {/* Moon Info Panel - Right Side */}
-      <div className="absolute right-0 bg-slate-800/90 backdrop-blur shadow-xl hidden md:block" style={{
+      <div className="absolute right-0 ios-glass hidden md:block" style={{
         width: 'min(15vw, 200px)',
         bottom: 'min(8vh, 80px)',
-        padding: 'min(1.5vw, 16px)',
-        borderTopLeftRadius: 'min(1.5vw, 16px)',
-        borderBottomLeftRadius: 'min(1.5vw, 16px)'
+        padding: 'min(1.5vw, 20px)',
+        borderTopLeftRadius: '20px',
+        borderBottomLeftRadius: '20px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
       }}>
         <div style={{ marginBottom: 'min(1.2vw, 12px)' }}>
-          <div style={{ fontSize: 'min(3vw, 32px)', marginBottom: 'min(0.5vw, 6px)' }}>{moonEmoji}</div>
+          <div style={{
+            fontSize: 'min(3vw, 32px)',
+            marginBottom: 'min(0.5vw, 6px)',
+            filter: 'drop-shadow(0 0 8px rgba(200, 200, 255, 0.4))'
+          }}>{moonEmoji}</div>
           <h3 className="font-bold text-white" style={{ fontSize: 'min(1.5vw, 18px)' }}>{moonName}</h3>
           <p className="text-slate-400" style={{ fontSize: 'min(1vw, 12px)' }}>{moonPhaseName}</p>
         </div>

@@ -206,8 +206,12 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
   }
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6 max-w-md w-full">
-      <h3 className="text-white text-lg font-semibold mb-4">Set Your Location</h3>
+    <div className="ios-glass-thick max-w-md w-full" style={{
+      borderRadius: '20px',
+      padding: '24px',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+    }}>
+      <h3 className="text-white text-lg font-semibold mb-4" style={{ fontWeight: '600' }}>Set Your Location</h3>
 
       {error && (
         <div className="mb-4 p-3 bg-amber-900/50 border border-amber-700 rounded text-amber-200 text-sm">
@@ -237,18 +241,36 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
                 }
               }}
               placeholder="Start typing: Paris, Tokyo, etc."
-              className="w-full px-4 py-2 bg-slate-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-white focus:outline-none"
+              style={{
+                padding: '12px 16px',
+                background: 'rgba(58, 58, 60, 0.6)',
+                borderRadius: '12px',
+                border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                fontSize: '15px',
+                fontWeight: '400'
+              }}
             />
 
             {/* Autocomplete Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute z-50 w-full mt-1 bg-slate-700 border border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-2 ios-glass-thick max-h-60 overflow-y-auto" style={{
+                borderRadius: '16px',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
+              }}>
                 {suggestions.map((suggestion, index) => (
                   <button
                     key={suggestion.place_id}
                     type="button"
                     onClick={() => handleSelectSuggestion(suggestion)}
-                    className="w-full text-left px-4 py-3 hover:bg-slate-600 text-white border-b border-slate-600 last:border-b-0 transition-colors"
+                    className="w-full text-left text-white transition-colors"
+                    style={{
+                      padding: '12px 16px',
+                      borderBottom: index < suggestions.length - 1 ? '0.5px solid rgba(255, 255, 255, 0.1)' : 'none',
+                      background: 'transparent'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
                     <div className="font-medium">{suggestion.display_name.split(',')[0]}</div>
                     <div className="text-sm text-slate-400">{suggestion.display_name.split(',').slice(1).join(',')}</div>
@@ -279,7 +301,15 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
                 value={latitude}
                 onChange={(e) => setLatitude(e.target.value)}
                 placeholder="45.5231"
-                className="w-full px-4 py-2 bg-slate-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-white focus:outline-none"
+                style={{
+                  padding: '12px 16px',
+                  background: 'rgba(58, 58, 60, 0.6)',
+                  borderRadius: '12px',
+                  border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                  fontSize: '15px',
+                  fontWeight: '400'
+                }}
               />
             </div>
 
@@ -292,7 +322,15 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
                 value={longitude}
                 onChange={(e) => setLongitude(e.target.value)}
                 placeholder="-122.6765"
-                className="w-full px-4 py-2 bg-slate-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-white focus:outline-none"
+                style={{
+                  padding: '12px 16px',
+                  background: 'rgba(58, 58, 60, 0.6)',
+                  borderRadius: '12px',
+                  border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                  fontSize: '15px',
+                  fontWeight: '400'
+                }}
               />
             </div>
           </div>
@@ -300,7 +338,15 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
           <div className="flex gap-3">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors"
+              className="flex-1 text-white font-semibold transition-opacity hover:opacity-80"
+              style={{
+                padding: '14px',
+                background: 'rgba(10, 132, 255, 0.8)',
+                borderRadius: '14px',
+                border: 'none',
+                fontSize: '15px',
+                fontWeight: '600'
+              }}
             >
               Use This Location
             </button>
@@ -308,7 +354,17 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
               type="button"
               onClick={handleAutoDetect}
               disabled={isSearching}
-              className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white font-semibold py-3 rounded-md transition-colors"
+              className="flex-1 text-white font-semibold transition-opacity disabled:opacity-50"
+              style={{
+                padding: '14px',
+                background: isSearching ? 'rgba(88, 86, 214, 0.5)' : 'rgba(88, 86, 214, 0.8)',
+                borderRadius: '14px',
+                border: 'none',
+                fontSize: '15px',
+                fontWeight: '600'
+              }}
+              onMouseEnter={(e) => !isSearching && (e.currentTarget.style.opacity = '0.8')}
+              onMouseLeave={(e) => !isSearching && (e.currentTarget.style.opacity = '1')}
             >
               {isSearching ? 'Detecting...' : 'Auto Detect'}
             </button>
