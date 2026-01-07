@@ -229,6 +229,11 @@ function AnnualEventsClock({ currentDate, events }) {
                 const isToday = event.month === currentDate.getMonth() + 1 &&
                                 event.day === currentDate.getDate()
 
+                // Check event type
+                const isAstronomical = event.name.includes('Solstice') || event.name.includes('Equinox')
+                const isSolarEclipse = event.type === 'solar-eclipse'
+                const isLunarEclipse = event.type === 'lunar-eclipse'
+
                 // Format date for tooltip
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
                 const eventDate = `${months[event.month - 1]} ${event.day}`
@@ -244,26 +249,115 @@ function AnnualEventsClock({ currentDate, events }) {
                   <g key={event.id} className="event-marker" style={{ cursor: 'pointer' }}>
                     <title>{event.name} ({eventDate})</title>
 
-                    {/* Event dot - magnified if today */}
-                    <circle
-                      cx={pos.x}
-                      cy={pos.y}
-                      r={isToday ? "10" : "6"}
-                      fill={event.color}
-                      stroke="#fff"
-                      strokeWidth={isToday ? "3" : "2"}
-                      opacity={isToday ? "1" : "0.9"}
-                    >
-                      {/* Pulse animation for today's events */}
-                      {isToday && (
-                        <animate
-                          attributeName="r"
-                          values="10;12;10"
-                          dur="2s"
-                          repeatCount="indefinite"
+                    {/* Event marker - different shapes for different event types */}
+                    {isSolarEclipse ? (
+                      // Star burst for solar eclipses
+                      <g>
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "8" : "5"}
+                          fill={event.color}
+                          stroke="#fff"
+                          strokeWidth={isToday ? "2" : "1.5"}
+                          opacity="0.9"
                         />
-                      )}
-                    </circle>
+                        {/* Sun rays */}
+                        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => {
+                          const rayLength = isToday ? 12 : 8
+                          const innerR = isToday ? 8 : 5
+                          const rad = (angle * Math.PI) / 180
+                          const x1 = pos.x + innerR * Math.cos(rad)
+                          const y1 = pos.y + innerR * Math.sin(rad)
+                          const x2 = pos.x + (innerR + rayLength) * Math.cos(rad)
+                          const y2 = pos.y + (innerR + rayLength) * Math.sin(rad)
+                          return (
+                            <line
+                              key={angle}
+                              x1={x1}
+                              y1={y1}
+                              x2={x2}
+                              y2={y2}
+                              stroke={event.color}
+                              strokeWidth={isToday ? "2.5" : "2"}
+                              strokeLinecap="round"
+                            />
+                          )
+                        })}
+                      </g>
+                    ) : isLunarEclipse ? (
+                      // Crescent for lunar eclipses
+                      <g>
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "9" : "6"}
+                          fill={event.color}
+                          stroke="#fff"
+                          strokeWidth={isToday ? "2.5" : "2"}
+                          opacity="0.9"
+                        />
+                        <circle
+                          cx={pos.x + (isToday ? 5 : 3)}
+                          cy={pos.y}
+                          r={isToday ? "9" : "6"}
+                          fill="#0a1628"
+                          opacity="0.8"
+                        />
+                      </g>
+                    ) : isAstronomical ? (
+                      // Diamond shape for solstices and equinoxes
+                      <rect
+                        x={pos.x}
+                        y={pos.y}
+                        width={isToday ? "20" : "12"}
+                        height={isToday ? "20" : "12"}
+                        transform={`translate(${isToday ? -10 : -6}, ${isToday ? -10 : -6}) rotate(45, ${pos.x}, ${pos.y})`}
+                        fill={event.color}
+                        stroke="#fff"
+                        strokeWidth={isToday ? "3" : "2"}
+                        opacity={isToday ? "1" : "0.9"}
+                      >
+                        {/* Pulse animation for today's events */}
+                        {isToday && (
+                          <>
+                            <animate
+                              attributeName="width"
+                              values="20;24;20"
+                              dur="2s"
+                              repeatCount="indefinite"
+                            />
+                            <animate
+                              attributeName="height"
+                              values="20;24;20"
+                              dur="2s"
+                              repeatCount="indefinite"
+                            />
+                          </>
+                        )}
+                      </rect>
+                    ) : (
+                      // Circle for personal events
+                      <circle
+                        cx={pos.x}
+                        cy={pos.y}
+                        r={isToday ? "10" : "6"}
+                        fill={event.color}
+                        stroke="#fff"
+                        strokeWidth={isToday ? "3" : "2"}
+                        opacity={isToday ? "1" : "0.9"}
+                      >
+                        {/* Pulse animation for today's events */}
+                        {isToday && (
+                          <animate
+                            attributeName="r"
+                            values="10;12;10"
+                            dur="2s"
+                            repeatCount="indefinite"
+                          />
+                        )}
+                      </circle>
+                    )}
 
                     {/* Event label - only visible for today's events */}
                     {isToday && (

@@ -680,3 +680,29 @@ Split into two side panels positioned in the negative space flanking the clock d
   - Added moon position data: altitude (height in sky 0-90°) and azimuth (compass direction 0-360°)
   - Entire interface now fits on one screen without scrolling
   - Main container adjusted: calc(100vh - 100px) height, relative positioning for absolute child panels
+- Fully responsive dynamic sizing (2026-01-06)
+  - All elements now scale with viewport size using min() functions
+  - **Clock**: Max size increased to 2400px (from 1000px), uses 95vw and calc(100vh - 200px)
+  - **Side panels**: Scale 18vw up to 320px max (from 200px), all fonts and spacing scale proportionally
+  - **Top buttons**: Location and Events buttons scale with padding/fonts based on viewport
+  - **Title**: Scales from 3.5vw up to 42px max
+  - Everything maintains minimum sizes for readability on small screens
+  - Maximizes use of screen real estate on large displays
+- Distinguished event icons (2026-01-06)
+  - **Personal events** (birthdays, etc.): Circles (6px radius, 10px when today)
+  - **Astronomical events** (solstices, equinoxes): Diamond shapes (45° rotated squares)
+  - **Solar eclipses**: Gold star-burst icons with 8 radiating rays
+  - **Lunar eclipses**: Crimson crescent icons (overlapping circles creating crescent shadow)
+  - Visual distinction makes event types immediately recognizable at a glance
+- Automated eclipse detection (2026-01-06)
+  - Eclipses automatically appear on annual ring based on location and year
+  - **Location-based visibility filtering**: Only shows eclipses visible from user's location
+    - Solar eclipses: Checks if location is within narrow visibility path
+    - Lunar eclipses: Checks if location is on night side (hemisphere-based)
+  - **Pre-loaded data 2026-2030**: 14 solar + 10 lunar eclipses with accurate NASA data
+  - Eclipse data source: NASA Eclipse Website (https://eclipse.gsfc.nasa.gov/eclipse.html)
+  - **Visibility regions defined**: Geographic bounds for solar paths, hemisphere zones for lunar
+  - **Automatic until 2031**: No manual updates needed for next 5 years
+  - Console warning system: Alerts in 2031+ with instructions to add new years
+  - Template provided in source for easy extension
+  - Created utility file: src/utils/eclipseCalculator.js

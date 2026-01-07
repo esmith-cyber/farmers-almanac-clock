@@ -95,10 +95,16 @@ function EventManager({ events, onEventsChange }) {
 
   return (
     <div>
-      <div className="bg-slate-800/90 backdrop-blur rounded-lg px-4 py-2 flex items-center gap-3">
+      <div className="bg-slate-800/90 backdrop-blur rounded-lg flex items-center gap-3" style={{
+        padding: 'min(1vw, 12px) min(1.5vw, 18px)'
+      }}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          style={{
+            fontSize: 'min(1.2vw, 14px)',
+            padding: 'min(0.5vw, 6px) min(1vw, 14px)'
+          }}
         >
           Events ({events.length})
         </button>

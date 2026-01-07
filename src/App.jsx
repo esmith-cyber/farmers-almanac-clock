@@ -5,6 +5,7 @@ import AlmanacClock from './components/AlmanacClock'
 import MoonPhaseClock from './components/MoonPhaseClock'
 import AnnualEventsClock from './components/AnnualEventsClock'
 import EventManager from './components/EventManager'
+import { getEclipsesForYear } from './utils/eclipseCalculator'
 import './App.css'
 
 function App() {
@@ -114,20 +115,32 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative" style={{
+      padding: 'min(2vw, 16px)'
+    }}>
       {/* Location Display - Top Left */}
-      <div className="fixed top-6 left-6 z-50">
+      <div className="fixed z-50" style={{
+        top: 'min(1.5vw, 24px)',
+        left: 'min(1.5vw, 24px)'
+      }}>
         {location && !isEditingLocation ? (
-          <div className="bg-slate-800/90 backdrop-blur rounded-lg px-4 py-2 flex items-center gap-3">
-            <div className="text-slate-300 text-sm">
-              <span className="text-xs">Location: </span>
+          <div className="bg-slate-800/90 backdrop-blur rounded-lg flex items-center gap-3" style={{
+            padding: 'min(1vw, 12px) min(1.5vw, 18px)',
+            fontSize: 'min(1.5vw, 16px)'
+          }}>
+            <div className="text-slate-300">
+              <span style={{ fontSize: 'min(1.2vw, 14px)' }}>Location: </span>
               <span className="font-semibold text-white">
                 {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
               </span>
             </div>
             <button
               onClick={() => setIsEditingLocation(true)}
-              className="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded-md transition-colors"
+              className="bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors"
+              style={{
+                fontSize: 'min(1.2vw, 14px)',
+                padding: 'min(0.5vw, 6px) min(1vw, 14px)'
+              }}
             >
               Change
             </button>
@@ -143,7 +156,10 @@ function App() {
 
       {/* Event Manager - Top Right */}
       {location && (
-        <div className="fixed top-6 right-6 z-50">
+        <div className="fixed z-50" style={{
+          top: 'min(1.5vw, 24px)',
+          right: 'min(1.5vw, 24px)'
+        }}>
           <EventManager
             events={events}
             onEventsChange={setEvents}
@@ -152,8 +168,13 @@ function App() {
       )}
 
       <div className="max-w-6xl w-full">
-        <header className="text-center mb-3">
-          <h1 className="text-3xl font-bold text-white">
+        <header className="text-center" style={{
+          marginTop: 'max(6vh, 50px)',
+          marginBottom: 'min(1.5vh, 12px)'
+        }}>
+          <h1 className="font-bold text-white" style={{
+            fontSize: 'min(3.5vw, 42px)'
+          }}>
             Farmer's Almanac Clock
           </h1>
         </header>
@@ -167,8 +188,8 @@ function App() {
           }}>
             {/* Layered Clock Display - Responsive sizing */}
             <div className="relative flex items-center justify-center" style={{
-              width: 'min(85vw, calc(100vh - 280px), 1000px)',
-              height: 'min(85vw, calc(100vh - 280px), 1000px)',
+              width: 'min(95vw, calc(100vh - 200px), 2400px)',
+              height: 'min(95vw, calc(100vh - 200px), 2400px)',
               minWidth: '400px',
               minHeight: '400px'
             }}>
@@ -188,7 +209,14 @@ function App() {
               <div className="absolute z-0 w-full h-full">
                 <AnnualEventsClock
                   currentDate={currentDate}
-                  events={events}
+                  events={[
+                    ...events,
+                    ...getEclipsesForYear(
+                      currentDate.getFullYear(),
+                      location.latitude,
+                      location.longitude
+                    )
+                  ]}
                 />
               </div>
 
