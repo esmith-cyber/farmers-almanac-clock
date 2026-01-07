@@ -15,20 +15,20 @@ function AnnualEventsClock({ currentDate, events }) {
   const [selectedZodiac, setSelectedZodiac] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
 
-  // Zodiac sign data with date ranges, colors, and descriptions
+  // Zodiac sign data with date ranges, colors, and astronomical/mythological descriptions
   const zodiacSigns = [
-    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, color: '#ef4444', element: 'Fire', symbol: '♈', description: 'The Ram - Bold, ambitious, and confident' },
-    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, color: '#4ade80', element: 'Earth', symbol: '♉', description: 'The Bull - Reliable, patient, and practical' },
-    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, color: '#fbbf24', element: 'Air', symbol: '♊', description: 'The Twins - Curious, adaptable, and communicative' },
-    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, color: '#e0e7ff', element: 'Water', symbol: '♋', description: 'The Crab - Intuitive, emotional, and protective' },
-    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, color: '#fb923c', element: 'Fire', symbol: '♌', description: 'The Lion - Creative, passionate, and generous' },
-    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, color: '#a78bfa', element: 'Earth', symbol: '♍', description: 'The Maiden - Analytical, kind, and hardworking' },
-    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, color: '#f472b6', element: 'Air', symbol: '♎', description: 'The Scales - Diplomatic, fair, and social' },
-    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, color: '#dc2626', element: 'Water', symbol: '♏', description: 'The Scorpion - Passionate, resourceful, and brave' },
-    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, color: '#a855f7', element: 'Fire', symbol: '♐', description: 'The Archer - Optimistic, adventurous, and philosophical' },
-    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, color: '#94a3b8', element: 'Earth', symbol: '♑', description: 'The Goat - Disciplined, responsible, and ambitious' },
-    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, color: '#22d3ee', element: 'Air', symbol: '♒', description: 'The Water Bearer - Progressive, independent, and humanitarian' },
-    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, color: '#2dd4bf', element: 'Water', symbol: '♓', description: 'The Fish - Compassionate, artistic, and intuitive' },
+    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, color: '#ef4444', element: 'Fire', symbol: '♈', description: 'The Ram - Named for the golden ram of Greek mythology. Contains the bright star Hamal, known to ancient astronomers.' },
+    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, color: '#4ade80', element: 'Earth', symbol: '♉', description: 'The Bull - Home to the Pleiades star cluster and Aldebaran, the "Eye of the Bull." One of the oldest recognized constellations.' },
+    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, color: '#fbbf24', element: 'Air', symbol: '♊', description: 'The Twins - Represents Castor and Pollux from Greek mythology. Contains two of the brightest stars in the night sky.' },
+    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, color: '#e0e7ff', element: 'Water', symbol: '♋', description: 'The Crab - Contains the Beehive Cluster (M44), visible to the naked eye. The faintest of the zodiac constellations.' },
+    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, color: '#fb923c', element: 'Fire', symbol: '♌', description: 'The Lion - Features Regulus, the "Heart of the Lion." Ancient Egyptians built temples aligned with this constellation.' },
+    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, color: '#a78bfa', element: 'Earth', symbol: '♍', description: 'The Maiden - Contains Spica, one of the brightest stars. The constellation spans more celestial longitude than any other zodiac sign.' },
+    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, color: '#f472b6', element: 'Air', symbol: '♎', description: 'The Scales - Originally part of Scorpius, representing the scorpion\'s claws. Added as a separate constellation by the Romans.' },
+    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, color: '#dc2626', element: 'Water', symbol: '♏', description: 'The Scorpion - Features Antares, a red supergiant 700 times larger than our Sun. Recognized by ancient Mesopotamian astronomers.' },
+    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, color: '#a855f7', element: 'Fire', symbol: '♐', description: 'The Archer - Points toward the galactic center of the Milky Way. Contains numerous star clusters and nebulae.' },
+    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, color: '#94a3b8', element: 'Earth', symbol: '♑', description: 'The Sea-Goat - One of the oldest identified constellations, dating to Bronze Age Mesopotamia. Marks the winter solstice position.' },
+    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, color: '#22d3ee', element: 'Air', symbol: '♒', description: 'The Water Bearer - Associated with the rainy season in ancient times. Contains the Helix Nebula, the closest planetary nebula to Earth.' },
+    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, color: '#2dd4bf', element: 'Water', symbol: '♓', description: 'The Fish - Contains the vernal equinox point. Represents Aphrodite and Eros transformed into fish in Greek mythology.' },
   ]
 
   // Helper functions
