@@ -875,3 +875,18 @@ Split into two side panels positioned in the negative space flanking the clock d
     - Nebulas create colorful ambient glow
     - Shooting stars provide occasional delight
     - Nothing distracts from clock itself
+- Clock border rendering fix (2026-01-07)
+  - **Problem**: Visible sliver artifacts appearing along the edge of rotating clock discs
+    - Thin line of incorrect color visible on both day/night and lunar clocks
+    - Sliver had no depth - appeared only at the circular edge
+    - Initially suspected conic gradient wrapping issues at 360°/0° transition
+  - **Root cause**: 1px solid border in .clock-glow class interacting with rotating gradient
+    - Border rendered on top of animated gradient background
+    - Created visual artifacts as gradient colors rotated underneath static border
+    - Anti-aliasing between circular border and rotating gradient caused color bleeding
+  - **Solution**: Removed border from .clock-glow class in src/index.css
+    - Kept box-shadow glow effects (outer and inset) for visual depth
+    - Border was aesthetic only, not functionally necessary
+    - Slivers disappeared immediately after border removal
+  - **Files modified**: src/index.css (line 286-287)
+  - **Lesson**: Edge rendering artifacts with rotating elements often caused by layered borders/shadows, not the underlying gradient logic
