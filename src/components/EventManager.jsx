@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 
 function EventManager({ events, onEventsChange }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -152,10 +153,11 @@ function EventManager({ events, onEventsChange }) {
       </div>
 
       {/* Event Manager Modal */}
-      {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{
+      {isOpen && createPortal(
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{
           background: 'rgba(0, 0, 0, 0.6)',
-          backdropFilter: 'blur(10px)'
+          backdropFilter: 'blur(10px)',
+          zIndex: 9999
         }} onClick={() => !showForm && setIsOpen(false)}>
           <div className="ios-glass-thick max-w-2xl w-full max-h-[80vh] overflow-y-auto" style={{
             borderRadius: '24px',
@@ -327,17 +329,34 @@ function EventManager({ events, onEventsChange }) {
                     <button
                       key={color.value}
                       onClick={() => setFormData({ ...formData, color: color.value })}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
-                        formData.color === color.value
-                          ? 'bg-slate-600 ring-2 ring-white'
-                          : 'bg-slate-700 hover:bg-slate-600'
-                      }`}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '12px 8px',
+                        background: formData.color === color.value ? 'rgba(71, 85, 105, 0.6)' : 'rgba(51, 65, 85, 0.6)',
+                        borderRadius: '12px',
+                        border: formData.color === color.value ? '2px solid white' : '1px solid rgba(255, 255, 255, 0.1)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
                     >
                       <div
-                        className="w-6 h-6 rounded-full"
-                        style={{ backgroundColor: color.value }}
+                        style={{
+                          backgroundColor: color.value,
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          border: '2px solid rgba(255, 255, 255, 0.3)',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                        }}
                       />
-                      <span className="text-sm text-slate-300">{color.name}</span>
+                      <span style={{
+                        fontSize: '11px',
+                        color: 'rgb(203, 213, 225)',
+                        fontWeight: '500'
+                      }}>{color.name}</span>
                     </button>
                   ))}
                 </div>
@@ -472,7 +491,8 @@ function EventManager({ events, onEventsChange }) {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
