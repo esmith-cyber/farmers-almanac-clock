@@ -181,7 +181,7 @@ function App() {
         </div>
       )}
 
-      <div className="max-w-6xl w-full">
+      <div className="w-full">
         <header className="text-center" style={{
           marginTop: 'max(6vh, 50px)',
           marginBottom: 'min(1.5vh, 12px)'
@@ -202,10 +202,10 @@ function App() {
           }}>
             {/* Layered Clock Display - Responsive sizing */}
             <div className="relative flex items-center justify-center" style={{
-              width: 'min(95vw, calc(100vh - 200px), 2400px)',
-              height: 'min(95vw, calc(100vh - 200px), 2400px)',
-              minWidth: '400px',
-              minHeight: '400px'
+              width: 'min(85vw, 70vh, 1000px)',
+              height: 'min(85vw, 70vh, 1000px)',
+              minWidth: '300px',
+              minHeight: '300px'
             }}>
               {/* NOW indicator - positioned outside and above the annual disc */}
               <div className="absolute left-1/2 z-30" style={{

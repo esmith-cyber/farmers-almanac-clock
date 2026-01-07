@@ -113,43 +113,42 @@ function SunTimes({ location, currentDate }) {
   return (
     <>
       {/* Sun Info Panel - Left Side */}
-      <div className="absolute left-0 bg-slate-800/90 backdrop-blur shadow-xl" style={{
-        maxWidth: 'min(18vw, 320px)',
-        minWidth: '160px',
+      <div className="absolute left-0 bg-slate-800/90 backdrop-blur shadow-xl hidden md:block" style={{
+        width: 'min(15vw, 200px)',
         bottom: 'min(8vh, 80px)',
-        padding: 'min(2vw, 24px)',
-        borderTopRightRadius: 'min(2vw, 20px)',
-        borderBottomRightRadius: 'min(2vw, 20px)'
+        padding: 'min(1.5vw, 16px)',
+        borderTopRightRadius: 'min(1.5vw, 16px)',
+        borderBottomRightRadius: 'min(1.5vw, 16px)'
       }}>
-        <div style={{ marginBottom: 'min(2vw, 18px)' }}>
-          <div style={{ fontSize: 'min(4.5vw, 48px)', marginBottom: 'min(0.8vw, 8px)' }}>{period.emoji}</div>
-          <h3 className="font-bold text-white" style={{ fontSize: 'min(2.2vw, 24px)' }}>{period.name}</h3>
-          <p className="text-slate-400" style={{ fontSize: 'min(1.4vw, 16px)' }}>{format(currentDate, 'MMM d, yyyy')}</p>
+        <div style={{ marginBottom: 'min(1.2vw, 12px)' }}>
+          <div style={{ fontSize: 'min(3vw, 32px)', marginBottom: 'min(0.5vw, 6px)' }}>{period.emoji}</div>
+          <h3 className="font-bold text-white" style={{ fontSize: 'min(1.5vw, 18px)' }}>{period.name}</h3>
+          <p className="text-slate-400" style={{ fontSize: 'min(1vw, 12px)' }}>{format(currentDate, 'MMM d, yyyy')}</p>
         </div>
 
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 'min(1.2vw, 12px)',
-          fontSize: 'min(1.8vw, 18px)'
+          gap: 'min(0.8vw, 8px)',
+          fontSize: 'min(1.2vw, 14px)'
         }}>
           <div>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Sunrise</div>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Sunrise</div>
             <div className="text-amber-400 font-bold">
               {formatTime(sunTimes.sunrise)}
             </div>
           </div>
 
           <div>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Sunset</div>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Sunset</div>
             <div className="text-orange-400 font-bold">
               {formatTime(sunTimes.sunset)}
             </div>
           </div>
 
-          <div className="border-t border-slate-700/50" style={{ paddingTop: 'min(1.2vw, 10px)' }}>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Day Length</div>
-            <div className="text-slate-300 font-semibold" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+          <div className="border-t border-slate-700/50" style={{ paddingTop: 'min(0.8vw, 8px)' }}>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Day Length</div>
+            <div className="text-slate-300 font-semibold" style={{ fontSize: 'min(1vw, 11px)' }}>
               {(() => {
                 const duration = sunTimes.sunset - sunTimes.sunrise
                 const hours = Math.floor(duration / (1000 * 60 * 60))
@@ -160,15 +159,15 @@ function SunTimes({ location, currentDate }) {
           </div>
 
           <div>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Dawn</div>
-            <div className="text-slate-300" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Dawn</div>
+            <div className="text-slate-300" style={{ fontSize: 'min(1vw, 11px)' }}>
               {formatTime(sunTimes.dawn)}
             </div>
           </div>
 
           <div>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Dusk</div>
-            <div className="text-slate-300" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Dusk</div>
+            <div className="text-slate-300" style={{ fontSize: 'min(1vw, 11px)' }}>
               {formatTime(sunTimes.dusk)}
             </div>
           </div>
@@ -176,37 +175,36 @@ function SunTimes({ location, currentDate }) {
       </div>
 
       {/* Moon Info Panel - Right Side */}
-      <div className="absolute right-0 bg-slate-800/90 backdrop-blur shadow-xl" style={{
-        maxWidth: 'min(18vw, 320px)',
-        minWidth: '160px',
+      <div className="absolute right-0 bg-slate-800/90 backdrop-blur shadow-xl hidden md:block" style={{
+        width: 'min(15vw, 200px)',
         bottom: 'min(8vh, 80px)',
-        padding: 'min(2vw, 24px)',
-        borderTopLeftRadius: 'min(2vw, 20px)',
-        borderBottomLeftRadius: 'min(2vw, 20px)'
+        padding: 'min(1.5vw, 16px)',
+        borderTopLeftRadius: 'min(1.5vw, 16px)',
+        borderBottomLeftRadius: 'min(1.5vw, 16px)'
       }}>
-        <div style={{ marginBottom: 'min(2vw, 18px)' }}>
-          <div style={{ fontSize: 'min(4.5vw, 48px)', marginBottom: 'min(0.8vw, 8px)' }}>{moonEmoji}</div>
-          <h3 className="font-bold text-white" style={{ fontSize: 'min(2.2vw, 24px)' }}>{moonName}</h3>
-          <p className="text-slate-400" style={{ fontSize: 'min(1.4vw, 16px)' }}>{moonPhaseName}</p>
+        <div style={{ marginBottom: 'min(1.2vw, 12px)' }}>
+          <div style={{ fontSize: 'min(3vw, 32px)', marginBottom: 'min(0.5vw, 6px)' }}>{moonEmoji}</div>
+          <h3 className="font-bold text-white" style={{ fontSize: 'min(1.5vw, 18px)' }}>{moonName}</h3>
+          <p className="text-slate-400" style={{ fontSize: 'min(1vw, 12px)' }}>{moonPhaseName}</p>
         </div>
 
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 'min(1.2vw, 12px)',
-          fontSize: 'min(1.8vw, 18px)'
+          gap: 'min(0.8vw, 8px)',
+          fontSize: 'min(1.2vw, 14px)'
         }}>
           <div>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Illumination</div>
-            <div className="text-slate-300 font-semibold" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Illumination</div>
+            <div className="text-slate-300 font-semibold" style={{ fontSize: 'min(1vw, 11px)' }}>
               {illuminationPercent}%
             </div>
           </div>
 
           {moonData.rise && (
-            <div className="border-t border-slate-700/50" style={{ paddingTop: 'min(1.2vw, 10px)' }}>
-              <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Moonrise</div>
-              <div className="text-slate-300" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+            <div className="border-t border-slate-700/50" style={{ paddingTop: 'min(0.8vw, 8px)' }}>
+              <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Moonrise</div>
+              <div className="text-slate-300" style={{ fontSize: 'min(1vw, 11px)' }}>
                 {formatTime(moonData.rise)}
               </div>
             </div>
@@ -214,23 +212,23 @@ function SunTimes({ location, currentDate }) {
 
           {moonData.set && (
             <div>
-              <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Moonset</div>
-              <div className="text-slate-300" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+              <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Moonset</div>
+              <div className="text-slate-300" style={{ fontSize: 'min(1vw, 11px)' }}>
                 {formatTime(moonData.set)}
               </div>
             </div>
           )}
 
-          <div className="border-t border-slate-700/50" style={{ paddingTop: 'min(1.2vw, 10px)' }}>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Altitude</div>
-            <div className="text-slate-300 font-semibold" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+          <div className="border-t border-slate-700/50" style={{ paddingTop: 'min(0.8vw, 8px)' }}>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Altitude</div>
+            <div className="text-slate-300 font-semibold" style={{ fontSize: 'min(1vw, 11px)' }}>
               {Math.round(moonData.altitude * (180 / Math.PI))}°
             </div>
           </div>
 
           <div>
-            <div className="text-slate-400" style={{ fontSize: 'min(1.4vw, 14px)' }}>Azimuth</div>
-            <div className="text-slate-300" style={{ fontSize: 'min(1.4vw, 14px)' }}>
+            <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Azimuth</div>
+            <div className="text-slate-300" style={{ fontSize: 'min(1vw, 11px)' }}>
               {Math.round(moonData.azimuth * (180 / Math.PI))}°
             </div>
           </div>

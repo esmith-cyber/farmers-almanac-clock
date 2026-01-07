@@ -776,3 +776,22 @@ Split into two side panels positioned in the negative space flanking the clock d
     - Root cause: date-fns `format()` automatically applies browser's timezone
     - Fix: Bypass date-fns, manually extract UTC hours/minutes from adjusted date
     - Format time manually without any timezone library interference
+- Responsive scaling refinement (2026-01-06)
+  - **Problem**: max-w-6xl on parent container limited width, clock didn't scale with window
+  - **Problem 2**: Clock used min(95vw, calc(100vh - 200px), 2400px) causing async scaling
+    - When shrinking width, if height was still large, clock stayed big based on height
+    - Side panels scaled with viewport width (18vw) but clock didn't, causing overlap
+  - **Problem 3**: Even at full size, bottom of clock was cut off
+  - **Solution**: Synchronized scaling across all elements
+    - Removed max-w-6xl parent container limit
+    - Changed clock size to min(85vw, 70vh, 1000px) - both width and height scale together
+    - Reduced side panels from 18vw to 15vw with fixed width instead of max/min
+    - Scaled down all panel fonts proportionally (emoji 3vw, headers 1.5vw, text 1vw)
+    - Added hidden md:block to panels - hide on screens below 768px to prevent overlap
+    - Reduced max clock size to 1000px (from 2400px) for better fit
+    - Used 70vh instead of 90vh to account for header and margins
+  - **Result**: Everything now scales smoothly and proportionally together
+    - Clock and panels shrink at same rate when resizing window
+    - No overlapping at any viewport size
+    - Clock fully visible from top to bottom
+    - Panels gracefully hide on smaller screens
