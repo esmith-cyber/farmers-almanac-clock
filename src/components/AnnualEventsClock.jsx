@@ -1,4 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
+
+// Constants
+const SVG_CENTER = 450
+const SVG_SIZE = 900
+const EVENT_RADIUS = 410
+const CONSTELLATION_RADIUS = 340
+const INNER_RADIUS = 250
+const OUTER_RADIUS = 450
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 function AnnualEventsClock({ currentDate, events }) {
   const [rotation, setRotation] = useState(0)
@@ -79,11 +88,10 @@ function AnnualEventsClock({ currentDate, events }) {
 
   // Calculate position on the ring for an event
   const getEventPosition = (angle) => {
-    const radius = 410 // Position for events in the outer part of ring
     const rad = ((angle - 90) * Math.PI) / 180 // -90 to start at top
     return {
-      x: 450 + radius * Math.cos(rad), // Center at 450, 450
-      y: 450 + radius * Math.sin(rad),
+      x: SVG_CENTER + EVENT_RADIUS * Math.cos(rad),
+      y: SVG_CENTER + EVENT_RADIUS * Math.sin(rad),
     }
   }
 
@@ -116,19 +124,17 @@ function AnnualEventsClock({ currentDate, events }) {
           <div className="relative w-full h-full rounded-full clock-glow overflow-hidden" style={{ background: 'transparent' }}>
 
             {/* Star field background - removed, using background stars instead */}
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 900 900">
+            <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}>
 
               {/* Zodiac division markers - subtle lines at sign boundaries */}
               {zodiacSigns.map((sign, i) => {
                 // Draw line at the START of each zodiac sign
                 const angle = dateToAngle(sign.startMonth, sign.startDay)
-                const innerRadius = 250
-                const outerRadius = 450
                 const rad = ((angle - 90) * Math.PI) / 180
-                const x1 = 450 + innerRadius * Math.cos(rad)
-                const y1 = 450 + innerRadius * Math.sin(rad)
-                const x2 = 450 + outerRadius * Math.cos(rad)
-                const y2 = 450 + outerRadius * Math.sin(rad)
+                const x1 = SVG_CENTER + INNER_RADIUS * Math.cos(rad)
+                const y1 = SVG_CENTER + INNER_RADIUS * Math.sin(rad)
+                const x2 = SVG_CENTER + OUTER_RADIUS * Math.cos(rad)
+                const y2 = SVG_CENTER + OUTER_RADIUS * Math.sin(rad)
 
                 return (
                   <line
@@ -175,15 +181,13 @@ function AnnualEventsClock({ currentDate, events }) {
 
                 // Calculate angle for this zodiac's midpoint (negative for counterclockwise)
                 const signAngle = -(dayOfYear / totalDays) * 360
-                const radius = 340 // Adjusted to center in ring area (250-450 range)
                 const rad = ((signAngle - 90) * Math.PI) / 180
-                const x = 450 + radius * Math.cos(rad)
-                const y = 450 + radius * Math.sin(rad)
+                const x = SVG_CENTER + CONSTELLATION_RADIUS * Math.cos(rad)
+                const y = SVG_CENTER + CONSTELLATION_RADIUS * Math.sin(rad)
 
                 // Format date range for tooltip
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                const startMonth = months[sign.startMonth - 1]
-                const endMonth = months[sign.endMonth - 1]
+                const startMonth = MONTH_NAMES[sign.startMonth - 1]
+                const endMonth = MONTH_NAMES[sign.endMonth - 1]
                 const dateRange = `${startMonth} ${sign.startDay} - ${endMonth} ${sign.endDay}`
 
                 // Calculate wedge boundaries for this sign
@@ -221,27 +225,25 @@ function AnnualEventsClock({ currentDate, events }) {
                 const largeArcFlag = arcAngle > 180 ? 1 : 0
 
                 // Create wedge path for hover area using expanded angles
-                const innerRadius = 250
-                const outerRadius = 450
                 const startRad = ((expandedStartAngle - 90) * Math.PI) / 180
                 const endRad = ((expandedEndAngle - 90) * Math.PI) / 180
 
                 // Calculate wedge path points
-                const x1 = 450 + innerRadius * Math.cos(startRad)
-                const y1 = 450 + innerRadius * Math.sin(startRad)
-                const x2 = 450 + outerRadius * Math.cos(startRad)
-                const y2 = 450 + outerRadius * Math.sin(startRad)
-                const x3 = 450 + outerRadius * Math.cos(endRad)
-                const y3 = 450 + outerRadius * Math.sin(endRad)
-                const x4 = 450 + innerRadius * Math.cos(endRad)
-                const y4 = 450 + innerRadius * Math.sin(endRad)
+                const x1 = SVG_CENTER + INNER_RADIUS * Math.cos(startRad)
+                const y1 = SVG_CENTER + INNER_RADIUS * Math.sin(startRad)
+                const x2 = SVG_CENTER + OUTER_RADIUS * Math.cos(startRad)
+                const y2 = SVG_CENTER + OUTER_RADIUS * Math.sin(startRad)
+                const x3 = SVG_CENTER + OUTER_RADIUS * Math.cos(endRad)
+                const y3 = SVG_CENTER + OUTER_RADIUS * Math.sin(endRad)
+                const x4 = SVG_CENTER + INNER_RADIUS * Math.cos(endRad)
+                const y4 = SVG_CENTER + INNER_RADIUS * Math.sin(endRad)
 
                 const wedgePath = `
                   M ${x1} ${y1}
                   L ${x2} ${y2}
-                  A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${x3} ${y3}
+                  A ${OUTER_RADIUS} ${OUTER_RADIUS} 0 ${largeArcFlag} 0 ${x3} ${y3}
                   L ${x4} ${y4}
-                  A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${x1} ${y1}
+                  A ${INNER_RADIUS} ${INNER_RADIUS} 0 ${largeArcFlag} 1 ${x1} ${y1}
                   Z
                 `
 
@@ -271,12 +273,12 @@ function AnnualEventsClock({ currentDate, events }) {
 
               {/* Event markers */}
               {events.map((event) => {
-                // Check if this is a multi-day event
-                const isMultiDay = event.endMonth && event.endDay
+                // Check if this is a multi-day event (explicit null check)
+                const isMultiDay = event.endMonth != null && event.endDay != null
                 const year = currentDate.getFullYear()
 
-                const angle = dateToAngle(event.month, event.day)
-                const pos = getEventPosition(angle)
+                const startAngle = dateToAngle(event.month, event.day)
+                const pos = getEventPosition(startAngle)
 
                 // Check if this event is today or spans today
                 let isToday = event.month === currentDate.getMonth() + 1 &&
@@ -303,21 +305,19 @@ function AnnualEventsClock({ currentDate, events }) {
                 const isLunarEclipse = event.type === 'lunar-eclipse'
 
                 // Format date for tooltip
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
                 const eventDate = isMultiDay
-                  ? `${months[event.month - 1]} ${event.day} - ${months[event.endMonth - 1]} ${event.endDay}`
-                  : `${months[event.month - 1]} ${event.day}`
+                  ? `${MONTH_NAMES[event.month - 1]} ${event.day} - ${MONTH_NAMES[event.endMonth - 1]} ${event.endDay}`
+                  : `${MONTH_NAMES[event.month - 1]} ${event.day}`
 
                 // For radial labels: rotate by angle to point outward
                 // Normalize angle to 0-360 range
-                const normalizedAngle = ((angle % 360) + 360) % 360
+                const normalizedAngle = ((startAngle % 360) + 360) % 360
                 // Flip text if it's on the left half (would be upside down or sideways)
                 const needsFlip = normalizedAngle > 90 && normalizedAngle < 270
                 const radialRotation = needsFlip ? normalizedAngle - 180 : normalizedAngle
 
                 // For multi-day events, render an arc
                 if (isMultiDay) {
-                  const startAngle = dateToAngle(event.month, event.day)
                   const endAngle = dateToAngle(event.endMonth, event.endDay)
 
                   // Calculate arc parameters
@@ -329,21 +329,20 @@ function AnnualEventsClock({ currentDate, events }) {
                   if (arcAngle < 0) arcAngle += 360
 
                   const largeArcFlag = arcAngle > 180 ? 1 : 0
-                  const arcRadius = 410 // Same radius as event markers
 
                   // Calculate start and end points
                   const startRad = ((startAngle - 90) * Math.PI) / 180
                   const endRad = ((endAngle - 90) * Math.PI) / 180
 
-                  const x1 = 450 + arcRadius * Math.cos(startRad)
-                  const y1 = 450 + arcRadius * Math.sin(startRad)
-                  const x2 = 450 + arcRadius * Math.cos(endRad)
-                  const y2 = 450 + arcRadius * Math.sin(endRad)
+                  const x1 = SVG_CENTER + EVENT_RADIUS * Math.cos(startRad)
+                  const y1 = SVG_CENTER + EVENT_RADIUS * Math.sin(startRad)
+                  const x2 = SVG_CENTER + EVENT_RADIUS * Math.cos(endRad)
+                  const y2 = SVG_CENTER + EVENT_RADIUS * Math.sin(endRad)
 
                   // Use sweep-flag = 0 for counterclockwise (following negative angle progression)
                   const arcPath = `
                     M ${x1} ${y1}
-                    A ${arcRadius} ${arcRadius} 0 ${largeArcFlag} 0 ${x2} ${y2}
+                    A ${EVENT_RADIUS} ${EVENT_RADIUS} 0 ${largeArcFlag} 0 ${x2} ${y2}
                   `
 
                   return (

@@ -62,11 +62,12 @@ function EventManager({ events, onEventsChange }) {
       return
     }
 
-    const month = parseInt(formData.month)
-    const day = parseInt(formData.day)
+    const month = parseInt(formData.month, 10)
+    const day = parseInt(formData.day, 10)
+    const currentYear = new Date().getFullYear()
 
     // Validate start date
-    const daysInMonth = new Date(2024, month, 0).getDate()
+    const daysInMonth = new Date(currentYear, month, 0).getDate()
     if (day < 1 || day > daysInMonth) {
       alert(`Day must be between 1 and ${daysInMonth} for month ${month}`)
       return
@@ -76,11 +77,21 @@ function EventManager({ events, onEventsChange }) {
     let endMonth = null
     let endDay = null
     if (isMultiDay) {
-      endMonth = parseInt(formData.endMonth)
-      endDay = parseInt(formData.endDay)
-      const daysInEndMonth = new Date(2024, endMonth, 0).getDate()
+      endMonth = parseInt(formData.endMonth, 10)
+      endDay = parseInt(formData.endDay, 10)
+      const daysInEndMonth = new Date(currentYear, endMonth, 0).getDate()
       if (endDay < 1 || endDay > daysInEndMonth) {
         alert(`End day must be between 1 and ${daysInEndMonth} for month ${endMonth}`)
+        return
+      }
+
+      // Validate that end date is after start date (unless crossing year boundary)
+      const startDate = new Date(currentYear, month - 1, day)
+      const endDate = new Date(currentYear, endMonth - 1, endDay)
+
+      // Only validate if not crossing year boundary
+      if (endMonth >= month && endDate <= startDate) {
+        alert('End date must be after start date')
         return
       }
     }
@@ -95,7 +106,7 @@ function EventManager({ events, onEventsChange }) {
     } else {
       // Add new event
       const newEvent = {
-        id: Date.now(),
+        id: Date.now() + Math.random(), // Prevent collision if events created rapidly
         name: formData.name,
         month,
         day,
