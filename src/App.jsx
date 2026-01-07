@@ -233,7 +233,8 @@ function App() {
               {/* Moon Phase Clock - Middle Layer */}
               <div className="absolute z-10" style={{
                 width: '55.56%',
-                height: '55.56%'
+                height: '55.56%',
+                pointerEvents: 'none'
               }}>
                 <MoonPhaseClock
                   location={location}
@@ -244,7 +245,8 @@ function App() {
               {/* Day/Night Clock - Innermost */}
               <div className="relative z-20" style={{
                 width: '38.89%',
-                height: '38.89%'
+                height: '38.89%',
+                pointerEvents: 'none'
               }}>
                 <AlmanacClock
                   location={location}

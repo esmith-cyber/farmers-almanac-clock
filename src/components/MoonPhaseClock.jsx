@@ -100,45 +100,13 @@ function MoonPhaseClock({ location, currentDate }) {
           {/* Main Moon Circle - larger than day/night clock */}
           <div
             className="relative w-full h-full rounded-full clock-glow overflow-hidden"
-            style={{ background: moonGradient }}
+            style={{
+              background: moonGradient,
+              opacity: 0.4
+            }}
           >
             {/* Quarter Phase Markers - Elegant Visual Representations */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 500 500">
-              {/* Background stars in lunar track - fade with moon phase */}
-              {(() => {
-                const stars = []
-                const center = 250
-                const innerRadius = 175  // Inner edge of lunar ring
-                const outerRadius = 250  // Outer edge of lunar ring
-                const starCount = 80
-
-                for (let i = 0; i < starCount; i++) {
-                  const angle = (i / starCount) * 360
-                  const radius = innerRadius + Math.random() * (outerRadius - innerRadius)
-                  const rad = ((angle - 90) * Math.PI) / 180
-                  const x = center + radius * Math.cos(rad)
-                  const y = center + radius * Math.sin(rad)
-
-                  // Calculate opacity based on angle - brightest at 0° (new moon), dimmest at 180° (full moon)
-                  // Use cosine for smooth fade
-                  const normalizedAngle = angle * Math.PI / 180
-                  const phaseOpacity = (Math.cos(normalizedAngle) + 1) / 2  // 0-1, highest at 0°/360°, lowest at 180°
-                  const starOpacity = phaseOpacity * 0.6 + 0.1  // Range from 0.1 to 0.7
-
-                  stars.push(
-                    <circle
-                      key={`star-${i}`}
-                      cx={x}
-                      cy={y}
-                      r={Math.random() * 1.2 + 0.5}
-                      fill="#e0f2fe"
-                      opacity={starOpacity}
-                    />
-                  )
-                }
-                return stars
-              })()}
-
               {/* Calculate positions for each phase marker */}
               {(() => {
                 const radius = 212.5  // Centered in the 75px ring (175 inner + 37.5)

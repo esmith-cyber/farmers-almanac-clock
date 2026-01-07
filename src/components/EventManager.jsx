@@ -8,8 +8,11 @@ function EventManager({ events, onEventsChange }) {
     name: '',
     month: 1,
     day: 1,
+    endMonth: null,
+    endDay: null,
     color: '#60a5fa'
   })
+  const [isMultiDay, setIsMultiDay] = useState(false)
 
   const colorOptions = [
     { name: 'Blue', value: '#60a5fa' },
@@ -24,7 +27,8 @@ function EventManager({ events, onEventsChange }) {
 
   const handleAdd = () => {
     setEditingEvent(null)
-    setFormData({ name: '', month: 1, day: 1, color: '#60a5fa' })
+    setFormData({ name: '', month: 1, day: 1, endMonth: null, endDay: null, color: '#60a5fa' })
+    setIsMultiDay(false)
     setShowForm(true)
   }
 
@@ -34,8 +38,11 @@ function EventManager({ events, onEventsChange }) {
       name: event.name,
       month: event.month,
       day: event.day,
+      endMonth: event.endMonth || null,
+      endDay: event.endDay || null,
       color: event.color
     })
+    setIsMultiDay(!!(event.endMonth && event.endDay))
     setShowForm(true)
   }
 
@@ -58,18 +65,31 @@ function EventManager({ events, onEventsChange }) {
     const month = parseInt(formData.month)
     const day = parseInt(formData.day)
 
-    // Validate date
+    // Validate start date
     const daysInMonth = new Date(2024, month, 0).getDate()
     if (day < 1 || day > daysInMonth) {
       alert(`Day must be between 1 and ${daysInMonth} for month ${month}`)
       return
     }
 
+    // Validate end date if multi-day event
+    let endMonth = null
+    let endDay = null
+    if (isMultiDay) {
+      endMonth = parseInt(formData.endMonth)
+      endDay = parseInt(formData.endDay)
+      const daysInEndMonth = new Date(2024, endMonth, 0).getDate()
+      if (endDay < 1 || endDay > daysInEndMonth) {
+        alert(`End day must be between 1 and ${daysInEndMonth} for month ${endMonth}`)
+        return
+      }
+    }
+
     if (editingEvent) {
       // Update existing event
       onEventsChange(events.map(e =>
         e.id === editingEvent.id
-          ? { ...e, name: formData.name, month, day, color: formData.color }
+          ? { ...e, name: formData.name, month, day, endMonth, endDay, color: formData.color }
           : e
       ))
     } else {
@@ -79,6 +99,8 @@ function EventManager({ events, onEventsChange }) {
         name: formData.name,
         month,
         day,
+        endMonth,
+        endDay,
         color: formData.color
       }
       onEventsChange([...events, newEvent])
@@ -86,11 +108,13 @@ function EventManager({ events, onEventsChange }) {
 
     setShowForm(false)
     setEditingEvent(null)
+    setIsMultiDay(false)
   }
 
   const handleCancel = () => {
     setShowForm(false)
     setEditingEvent(null)
+    setIsMultiDay(false)
   }
 
   return (
@@ -167,7 +191,7 @@ function EventManager({ events, onEventsChange }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Month
+                    Start Month
                   </label>
                   <select
                     value={formData.month}
@@ -191,7 +215,7 @@ function EventManager({ events, onEventsChange }) {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Day
+                    Start Day
                   </label>
                   <input
                     type="number"
@@ -210,6 +234,78 @@ function EventManager({ events, onEventsChange }) {
                   />
                 </div>
               </div>
+
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isMultiDay}
+                    onChange={(e) => {
+                      setIsMultiDay(e.target.checked)
+                      if (e.target.checked && !formData.endMonth) {
+                        // Initialize end date to same as start date
+                        setFormData({ ...formData, endMonth: formData.month, endDay: formData.day })
+                      }
+                    }}
+                    className="w-5 h-5 rounded"
+                    style={{
+                      accentColor: 'rgba(10, 132, 255, 0.8)'
+                    }}
+                  />
+                  <span className="text-sm font-medium text-slate-300">
+                    Multi-day event (e.g., vacation)
+                  </span>
+                </label>
+              </div>
+
+              {isMultiDay && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      End Month
+                    </label>
+                    <select
+                      value={formData.endMonth || formData.month}
+                      onChange={(e) => setFormData({ ...formData, endMonth: e.target.value })}
+                      className="w-full text-white focus:outline-none"
+                      style={{
+                        padding: '12px 16px',
+                        background: 'rgba(58, 58, 60, 0.6)',
+                        borderRadius: '12px',
+                        border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                        fontSize: '15px'
+                      }}
+                    >
+                      {Array.from({ length: 12 }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {new Date(2024, i, 1).toLocaleString('en-US', { month: 'long' })}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      End Day
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="31"
+                      value={formData.endDay || formData.day}
+                      onChange={(e) => setFormData({ ...formData, endDay: e.target.value })}
+                      className="w-full text-white focus:outline-none"
+                      style={{
+                        padding: '12px 16px',
+                        background: 'rgba(58, 58, 60, 0.6)',
+                        borderRadius: '12px',
+                        border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                        fontSize: '15px'
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">

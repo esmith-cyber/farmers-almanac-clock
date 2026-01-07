@@ -103,26 +103,6 @@ function AnnualEventsClock({ currentDate, events }) {
     Pisces: <g><circle cx="-5" cy="-5" r="1.5" fill="currentColor" /><circle cx="-3" cy="-2" r="1" fill="currentColor" /><circle cx="0" cy="0" r="1.5" fill="currentColor" /><circle cx="3" cy="2" r="1" fill="currentColor" /><circle cx="5" cy="5" r="1.5" fill="currentColor" /><circle cx="-6" cy="-7" r="1" fill="currentColor" /><circle cx="6" cy="7" r="1" fill="currentColor" /><line x1="-5" y1="-5" x2="0" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="5" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-5" x2="-6" y2="-7" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="5" x2="6" y2="7" stroke="currentColor" strokeWidth="0.5" /></g>,
   }
 
-  // Generate star field for background
-  const generateStars = () => {
-    const stars = []
-    for (let i = 0; i < 150; i++) {
-      const angle = Math.random() * 360 // Random angle for even distribution
-      const radius = 250 + Math.random() * 200 // Within the ring (250-450)
-      const rad = ((angle - 90) * Math.PI) / 180
-      const x = 450 + radius * Math.cos(rad)
-      const y = 450 + radius * Math.sin(rad)
-      stars.push({
-        x,
-        y,
-        r: Math.random() * 1.5 + 0.5,
-        opacity: Math.random() * 0.7 + 0.3,
-      })
-    }
-    return stars
-  }
-
-  const stars = generateStars()
 
   return (
     <div className="flex justify-center items-center w-full h-full">
@@ -133,21 +113,10 @@ function AnnualEventsClock({ currentDate, events }) {
           style={{ transform: `rotate(${rotation}deg)` }}
         >
           {/* Main Annual Circle */}
-          <div className="relative w-full h-full rounded-full clock-glow overflow-hidden" style={{ background: 'linear-gradient(to bottom right, #0a1628, #1e293b)' }}>
+          <div className="relative w-full h-full rounded-full clock-glow overflow-hidden" style={{ background: 'transparent' }}>
 
-            {/* Star field background */}
+            {/* Star field background - removed, using background stars instead */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 900 900">
-              {stars.map((star, i) => (
-                <circle
-                  key={i}
-                  cx={star.x}
-                  cy={star.y}
-                  r={star.r}
-                  fill="#e0f2fe"
-                  opacity={star.opacity}
-                  style={{ pointerEvents: 'none' }}
-                />
-              ))}
 
               {/* Zodiac division markers - subtle lines at sign boundaries */}
               {zodiacSigns.map((sign, i) => {
@@ -176,7 +145,7 @@ function AnnualEventsClock({ currentDate, events }) {
                 )
               })}
 
-              {/* Zodiac Constellations */}
+              {/* Zodiac Constellations with wedge-shaped hover areas */}
               {zodiacSigns.map((sign) => {
                 // Calculate the midpoint date of this zodiac sign for positioning
                 const year = currentDate.getFullYear()
@@ -189,9 +158,20 @@ function AnnualEventsClock({ currentDate, events }) {
                 }
 
                 const midDate = new Date((startDate.getTime() + endDate.getTime()) / 2)
-                const startOfYear = new Date(year, 0, 1)
-                const dayOfYear = Math.floor((midDate - startOfYear) / (1000 * 60 * 60 * 24)) + 1
+
+                // Calculate day of year, handling year wrap-around
+                let dayOfYear
                 const totalDays = 365 + (isLeapYear(year) ? 1 : 0)
+
+                if (midDate.getFullYear() > year) {
+                  // Midpoint is in next year, wrap it to current year for display
+                  const nextYearStart = new Date(year + 1, 0, 1)
+                  const dayInNextYear = Math.floor((midDate - nextYearStart) / (1000 * 60 * 60 * 24)) + 1
+                  dayOfYear = dayInNextYear // Position at the beginning of year
+                } else {
+                  const startOfYear = new Date(year, 0, 1)
+                  dayOfYear = Math.floor((midDate - startOfYear) / (1000 * 60 * 60 * 24)) + 1
+                }
 
                 // Calculate angle for this zodiac's midpoint (negative for counterclockwise)
                 const signAngle = -(dayOfYear / totalDays) * 360
@@ -206,28 +186,116 @@ function AnnualEventsClock({ currentDate, events }) {
                 const endMonth = months[sign.endMonth - 1]
                 const dateRange = `${startMonth} ${sign.startDay} - ${endMonth} ${sign.endDay}`
 
+                // Calculate wedge boundaries for this sign
+                // Add slight buffer to account for constellation visual overflow
+                const startAngle = dateToAngle(sign.startMonth, sign.startDay)
+                const endAngle = dateToAngle(sign.endMonth, sign.endDay)
+
+                // Expand wedge by ~2 degrees on each side to ensure full constellation coverage
+                const bufferAngle = 2
+                const expandedStartAngle = startAngle - bufferAngle
+                const expandedEndAngle = endAngle + bufferAngle
+
+                // Calculate the actual duration of this zodiac sign in days
+                let daysInSign
+
+                if (sign.endMonth < sign.startMonth) {
+                  // Crosses year boundary (like Capricorn: Dec 22 - Jan 19)
+                  const startDate = new Date(year, sign.startMonth - 1, sign.startDay)
+                  const endOfYear = new Date(year, 11, 31, 23, 59, 59)
+                  const startOfNextYear = new Date(year + 1, 0, 1)
+                  const endDate = new Date(year + 1, sign.endMonth - 1, sign.endDay)
+
+                  const daysToEndOfYear = Math.floor((endOfYear - startDate) / (1000 * 60 * 60 * 24)) + 1
+                  const daysFromStartOfYear = Math.floor((endDate - startOfNextYear) / (1000 * 60 * 60 * 24)) + 1
+                  daysInSign = daysToEndOfYear + daysFromStartOfYear
+                } else {
+                  // Normal case - doesn't cross year boundary
+                  const startDate = new Date(year, sign.startMonth - 1, sign.startDay)
+                  const endDate = new Date(year, sign.endMonth - 1, sign.endDay)
+                  daysInSign = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1
+                }
+
+                // Arc angle based on actual days in sign
+                const arcAngle = (daysInSign / totalDays) * 360
+                const largeArcFlag = arcAngle > 180 ? 1 : 0
+
+                // Create wedge path for hover area using expanded angles
+                const innerRadius = 250
+                const outerRadius = 450
+                const startRad = ((expandedStartAngle - 90) * Math.PI) / 180
+                const endRad = ((expandedEndAngle - 90) * Math.PI) / 180
+
+                // Calculate wedge path points
+                const x1 = 450 + innerRadius * Math.cos(startRad)
+                const y1 = 450 + innerRadius * Math.sin(startRad)
+                const x2 = 450 + outerRadius * Math.cos(startRad)
+                const y2 = 450 + outerRadius * Math.sin(startRad)
+                const x3 = 450 + outerRadius * Math.cos(endRad)
+                const y3 = 450 + outerRadius * Math.sin(endRad)
+                const x4 = 450 + innerRadius * Math.cos(endRad)
+                const y4 = 450 + innerRadius * Math.sin(endRad)
+
+                const wedgePath = `
+                  M ${x1} ${y1}
+                  L ${x2} ${y2}
+                  A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${x3} ${y3}
+                  L ${x4} ${y4}
+                  A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${x1} ${y1}
+                  Z
+                `
+
                 return (
-                  <g
-                    key={sign.name}
-                    transform={`translate(${x}, ${y}) rotate(${-rotation - signAngle}) scale(6.5)`}
-                    opacity="0.18"
-                    style={{ color: sign.color, cursor: 'pointer' }}
-                    className="zodiac-sign"
-                  >
-                    <title>{sign.name}: {dateRange}</title>
-                    {constellations[sign.name]}
+                  <g key={sign.name}>
+                    {/* Constellation visual - rendered first (behind) */}
+                    <g
+                      transform={`translate(${x}, ${y}) rotate(${-rotation - signAngle}) scale(6.5)`}
+                      opacity="0.18"
+                      style={{ color: sign.color, pointerEvents: 'none' }}
+                      className="zodiac-sign"
+                    >
+                      {constellations[sign.name]}
+                    </g>
+
+                    {/* Wedge-shaped hover area */}
+                    <path
+                      d={wedgePath}
+                      fill="transparent"
+                      style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                    >
+                      <title>{sign.name}: {dateRange}</title>
+                    </path>
                   </g>
                 )
               })}
 
               {/* Event markers */}
               {events.map((event) => {
+                // Check if this is a multi-day event
+                const isMultiDay = event.endMonth && event.endDay
+                const year = currentDate.getFullYear()
+
                 const angle = dateToAngle(event.month, event.day)
                 const pos = getEventPosition(angle)
 
-                // Check if this event is today
-                const isToday = event.month === currentDate.getMonth() + 1 &&
-                                event.day === currentDate.getDate()
+                // Check if this event is today or spans today
+                let isToday = event.month === currentDate.getMonth() + 1 &&
+                              event.day === currentDate.getDate()
+
+                // For multi-day events, check if today falls within the range
+                if (isMultiDay && !isToday) {
+                  const startDate = new Date(year, event.month - 1, event.day)
+                  const endDate = new Date(year, event.endMonth - 1, event.endDay)
+                  const today = new Date(year, currentDate.getMonth(), currentDate.getDate())
+
+                  // Handle year-crossing events
+                  if (endDate < startDate) {
+                    // Event crosses year boundary (e.g., Dec 20 - Jan 5)
+                    isToday = today >= startDate || today <= endDate
+                  } else {
+                    isToday = today >= startDate && today <= endDate
+                  }
+                }
 
                 // Check event type
                 const isAstronomical = event.name.includes('Solstice') || event.name.includes('Equinox')
@@ -236,7 +304,9 @@ function AnnualEventsClock({ currentDate, events }) {
 
                 // Format date for tooltip
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                const eventDate = `${months[event.month - 1]} ${event.day}`
+                const eventDate = isMultiDay
+                  ? `${months[event.month - 1]} ${event.day} - ${months[event.endMonth - 1]} ${event.endDay}`
+                  : `${months[event.month - 1]} ${event.day}`
 
                 // For radial labels: rotate by angle to point outward
                 // Normalize angle to 0-360 range
@@ -245,27 +315,138 @@ function AnnualEventsClock({ currentDate, events }) {
                 const needsFlip = normalizedAngle > 90 && normalizedAngle < 270
                 const radialRotation = needsFlip ? normalizedAngle - 180 : normalizedAngle
 
+                // For multi-day events, render an arc
+                if (isMultiDay) {
+                  const startAngle = dateToAngle(event.month, event.day)
+                  const endAngle = dateToAngle(event.endMonth, event.endDay)
+
+                  // Calculate arc parameters
+                  // Since angles are negative and decrease as dates progress,
+                  // we need to calculate the absolute arc span
+                  let arcAngle = startAngle - endAngle // Reversed since angles are negative
+
+                  // Handle year-crossing events (e.g., Dec 20 - Jan 5)
+                  if (arcAngle < 0) arcAngle += 360
+
+                  const largeArcFlag = arcAngle > 180 ? 1 : 0
+                  const arcRadius = 410 // Same radius as event markers
+
+                  // Calculate start and end points
+                  const startRad = ((startAngle - 90) * Math.PI) / 180
+                  const endRad = ((endAngle - 90) * Math.PI) / 180
+
+                  const x1 = 450 + arcRadius * Math.cos(startRad)
+                  const y1 = 450 + arcRadius * Math.sin(startRad)
+                  const x2 = 450 + arcRadius * Math.cos(endRad)
+                  const y2 = 450 + arcRadius * Math.sin(endRad)
+
+                  // Use sweep-flag = 0 for counterclockwise (following negative angle progression)
+                  const arcPath = `
+                    M ${x1} ${y1}
+                    A ${arcRadius} ${arcRadius} 0 ${largeArcFlag} 0 ${x2} ${y2}
+                  `
+
+                  return (
+                    <g key={event.id} className="event-marker">
+                      {/* Arc path for multi-day event */}
+                      <path
+                        d={arcPath}
+                        fill="none"
+                        stroke={event.color}
+                        strokeWidth={isToday ? "8" : "6"}
+                        strokeLinecap="round"
+                        opacity={isToday ? "0.9" : "0.7"}
+                        style={{ pointerEvents: 'stroke', cursor: 'pointer' }}
+                        filter="drop-shadow(0 0 4px rgba(100, 100, 255, 0.6))"
+                      >
+                        <title>{event.name} ({eventDate})</title>
+                      </path>
+
+                      {/* Start marker */}
+                      <circle
+                        cx={x1}
+                        cy={y1}
+                        r={isToday ? "6" : "4"}
+                        fill={event.color}
+                        stroke="#fff"
+                        strokeWidth="2"
+                        opacity="0.9"
+                        style={{ pointerEvents: 'none' }}
+                      />
+
+                      {/* End marker */}
+                      <circle
+                        cx={x2}
+                        cy={y2}
+                        r={isToday ? "6" : "4"}
+                        fill={event.color}
+                        stroke="#fff"
+                        strokeWidth="2"
+                        opacity="0.9"
+                        style={{ pointerEvents: 'none' }}
+                      />
+
+                      {/* Event label - only visible for today's events */}
+                      {isToday && (
+                        <g transform={`translate(${pos.x}, ${pos.y}) rotate(${radialRotation})`}>
+                          <text
+                            x="0"
+                            y={needsFlip ? "22" : "-22"}
+                            textAnchor="middle"
+                            fill="#ffffff"
+                            fontSize="13"
+                            fontWeight="700"
+                            style={{ userSelect: 'none', pointerEvents: 'none' }}
+                          >
+                            {event.name}
+                          </text>
+                        </g>
+                      )}
+                    </g>
+                  )
+                }
+
+                // Single-day event - original rendering logic
                 return (
-                  <g key={event.id} className="event-marker" style={{ cursor: 'pointer' }}>
-                    <title>{event.name} ({eventDate})</title>
+                  <g key={event.id} className="event-marker">
+                    {/* Invisible hover area - ensures event hovers take priority over zodiac wedges */}
+                    <circle
+                      cx={pos.x}
+                      cy={pos.y}
+                      r="20"
+                      fill="transparent"
+                      style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                    >
+                      <title>{event.name} ({eventDate})</title>
+                    </circle>
 
                     {/* Event marker - different shapes for different event types */}
                     {isSolarEclipse ? (
-                      // Star burst for solar eclipses
-                      <g>
+                      // Star burst for solar eclipses - more prominent
+                      <g style={{ pointerEvents: 'none' }}>
+                        {/* Outer glow */}
                         <circle
                           cx={pos.x}
                           cy={pos.y}
-                          r={isToday ? "8" : "5"}
+                          r={isToday ? "14" : "11"}
+                          fill={event.color}
+                          opacity="0.2"
+                        />
+                        {/* Main circle */}
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "10" : "7"}
                           fill={event.color}
                           stroke="#fff"
-                          strokeWidth={isToday ? "2" : "1.5"}
-                          opacity="0.9"
+                          strokeWidth={isToday ? "2.5" : "2"}
+                          opacity="1"
+                          filter="drop-shadow(0 0 4px rgba(255, 200, 0, 0.8))"
                         />
                         {/* Sun rays */}
                         {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => {
-                          const rayLength = isToday ? 12 : 8
-                          const innerR = isToday ? 8 : 5
+                          const rayLength = isToday ? 16 : 12
+                          const innerR = isToday ? 10 : 7
                           const rad = (angle * Math.PI) / 180
                           const x1 = pos.x + innerR * Math.cos(rad)
                           const y1 = pos.y + innerR * Math.sin(rad)
@@ -279,66 +460,93 @@ function AnnualEventsClock({ currentDate, events }) {
                               x2={x2}
                               y2={y2}
                               stroke={event.color}
-                              strokeWidth={isToday ? "2.5" : "2"}
+                              strokeWidth={isToday ? "3" : "2.5"}
                               strokeLinecap="round"
+                              opacity="0.9"
                             />
                           )
                         })}
                       </g>
                     ) : isLunarEclipse ? (
-                      // Crescent for lunar eclipses
-                      <g>
+                      // Crescent for lunar eclipses - more prominent
+                      <g style={{ pointerEvents: 'none' }}>
+                        {/* Outer glow */}
                         <circle
                           cx={pos.x}
                           cy={pos.y}
-                          r={isToday ? "9" : "6"}
+                          r={isToday ? "14" : "11"}
+                          fill={event.color}
+                          opacity="0.2"
+                        />
+                        {/* Main moon circle */}
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "11" : "8"}
                           fill={event.color}
                           stroke="#fff"
-                          strokeWidth={isToday ? "2.5" : "2"}
-                          opacity="0.9"
+                          strokeWidth={isToday ? "3" : "2.5"}
+                          opacity="1"
+                          filter="drop-shadow(0 0 4px rgba(200, 150, 100, 0.8))"
                         />
+                        {/* Shadow overlay for crescent */}
                         <circle
-                          cx={pos.x + (isToday ? 5 : 3)}
+                          cx={pos.x + (isToday ? 6 : 4)}
                           cy={pos.y}
-                          r={isToday ? "9" : "6"}
+                          r={isToday ? "11" : "8"}
                           fill="#0a1628"
-                          opacity="0.8"
+                          opacity="0.85"
                         />
                       </g>
                     ) : isAstronomical ? (
-                      // Diamond shape for solstices and equinoxes
-                      <rect
-                        x={pos.x}
-                        y={pos.y}
-                        width={isToday ? "20" : "12"}
-                        height={isToday ? "20" : "12"}
-                        transform={`translate(${isToday ? -10 : -6}, ${isToday ? -10 : -6}) rotate(45, ${pos.x}, ${pos.y})`}
-                        fill={event.color}
-                        stroke="#fff"
-                        strokeWidth={isToday ? "3" : "2"}
-                        opacity={isToday ? "1" : "0.9"}
-                      >
-                        {/* Pulse animation for today's events */}
-                        {isToday && (
-                          <>
-                            <animate
-                              attributeName="width"
-                              values="20;24;20"
-                              dur="2s"
-                              repeatCount="indefinite"
-                            />
-                            <animate
-                              attributeName="height"
-                              values="20;24;20"
-                              dur="2s"
-                              repeatCount="indefinite"
-                            />
-                          </>
-                        )}
-                      </rect>
+                      // Diamond shape for solstices and equinoxes - more prominent
+                      <g style={{ pointerEvents: 'none' }}>
+                        {/* Outer glow */}
+                        <rect
+                          x={pos.x}
+                          y={pos.y}
+                          width={isToday ? "26" : "20"}
+                          height={isToday ? "26" : "20"}
+                          transform={`translate(${isToday ? -13 : -10}, ${isToday ? -13 : -10}) rotate(45, ${pos.x}, ${pos.y})`}
+                          fill={event.color}
+                          opacity="0.2"
+                        />
+                        {/* Main diamond */}
+                        <rect
+                          x={pos.x}
+                          y={pos.y}
+                          width={isToday ? "22" : "16"}
+                          height={isToday ? "22" : "16"}
+                          transform={`translate(${isToday ? -11 : -8}, ${isToday ? -11 : -8}) rotate(45, ${pos.x}, ${pos.y})`}
+                          fill={event.color}
+                          stroke="#fff"
+                          strokeWidth={isToday ? "3" : "2.5"}
+                          opacity="1"
+                          filter="drop-shadow(0 0 4px rgba(150, 100, 255, 0.8))"
+                        >
+                          {/* Pulse animation for today's events */}
+                          {isToday && (
+                            <>
+                              <animate
+                                attributeName="width"
+                                values="22;26;22"
+                                dur="2s"
+                                repeatCount="indefinite"
+                              />
+                              <animate
+                                attributeName="height"
+                                values="22;26;22"
+                                dur="2s"
+                                repeatCount="indefinite"
+                              />
+                            </>
+                          )}
+                        </rect>
+                      </g>
                     ) : (
                       // Circle for personal events
                       <circle
+                        style={{ pointerEvents: 'none' }}
                         cx={pos.x}
                         cy={pos.y}
                         r={isToday ? "10" : "6"}
