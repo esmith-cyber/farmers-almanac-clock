@@ -622,10 +622,11 @@ function AnnualEventsClock({ currentDate, events }) {
       {/* Zodiac Info Modal */}
       {selectedZodiac && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 flex items-center justify-center p-4"
           style={{
             background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            zIndex: 9999
           }}
           onClick={() => setSelectedZodiac(null)}
         >
@@ -679,10 +680,11 @@ function AnnualEventsClock({ currentDate, events }) {
       {/* Event Info Modal */}
       {selectedEvent && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 flex items-center justify-center p-4"
           style={{
             background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            zIndex: 9999
           }}
           onClick={() => setSelectedEvent(null)}
         >
