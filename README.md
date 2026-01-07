@@ -22,8 +22,10 @@ A beautiful, interactive astronomical clock visualizing the annual cycle, moon p
 
 ### ⭐ Zodiac Constellations
 - Interactive constellation displays for all 12 zodiac signs
-- Precise wedge-shaped hover areas for easy tooltip access
-- Shows sign date ranges and current zodiac sign
+- Tap-to-show modals with astronomical and mythological facts
+- Desktop: Hover tooltips with date ranges
+- Mobile: Tap to view detailed information
+- Historically grounded descriptions (stars, nebulae, ancient origins)
 - Constellations rotate with the annual cycle
 
 ### 🌙 Astronomical Data
@@ -42,16 +44,20 @@ A beautiful, interactive astronomical clock visualizing the annual cycle, moon p
 - iOS-native glass morphism aesthetic
 - Cosmic starfield background (160+ stars with random distribution)
 - Smooth animations and transitions
-- Responsive design adapting to all screen sizes
+- Fully responsive design with mobile-first optimization
+- Mobile: Top/bottom info cards, tap interactions for modals
+- Desktop: Side panels, hover tooltips
 - Dark theme optimized for visibility
+- Safe area handling for iPhone notch and indicators
 
 ## Tech Stack
 
-- **React 18** - UI framework
+- **React 18** - UI framework with Portals for modal rendering
 - **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first styling
+- **Tailwind CSS** - Utility-first styling with responsive breakpoints
 - **SunCalc** - Astronomical calculations
 - **SVG** - Vector graphics for clocks and visualizations
+- **Vercel** - Deployment platform
 
 ## Getting Started
 
@@ -76,6 +82,18 @@ npm run preview
 
 ### Development
 The app runs on `http://localhost:5173` with hot module replacement (HMR) enabled.
+
+### Deployment
+Deploy to Vercel:
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy to production
+vercel --prod
+```
+
+**Live Demo:** https://farmers-almanac-clock.vercel.app
 
 ## Architecture
 
@@ -116,7 +134,35 @@ All layout dimensions are extracted to named constants:
 - `Date.now() + Math.random()` prevents collisions
 - Handles rapid event creation without duplicate IDs
 
+**React Portal for Modals**
+- Modals rendered outside component hierarchy using `createPortal(element, document.body)`
+- Bypasses CSS stacking context issues with nested z-index
+- Ensures modals always appear above all clock layers
+- Maintains proper event isolation with `stopPropagation`
+
 ## Recent Updates
+
+### Mobile Optimization & Deployment (2026-01-07)
+- Deployed to Vercel at https://farmers-almanac-clock.vercel.app
+- Mobile-first responsive design optimized for iPhone 16 Pro
+- Top/bottom info cards for sun and moon data on mobile
+- Centered clock layout between info cards
+- Aligned location and events button styling
+- Safe area inset handling for notch and home indicator
+
+### Touch Interaction & Modals (2026-01-07)
+- Tap-to-show modals for zodiac signs and events on mobile
+- React Portal implementation for proper z-index stacking
+- iOS-native modal design with glass morphism
+- Desktop: Hover tooltips remain functional
+- Mobile: Tap interactions with backdrop blur
+
+### Zodiac Content Update (2026-01-07)
+- Replaced personality trait descriptions with astronomical facts
+- Added notable stars: Regulus, Antares, Hamal, Spica, Aldebaran
+- Included celestial objects: Pleiades, Beehive Cluster M44, Helix Nebula
+- Documented ancient origins and Greek/Roman mythology
+- Historically grounded astronomical significance
 
 ### Multi-Day Event Support (2026-01-07)
 - Added checkbox toggle for multi-day events
