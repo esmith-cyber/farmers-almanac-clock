@@ -142,6 +142,15 @@ All layout dimensions are extracted to named constants:
 
 ## Recent Updates
 
+### EventManager Modal Fixes (2026-01-07)
+- Fixed modal rendering using React Portal at document.body level
+- Resolved z-index stacking issues where modal appeared behind clock layers
+- Redesigned color picker with vertical layout (dot on top, name below)
+- Increased color indicator size from 24px to 32px
+- Added white borders and shadows to color dots for visibility
+- Fixed rendering bug where Green/Yellow/Orange/Purple colors were missing or malformed
+- All 8 color options now display correctly on all devices
+
 ### Mobile Optimization & Deployment (2026-01-07)
 - Deployed to Vercel at https://farmers-almanac-clock.vercel.app
 - Mobile-first responsive design optimized for iPhone 16 Pro
