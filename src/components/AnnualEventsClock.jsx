@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 
 // Constants
 const SVG_CENTER = 450
@@ -620,7 +621,7 @@ function AnnualEventsClock({ currentDate, events }) {
       </div>
 
       {/* Zodiac Info Modal */}
-      {selectedZodiac && (
+      {selectedZodiac && createPortal(
         <div
           className="fixed inset-0 flex items-center justify-center p-4"
           style={{
@@ -674,11 +675,12 @@ function AnnualEventsClock({ currentDate, events }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Event Info Modal */}
-      {selectedEvent && (
+      {selectedEvent && createPortal(
         <div
           className="fixed inset-0 flex items-center justify-center p-4"
           style={{
@@ -734,7 +736,8 @@ function AnnualEventsClock({ currentDate, events }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
