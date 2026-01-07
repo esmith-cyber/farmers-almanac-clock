@@ -17,29 +17,52 @@ function AlmanacClock({ location, currentDate }) {
   }, [location, currentDate])
 
   useEffect(() => {
-    // Calculate rotation to keep "now" at top
-    const hours = currentDate.getHours()
-    const minutes = currentDate.getMinutes()
-    const seconds = currentDate.getSeconds()
+    if (!location) return
 
-    // Current time as decimal hours (0-24)
-    const currentTimeInHours = hours + minutes / 60 + seconds / 3600
+    // Calculate timezone offset from longitude (rough approximation: 15 degrees = 1 hour)
+    const timezoneOffsetHours = location.longitude / 15
+
+    // Get current UTC time
+    const utcHours = currentDate.getUTCHours()
+    const utcMinutes = currentDate.getUTCMinutes()
+    const utcSeconds = currentDate.getUTCSeconds()
+
+    // Calculate local time at the target location
+    let localHours = utcHours + timezoneOffsetHours
+
+    // Normalize to 0-24 range
+    while (localHours < 0) localHours += 24
+    while (localHours >= 24) localHours -= 24
+
+    // Current time as decimal hours (0-24) at target location
+    const currentTimeInHours = localHours + utcMinutes / 60 + utcSeconds / 3600
 
     // Convert to degrees (full circle = 24 hours)
     const currentAngle = (currentTimeInHours / 24) * 360
 
     // Rotate CLOCKWISE to put current time at top
-    // Positive rotation = clockwise, so past events move to the right
     setRotation(currentAngle)
-  }, [currentDate])
+  }, [currentDate, location])
 
-  if (!sunTimes) return null
+  if (!sunTimes || !location) return null
 
-  // Helper to convert Date to angle position
+  // Helper to convert Date to angle position (using location's timezone)
   const timeToAngle = (date) => {
-    const hours = date.getHours()
-    const minutes = date.getMinutes()
-    const timeInHours = hours + minutes / 60
+    // Calculate timezone offset from longitude
+    const timezoneOffsetHours = location.longitude / 15
+
+    // Get UTC time
+    const utcHours = date.getUTCHours()
+    const utcMinutes = date.getUTCMinutes()
+
+    // Calculate local time at the target location
+    let localHours = utcHours + timezoneOffsetHours
+
+    // Normalize to 0-24 range
+    while (localHours < 0) localHours += 24
+    while (localHours >= 24) localHours -= 24
+
+    const timeInHours = localHours + utcMinutes / 60
     return (timeInHours / 24) * 360
   }
 

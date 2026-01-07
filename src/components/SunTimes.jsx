@@ -20,8 +20,29 @@ function SunTimes({ location, currentDate }) {
 
   if (!sunTimes || !moonData) return null
 
+  // Helper to convert UTC time to local time at target location
+  const toLocalTime = (date) => {
+    // Calculate timezone offset from longitude (15 degrees = 1 hour)
+    const timezoneOffsetHours = location.longitude / 15
+    const offsetMilliseconds = timezoneOffsetHours * 60 * 60 * 1000
+
+    // Create new date with adjusted time
+    return new Date(date.getTime() + offsetMilliseconds)
+  }
+
   const formatTime = (date) => {
-    return format(date, 'h:mm a')
+    const localDate = toLocalTime(date)
+
+    // Get UTC hours/minutes from the adjusted date (which represents local time at target)
+    const hours = localDate.getUTCHours()
+    const minutes = localDate.getUTCMinutes()
+
+    // Format as 12-hour time
+    const period = hours >= 12 ? 'PM' : 'AM'
+    const displayHours = hours % 12 || 12
+    const displayMinutes = minutes.toString().padStart(2, '0')
+
+    return `${displayHours}:${displayMinutes} ${period}`
   }
 
   const getCurrentPeriod = () => {

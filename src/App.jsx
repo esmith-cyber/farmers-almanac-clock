@@ -9,7 +9,11 @@ import { getEclipsesForYear } from './utils/eclipseCalculator'
 import './App.css'
 
 function App() {
-  const [location, setLocation] = useState(null)
+  const [location, setLocation] = useState(() => {
+    // Load location from localStorage
+    const saved = localStorage.getItem('userLocation')
+    return saved ? JSON.parse(saved) : null
+  })
   const [locationError, setLocationError] = useState(null)
   const [isEditingLocation, setIsEditingLocation] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -31,8 +35,18 @@ function App() {
     localStorage.setItem('annualEvents', JSON.stringify(events))
   }, [events])
 
-  // Auto-detect location on mount
+  // Save location to localStorage whenever it changes
   useEffect(() => {
+    if (location) {
+      localStorage.setItem('userLocation', JSON.stringify(location))
+    }
+  }, [location])
+
+  // Auto-detect location on mount ONLY if no saved location exists
+  useEffect(() => {
+    // Skip geolocation if we already have a saved location
+    if (location) return
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -97,7 +111,7 @@ function App() {
     } else {
       setLocationError('Geolocation is not supported by your browser.')
     }
-  }, [])
+  }, [location])
 
   // Update current time every minute
   useEffect(() => {

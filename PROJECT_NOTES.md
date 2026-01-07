@@ -706,3 +706,73 @@ Split into two side panels positioned in the negative space flanking the clock d
   - Console warning system: Alerts in 2031+ with instructions to add new years
   - Template provided in source for easy extension
   - Created utility file: src/utils/eclipseCalculator.js
+- Location search with type-ahead autocomplete (2026-01-06)
+  - **Search by location name**: Users can type city names (e.g., "Paris, France") to find locations
+  - **Debounced autocomplete dropdown**: 300ms delay after typing to prevent excessive API calls
+  - **OpenStreetMap Nominatim API**: Free geocoding service for location search
+  - **Deduplication algorithm**: Removes duplicate results using compound key (name + coordinates)
+    - Groups by first 2 parts of location name (e.g., "Paris, Île-de-France")
+    - Rounds coordinates to 1 decimal place for fuzzy matching
+    - Prevents showing "Paris, France" multiple times from different result sets
+  - **Auto-complete features**:
+    - Shows up to 5 unique suggestions as user types
+    - Minimum 2 characters to trigger search
+    - Click outside to close dropdown
+    - Selection auto-fills latitude/longitude fields
+    - Formats display names as "City, Region/Country"
+  - **Three distinct buttons**:
+    - "Use This Location" (blue): Applies filled coordinates and updates clock
+    - "Auto Detect" (purple): Uses browser geolocation API and applies immediately
+    - Both buttons properly labeled to clarify their different purposes
+  - Implementation: LocationInput.jsx with useRef for timeout and dropdown management
+- Timezone handling for remote locations (2026-01-06)
+  - **Problem**: JavaScript Date objects don't carry timezone information
+  - **Core challenge**: When selecting Paris, France, need to show Paris local time (not user's PST)
+  - **Solution**: Longitude-based timezone approximation (15° longitude = 1 hour offset)
+  - **Day/Night gradient fix** (AlmanacClock.jsx):
+    - Calculate timezone offset from longitude: `timezoneOffsetHours = location.longitude / 15`
+    - Convert UTC hours to target location's local hours
+    - Normalize to 0-24 range with proper wrapping
+    - Calculate rotation angle based on local time at target location
+    - Update all sun event angles (sunrise, sunset, dawn, dusk, etc.) using same conversion
+    - Gradient now accurately reflects time of day at selected location
+  - **Time display fix** (SunTimes.jsx):
+    - Create `toLocalTime()` helper that adds timezone offset to UTC time
+    - Bypass date-fns `format()` function (which auto-applies browser timezone)
+    - Manual time formatting: extract UTC hours/minutes from adjusted date
+    - Convert to 12-hour format with AM/PM
+    - Sunrise/sunset times now display in target location's timezone
+  - **Architectural decision**: Use longitude approximation instead of full timezone library
+    - Keeps app lightweight with no external timezone dependencies
+    - Generally accurate for visualization purposes
+    - Trade-off: Doesn't account for DST or political timezone boundaries
+    - Good enough for natural phenomena display (sun/moon cycles)
+- Location persistence across sessions (2026-01-06)
+  - **localStorage integration**: User's selected location saved automatically
+  - **State initialization**: Load location from localStorage on App mount
+  - **Auto-save**: Save to localStorage whenever location changes
+  - **Smart geolocation**: Skip browser geolocation if saved location exists
+  - **User experience**: Selected location persists across page refreshes
+  - **Storage key**: 'userLocation' contains {latitude, longitude, name}
+  - Implementation: App.jsx with useState initializer and useEffect for persistence
+- Location search bug fixes (2026-01-06)
+  - **Bug 1: "Gradient went bananas"**
+    - Symptom: Harsh color transitions, chaotic gradient when switching to Paris
+    - Root cause: Sun times in UTC but `.getHours()` converted to PST, causing wrong gradient angles
+    - Failed fix: Switched everything to UTC, broke gradient for local viewing
+    - Final fix: Keep local time display, calculate timezone offset from longitude
+  - **Bug 2: Location not persisting**
+    - Symptom: Refresh reverted location back to Renton instead of staying on Paris
+    - Root cause: No localStorage persistence for location state
+    - Fix: Initialize state from localStorage, save on every location change
+  - **Bug 3: Duplicate autocomplete suggestions**
+    - Symptom: Multiple identical "Paris, France" entries in dropdown
+    - First fix: Deduplicate by coordinates (2 decimals) - removed one duplicate
+    - Still seeing duplicates after first fix
+    - Final fix: Compound deduplication key using both name AND coordinates
+    - Key format: `"${nameParts}|${coordKey}"` where coordinates rounded to 1 decimal
+  - **Bug 4: Times still showing PST**
+    - Symptom: Gradient fixed but sunrise/sunset times still in PST not Paris time
+    - Root cause: date-fns `format()` automatically applies browser's timezone
+    - Fix: Bypass date-fns, manually extract UTC hours/minutes from adjusted date
+    - Format time manually without any timezone library interference
