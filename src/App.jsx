@@ -138,22 +138,23 @@ function App() {
 
       {/* Location Display - Top Left */}
       <div className="fixed z-50" style={{
-        top: 'min(1.5vw, 24px)',
-        left: 'min(1.5vw, 24px)'
+        top: 'max(12px, env(safe-area-inset-top))',
+        left: '12px'
       }}>
         {location && !isEditingLocation ? (
-          <div className="ios-glass flex items-center gap-3" style={{
+          <div className="ios-glass flex items-center gap-2 md:gap-3" style={{
             padding: '12px 16px',
-            fontSize: '15px',
             borderRadius: '16px',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
-            <div className="text-white font-semibold">
+            <div className="text-white font-semibold truncate max-w-[100px] md:max-w-none" style={{
+              fontSize: '13px'
+            }}>
               {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
             </div>
             <button
               onClick={() => setIsEditingLocation(true)}
-              className="text-white hover:opacity-80 transition-opacity"
+              className="text-white hover:opacity-80 transition-opacity whitespace-nowrap"
               style={{
                 fontSize: '13px',
                 padding: '6px 12px',
@@ -178,8 +179,8 @@ function App() {
       {/* Event Manager - Top Right */}
       {location && (
         <div className="fixed z-50" style={{
-          top: 'min(1.5vw, 24px)',
-          right: 'min(1.5vw, 24px)'
+          top: 'max(12px, env(safe-area-inset-top))',
+          right: '12px'
         }}>
           <EventManager
             events={events}
@@ -197,7 +198,7 @@ function App() {
             minHeight: '600px'
           }}>
             {/* Layered Clock Display - Responsive sizing */}
-            <div className="relative flex items-center justify-center" style={{
+            <div className="relative flex items-center justify-center my-24 md:my-0" style={{
               width: 'min(85vw, 85vh, 1000px)',
               height: 'min(85vw, 85vh, 1000px)',
               minWidth: '300px',

@@ -112,6 +112,7 @@ function SunTimes({ location, currentDate }) {
 
   return (
     <>
+      {/* Desktop: Side Panels */}
       {/* Sun Info Panel - Left Side */}
       <div className="absolute left-0 ios-glass hidden md:block" style={{
         width: 'min(15vw, 200px)',
@@ -240,6 +241,72 @@ function SunTimes({ location, currentDate }) {
             <div className="text-slate-400" style={{ fontSize: 'min(1vw, 11px)' }}>Azimuth</div>
             <div className="text-slate-300" style={{ fontSize: 'min(1vw, 11px)' }}>
               {Math.round(moonData.azimuth * (180 / Math.PI))}°
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile: Top Card - Sun Info */}
+      <div className="md:hidden fixed left-0 right-0 z-40" style={{
+        top: 'max(80px, calc(env(safe-area-inset-top) + 80px))',
+        padding: '0 12px'
+      }}>
+        <div className="ios-glass" style={{
+          padding: '12px',
+          borderRadius: '16px',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+        }}>
+          <div className="flex items-center gap-3">
+            <div style={{ fontSize: '32px' }}>{period.emoji}</div>
+            <div className="flex-1">
+              <div className="text-white font-semibold text-base">{period.name}</div>
+              <div className="text-slate-400 text-xs">{format(currentDate, 'MMM d, yyyy')}</div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="text-slate-400 text-xs">Sunrise</div>
+                  <div className="text-amber-400 font-bold text-sm">{formatTime(sunTimes.sunrise)}</div>
+                </div>
+                <div>
+                  <div className="text-slate-400 text-xs">Sunset</div>
+                  <div className="text-orange-400 font-bold text-sm">{formatTime(sunTimes.sunset)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile: Bottom Card - Moon Info */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40" style={{
+        padding: '12px',
+        paddingBottom: 'max(12px, env(safe-area-inset-bottom))'
+      }}>
+        <div className="ios-glass" style={{
+          padding: '12px',
+          borderRadius: '16px',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+        }}>
+          <div className="flex items-center gap-3">
+            <div style={{ fontSize: '32px' }}>{moonEmoji}</div>
+            <div className="flex-1">
+              <div className="text-white font-semibold text-base">{moonName}</div>
+              <div className="text-slate-400 text-xs">{moonPhaseName}</div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="text-slate-400 text-xs">Illumination</div>
+                  <div className="text-slate-300 font-bold text-sm">{illuminationPercent}%</div>
+                </div>
+                {moonData.rise && (
+                  <div>
+                    <div className="text-slate-400 text-xs">Moonrise</div>
+                    <div className="text-slate-300 font-bold text-sm">{formatTime(moonData.rise)}</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

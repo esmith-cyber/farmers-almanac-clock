@@ -11,21 +11,23 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 
 function AnnualEventsClock({ currentDate, events }) {
   const [rotation, setRotation] = useState(0)
+  const [selectedZodiac, setSelectedZodiac] = useState(null)
+  const [selectedEvent, setSelectedEvent] = useState(null)
 
-  // Zodiac sign data with date ranges and colors
+  // Zodiac sign data with date ranges, colors, and descriptions
   const zodiacSigns = [
-    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, color: '#ef4444' },
-    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, color: '#4ade80' },
-    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, color: '#fbbf24' },
-    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, color: '#e0e7ff' },
-    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, color: '#fb923c' },
-    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, color: '#a78bfa' },
-    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, color: '#f472b6' },
-    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, color: '#dc2626' },
-    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, color: '#a855f7' },
-    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, color: '#94a3b8' },
-    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, color: '#22d3ee' },
-    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, color: '#2dd4bf' },
+    { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, color: '#ef4444', element: 'Fire', symbol: '♈', description: 'The Ram - Bold, ambitious, and confident' },
+    { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, color: '#4ade80', element: 'Earth', symbol: '♉', description: 'The Bull - Reliable, patient, and practical' },
+    { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, color: '#fbbf24', element: 'Air', symbol: '♊', description: 'The Twins - Curious, adaptable, and communicative' },
+    { name: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22, color: '#e0e7ff', element: 'Water', symbol: '♋', description: 'The Crab - Intuitive, emotional, and protective' },
+    { name: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22, color: '#fb923c', element: 'Fire', symbol: '♌', description: 'The Lion - Creative, passionate, and generous' },
+    { name: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22, color: '#a78bfa', element: 'Earth', symbol: '♍', description: 'The Maiden - Analytical, kind, and hardworking' },
+    { name: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22, color: '#f472b6', element: 'Air', symbol: '♎', description: 'The Scales - Diplomatic, fair, and social' },
+    { name: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21, color: '#dc2626', element: 'Water', symbol: '♏', description: 'The Scorpion - Passionate, resourceful, and brave' },
+    { name: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21, color: '#a855f7', element: 'Fire', symbol: '♐', description: 'The Archer - Optimistic, adventurous, and philosophical' },
+    { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, color: '#94a3b8', element: 'Earth', symbol: '♑', description: 'The Goat - Disciplined, responsible, and ambitious' },
+    { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, color: '#22d3ee', element: 'Air', symbol: '♒', description: 'The Water Bearer - Progressive, independent, and humanitarian' },
+    { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, color: '#2dd4bf', element: 'Water', symbol: '♓', description: 'The Fish - Compassionate, artistic, and intuitive' },
   ]
 
   // Helper functions
@@ -264,6 +266,7 @@ function AnnualEventsClock({ currentDate, events }) {
                       d={wedgePath}
                       fill="transparent"
                       style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                      onClick={() => setSelectedZodiac(sign)}
                     >
                       <title>{sign.name}: {dateRange}</title>
                     </path>
@@ -357,6 +360,7 @@ function AnnualEventsClock({ currentDate, events }) {
                         opacity={isToday ? "0.9" : "0.7"}
                         style={{ pointerEvents: 'stroke', cursor: 'pointer' }}
                         filter="drop-shadow(0 0 4px rgba(100, 100, 255, 0.6))"
+                        onClick={() => setSelectedEvent(event)}
                       >
                         <title>{event.name} ({eventDate})</title>
                       </path>
@@ -415,6 +419,7 @@ function AnnualEventsClock({ currentDate, events }) {
                       r="20"
                       fill="transparent"
                       style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                      onClick={() => setSelectedEvent(event)}
                     >
                       <title>{event.name} ({eventDate})</title>
                     </circle>
@@ -613,6 +618,122 @@ function AnnualEventsClock({ currentDate, events }) {
           </div>
         </div>
       </div>
+
+      {/* Zodiac Info Modal */}
+      {selectedZodiac && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(10px)'
+          }}
+          onClick={() => setSelectedZodiac(null)}
+        >
+          <div
+            className="ios-glass-thick max-w-sm w-full"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span style={{ fontSize: '32px' }}>{selectedZodiac.symbol}</span>
+                  <div>
+                    <h2 className="text-2xl font-bold" style={{ color: selectedZodiac.color }}>
+                      {selectedZodiac.name}
+                    </h2>
+                    <p className="text-slate-400 text-sm">{selectedZodiac.element} Sign</p>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedZodiac(null)}
+                className="text-slate-400 hover:text-white text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <div className="text-slate-400 text-sm mb-1">Date Range</div>
+                <div className="text-white font-semibold">
+                  {MONTH_NAMES[selectedZodiac.startMonth - 1]} {selectedZodiac.startDay} - {MONTH_NAMES[selectedZodiac.endMonth - 1]} {selectedZodiac.endDay}
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-700/50">
+                <div className="text-slate-300 text-sm leading-relaxed">
+                  {selectedZodiac.description}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Event Info Modal */}
+      {selectedEvent && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(10px)'
+          }}
+          onClick={() => setSelectedEvent(null)}
+        >
+          <div
+            className="ios-glass-thick max-w-sm w-full"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {selectedEvent.name}
+                </h2>
+              </div>
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="text-slate-400 hover:text-white text-2xl leading-none ml-2"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <div className="text-slate-400 text-sm mb-1">Date</div>
+                <div className="text-white font-semibold">
+                  {selectedEvent.endMonth && selectedEvent.endDay ? (
+                    `${MONTH_NAMES[selectedEvent.month - 1]} ${selectedEvent.day} - ${MONTH_NAMES[selectedEvent.endMonth - 1]} ${selectedEvent.endDay}`
+                  ) : (
+                    `${MONTH_NAMES[selectedEvent.month - 1]} ${selectedEvent.day}`
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: selectedEvent.color }}
+                />
+                <span className="text-slate-300 text-sm">
+                  {selectedEvent.type ? selectedEvent.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Personal Event'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
