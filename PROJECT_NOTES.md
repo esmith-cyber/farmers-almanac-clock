@@ -1014,3 +1014,80 @@ Added descriptions for celestial events:
 - `src/components/SunTimes.jsx`: Modal state, click handlers, modal rendering
 - `src/App.jsx`: Added mobile-clock-border class to clock container
 - `src/index.css`: Mobile-specific border and glow styles with media query
+
+## Interactive Lunar Disc (2026-01-08)
+
+### Clickable Phase Markers & Ring Segments
+- **Goal**: Make the lunar disc educational and interactive
+- **Solution**: Added click handlers for both phase markers and ring segments
+
+**Phase Marker Interactivity:**
+- Each of the four principal phases (New Moon, First Quarter, Full Moon, Last Quarter) is clickable
+- Clicking a phase marker shows detailed educational content:
+  - Description of the phase's astronomical characteristics
+  - Timing in the lunar cycle (when it occurs)
+  - Visibility information (when to see it in the sky)
+  - Astronomical facts (Sun-Earth-Moon angles, eclipse conditions, terminator visibility)
+  - Cultural significance (traditions and meanings)
+- Each marker has transparent hit area (radius + 8px) for easier clicking
+- Markers prevent event propagation to avoid triggering ring clicks
+
+**Ring Segment Interactivity:**
+- Ring divided into 8 phase segments based on click position
+- Clicking different parts of the ring shows info for that phase:
+  - New Moon area (top): 0° - New Moon info
+  - Waxing Crescent (top-left): ~15-80° counter-clockwise
+  - First Quarter (left): 90° - First Quarter info
+  - Waxing Gibbous (bottom-left): ~100-170° counter-clockwise
+  - Full Moon (bottom): 180° - Full Moon info
+  - Waning Gibbous (bottom-right): ~190-260° counter-clockwise
+  - Last Quarter (right): 270° - Last Quarter info
+  - Waning Crescent (top-right): ~280-345° counter-clockwise
+- Click position is calculated accounting for disc rotation
+- Formula: `clickPhase = ((360 - clickAngle) % 360) / 360` to match counter-clockwise phase progression
+
+**Center Area Reserved:**
+- Day/night clock center (inner 70% of disc) is non-interactive
+- Ring uses SVG path with donut shape (outer ring only)
+- Center left completely free for future day/night click handlers
+- No pointer events blocking the AlmanacClock component underneath
+
+**Modal Content:**
+- **Principal phases** (clicked via marker or ring): Detailed educational content with 6 sections
+- **Intermediate phases** (clicked via ring): General description with typical illumination
+- **Current phase** indicator shows actual live data
+- **Non-current phases** show "Typical Illumination" with approximate percentages
+- Cycle progress bar only displays when viewing current phase
+- Appropriate emoji for each phase (🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘)
+
+### Rotation Logic Fix
+- **Issue**: Phases appeared in wrong order (waxing/waning flipped)
+- **Root cause**: Original clockwise rotation was correct, but phase marker positions needed adjustment
+- **Solution**: Changed phase marker angles to match counter-clockwise time progression:
+  - New Moon: 0° (top)
+  - First Quarter: 270° (left) - was 90°
+  - Full Moon: 180° (bottom)
+  - Last Quarter: 90° (right) - was 270°
+- Rotation formula: `setRotation(currentAngle)` where currentAngle = phase * 360
+- Comment clarifies: "Positive rotation = clockwise, so past phases move to the right"
+- Future phases appear counter-clockwise (to the left), past phases clockwise (to the right)
+
+**Technical Implementation:**
+- SVG `<path>` creates ring shape (donut) from 175px to 250px radius
+- Path syntax: Two circles with even-odd fill rule creates hole in center
+- Click handler calculates SVG coordinates from browser mouse position
+- `Math.atan2(dy, dx)` computes angle from center
+- Angle adjusted for rotation: `phaseAngle = (angle - rotation + 360) % 360`
+- Phase lookup uses thresholds matching gradient boundaries
+
+**Files Modified:**
+- `src/components/MoonPhaseClock.jsx`:
+  - Added `selectedPhaseMarker` and `displayPhaseName` state
+  - `handleRingClick(e, clickAngle)` - determines clicked phase segment
+  - `handlePhaseMarkerClick(e, phaseName)` - handles marker clicks
+  - `getPhaseMarkerInfo(phaseName)` - returns detailed phase data
+  - Clickable SVG groups for each phase marker with pointer events
+  - SVG ring path with click calculation and rotation compensation
+  - Modal renders different content based on selectedPhaseMarker vs displayPhaseName
+  - Fixed phase marker angles (270° for First Quarter, 90° for Last Quarter)
+  - Fixed click-to-phase calculation for counter-clockwise progression

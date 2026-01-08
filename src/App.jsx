@@ -285,8 +285,7 @@ function App() {
               {/* Moon Phase Clock - Middle Layer */}
               <div className="absolute z-10" style={{
                 width: '55.56%',
-                height: '55.56%',
-                pointerEvents: 'none'
+                height: '55.56%'
               }}>
                 <MoonPhaseClock
                   location={location}
