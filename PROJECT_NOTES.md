@@ -962,3 +962,55 @@ Added descriptions for celestial events:
 - Head positioned slightly toward center, tail extends outward
 - Sparkles oriented along radial and perpendicular axes
 - IIFE pattern used in JSX to calculate positions before rendering
+
+## Mobile UX Improvements (2026-01-07)
+
+### Clickable Sun & Moon Modals
+- **Problem**: Limited space on mobile cards meant less information visible
+- **Solution**: Made sun and moon cards tappable to reveal detailed modals
+
+**Sun Modal Features:**
+- Sunrise/sunset times (highlighted with color)
+- Day length prominently displayed
+- Solar noon, dawn, dusk (civil)
+- Nautical dawn/dusk times
+- Astronomical night begin/end times
+- Scrollable content for smaller screens
+
+**Moon Modal Features:**
+- Large illumination percentage display
+- Lunar cycle progress bar (visual % through cycle)
+- Moonrise/moonset times
+- Current altitude and azimuth
+- Approximate distance from Earth (~384,400 km)
+- Scrollable content
+
+**Implementation:**
+- iOS-style glass morphism design
+- Portal-based modals (createPortal to body)
+- Touch-friendly close button
+- Tap outside modal to dismiss
+- Mobile-only (md:hidden media query)
+- Cards show pointer cursor to indicate clickability
+
+### Mobile Clock Border
+- **Problem**: Clock boundaries somewhat lost against cosmic background on mobile
+- **Solution**: Added subtle border and multi-layer glow effect for mobile screens only
+
+**Visual Treatment (mobile only):**
+- 2px circular border (semi-transparent slate)
+- Multi-layer outer glow (40px and 80px radius)
+- Subtle inset shadow for depth perception
+- Applied only on screens ≤768px width
+- Doesn't affect desktop aesthetic
+
+**Benefits:**
+- Clearly defines clock edge without being harsh
+- Soft halo effect separates clock from background
+- Maintains cosmic atmosphere while improving clarity
+- No impact on desktop/tablet experience
+
+**Files Modified:**
+- `src/components/SunTimes.jsx`: Modal state, click handlers, modal rendering
+- `src/App.jsx`: Added mobile-clock-border class to clock container
+- `src/index.css`: Mobile-specific border and glow styles with media query

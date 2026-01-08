@@ -249,7 +249,7 @@ function App() {
             minHeight: '600px'
           }}>
             {/* Layered Clock Display - Responsive sizing */}
-            <div className="relative flex items-center justify-center my-24 md:my-0" style={{
+            <div className="relative flex items-center justify-center my-24 md:my-0 mobile-clock-border" style={{
               width: 'min(85vw, 85vh, 1000px)',
               height: 'min(85vw, 85vh, 1000px)',
               minWidth: '300px',
