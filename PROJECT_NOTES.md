@@ -890,3 +890,75 @@ Split into two side panels positioned in the negative space flanking the clock d
     - Slivers disappeared immediately after border removal
   - **Files modified**: src/index.css (line 286-287)
   - **Lesson**: Edge rendering artifacts with rotating elements often caused by layered borders/shadows, not the underlying gradient logic
+
+## Celestial Events & Event Type System (2026-01-07)
+
+### Overview
+Expanded the annual events system to properly categorize and display astronomical events alongside personal events, with educational content and improved visual hierarchy.
+
+### Event Type System
+- **Type field added** to all events with automatic migration
+  - `personal`: Birthdays, holidays, cultural events (circles on outer ring)
+  - `celestial`: Solstices, equinoxes, perihelion, aphelion (diamonds on inner ring)
+  - `meteor-shower`: Annual meteor showers (shooting stars on inner ring)
+  - `solar-eclipse` / `lunar-eclipse`: Eclipse events (star-burst/crescent icons)
+
+### New Default Events
+Added 11 celestial events that appear for all users:
+- **Meteor Showers**: Quadrantids (Jan 3), Lyrids (Apr 22), Eta Aquarids (May 6), Perseids (Aug 12), Orionids (Oct 21), Leonids (Nov 17), Geminids (Dec 13)
+- **Earth's Orbit**: Perihelion (Jan 3 - closest to Sun), Aphelion (Jul 4 - farthest from Sun)
+- **Solstices & Equinoxes**: Now properly categorized as `celestial` type
+
+### Visual Improvements
+1. **Two-ring layout** for better organization:
+   - Personal events: Outer ring at radius 410px
+   - Celestial events: Inner ring at radius 285px (closer to lunar clock)
+   - Reduces visual clutter and separates event categories
+
+2. **Meteor shower icons**:
+   - Shooting star design with radially-oriented tails
+   - Tails point inward toward Earth (meteors falling from space)
+   - Sparkles on star head for visual interest
+   - Positioned on inner ring with other celestial events
+
+3. **Improved click detection**:
+   - Transparent circular clickable areas around each event icon
+   - Prevents overlapping click regions
+   - Visual elements styled with `pointerEvents: 'none'`
+
+### Multi-Event Modal System
+- **Problem**: Multiple events on same date (e.g., Perihelion + Quadrantids on Jan 3)
+- **Solution**: Clicking any event shows ALL events for that date
+  - Modal header shows date and event count
+  - Each event displayed as separate card
+  - Scrollable list for dates with many events
+  - Includes educational descriptions for celestial events
+- **UX benefit**: No need to avoid overlapping dates; embraces the richness of concurrent events
+
+### Educational Content
+Added descriptions for celestial events:
+- **Perihelion**: Explains Earth's closest approach to Sun, why distance doesn't determine seasons
+- **Aphelion**: Earth's farthest point, emphasizes axial tilt importance
+- **Meteor Showers**: Describes debris streams, best viewing times after midnight
+
+### Migration Strategy
+- Automatic localStorage migration on page load
+- Infers event types from names for backwards compatibility
+- Merges new celestial events without removing user's personal events
+- Migration preserves all user data while adding new default events
+
+### Files Modified
+- `src/App.jsx`: Default events with types, migration logic
+- `src/components/EventManager.jsx`: Event type selector in UI
+- `src/components/AnnualEventsClock.jsx`:
+  - Two-ring layout with different radii
+  - Meteor shower rendering with radial orientation
+  - Multi-event modal system
+  - Click detection improvements
+  - Educational descriptions
+
+### Technical Details
+- Meteor tail calculation uses `Math.atan2()` to compute radial angle from center
+- Head positioned slightly toward center, tail extends outward
+- Sparkles oriented along radial and perpendicular axes
+- IIFE pattern used in JSX to calculate positions before rendering

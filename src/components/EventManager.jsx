@@ -11,9 +11,16 @@ function EventManager({ events, onEventsChange }) {
     day: 1,
     endMonth: null,
     endDay: null,
-    color: '#60a5fa'
+    color: '#60a5fa',
+    type: 'personal'
   })
   const [isMultiDay, setIsMultiDay] = useState(false)
+
+  const eventTypes = [
+    { name: 'Personal Event', value: 'personal', description: 'Birthdays, anniversaries, holidays' },
+    { name: 'Celestial Event', value: 'celestial', description: 'Solstices, equinoxes, perihelion, aphelion' },
+    { name: 'Meteor Shower', value: 'meteor-shower', description: 'Annual meteor showers' },
+  ]
 
   const colorOptions = [
     { name: 'Blue', value: '#60a5fa' },
@@ -28,7 +35,7 @@ function EventManager({ events, onEventsChange }) {
 
   const handleAdd = () => {
     setEditingEvent(null)
-    setFormData({ name: '', month: 1, day: 1, endMonth: null, endDay: null, color: '#60a5fa' })
+    setFormData({ name: '', month: 1, day: 1, endMonth: null, endDay: null, color: '#60a5fa', type: 'personal' })
     setIsMultiDay(false)
     setShowForm(true)
   }
@@ -41,7 +48,8 @@ function EventManager({ events, onEventsChange }) {
       day: event.day,
       endMonth: event.endMonth || null,
       endDay: event.endDay || null,
-      color: event.color
+      color: event.color,
+      type: event.type || 'personal' // Default to personal for backwards compatibility
     })
     setIsMultiDay(!!(event.endMonth && event.endDay))
     setShowForm(true)
@@ -101,7 +109,7 @@ function EventManager({ events, onEventsChange }) {
       // Update existing event
       onEventsChange(events.map(e =>
         e.id === editingEvent.id
-          ? { ...e, name: formData.name, month, day, endMonth, endDay, color: formData.color }
+          ? { ...e, name: formData.name, month, day, endMonth, endDay, color: formData.color, type: formData.type }
           : e
       ))
     } else {
@@ -113,7 +121,8 @@ function EventManager({ events, onEventsChange }) {
         day,
         endMonth,
         endDay,
-        color: formData.color
+        color: formData.color,
+        type: formData.type
       }
       onEventsChange([...events, newEvent])
     }
@@ -199,6 +208,31 @@ function EventManager({ events, onEventsChange }) {
                     fontSize: '15px'
                   }}
                 />
+              </div>
+
+              {/* Event Type Selector */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Event Type
+                </label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  className="w-full text-white focus:outline-none"
+                  style={{
+                    padding: '12px 16px',
+                    background: 'rgba(58, 58, 60, 0.6)',
+                    borderRadius: '12px',
+                    border: '0.5px solid rgba(255, 255, 255, 0.1)',
+                    fontSize: '15px'
+                  }}
+                >
+                  {eventTypes.map(type => (
+                    <option key={type.value} value={type.value}>
+                      {type.name} - {type.description}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

@@ -4,7 +4,8 @@ import { createPortal } from 'react-dom'
 // Constants
 const SVG_CENTER = 450
 const SVG_SIZE = 900
-const EVENT_RADIUS = 410
+const EVENT_RADIUS = 410 // Personal events on outer edge
+const CELESTIAL_EVENT_RADIUS = 285 // Celestial events on inner edge (closer to lunar ring)
 const CONSTELLATION_RADIUS = 340
 const INNER_RADIUS = 250
 const OUTER_RADIUS = 450
@@ -90,11 +91,11 @@ function AnnualEventsClock({ currentDate, events }) {
   }
 
   // Calculate position on the ring for an event
-  const getEventPosition = (angle) => {
+  const getEventPosition = (angle, radius = EVENT_RADIUS) => {
     const rad = ((angle - 90) * Math.PI) / 180 // -90 to start at top
     return {
-      x: SVG_CENTER + EVENT_RADIUS * Math.cos(rad),
-      y: SVG_CENTER + EVENT_RADIUS * Math.sin(rad),
+      x: SVG_CENTER + radius * Math.cos(rad),
+      y: SVG_CENTER + radius * Math.sin(rad),
     }
   }
 
@@ -281,8 +282,18 @@ function AnnualEventsClock({ currentDate, events }) {
                 const isMultiDay = event.endMonth != null && event.endDay != null
                 const year = currentDate.getFullYear()
 
+                // Check event type first to determine positioning
+                const isSolarEclipse = event.type === 'solar-eclipse'
+                const isLunarEclipse = event.type === 'lunar-eclipse'
+                const isMeteorShower = event.type === 'meteor-shower'
+                const isCelestial = event.type === 'celestial' || event.name.includes('Solstice') || event.name.includes('Equinox') || event.name.includes('Perihelion') || event.name.includes('Aphelion')
+                const isPersonal = event.type === 'personal' || (!isSolarEclipse && !isLunarEclipse && !isMeteorShower && !isCelestial)
+
+                // Use different radius based on event type
+                const eventRadius = isPersonal ? EVENT_RADIUS : CELESTIAL_EVENT_RADIUS
+
                 const startAngle = dateToAngle(event.month, event.day)
-                const pos = getEventPosition(startAngle)
+                const pos = getEventPosition(startAngle, eventRadius)
 
                 // Check if this event is today or spans today
                 let isToday = event.month === currentDate.getMonth() + 1 &&
@@ -302,11 +313,6 @@ function AnnualEventsClock({ currentDate, events }) {
                     isToday = today >= startDate && today <= endDate
                   }
                 }
-
-                // Check event type
-                const isAstronomical = event.name.includes('Solstice') || event.name.includes('Equinox')
-                const isSolarEclipse = event.type === 'solar-eclipse'
-                const isLunarEclipse = event.type === 'lunar-eclipse'
 
                 // Format date for tooltip
                 const eventDate = isMultiDay
@@ -334,19 +340,19 @@ function AnnualEventsClock({ currentDate, events }) {
 
                   const largeArcFlag = arcAngle > 180 ? 1 : 0
 
-                  // Calculate start and end points
+                  // Calculate start and end points using the appropriate radius for this event type
                   const startRad = ((startAngle - 90) * Math.PI) / 180
                   const endRad = ((endAngle - 90) * Math.PI) / 180
 
-                  const x1 = SVG_CENTER + EVENT_RADIUS * Math.cos(startRad)
-                  const y1 = SVG_CENTER + EVENT_RADIUS * Math.sin(startRad)
-                  const x2 = SVG_CENTER + EVENT_RADIUS * Math.cos(endRad)
-                  const y2 = SVG_CENTER + EVENT_RADIUS * Math.sin(endRad)
+                  const x1 = SVG_CENTER + eventRadius * Math.cos(startRad)
+                  const y1 = SVG_CENTER + eventRadius * Math.sin(startRad)
+                  const x2 = SVG_CENTER + eventRadius * Math.cos(endRad)
+                  const y2 = SVG_CENTER + eventRadius * Math.sin(endRad)
 
                   // Use sweep-flag = 0 for counterclockwise (following negative angle progression)
                   const arcPath = `
                     M ${x1} ${y1}
-                    A ${EVENT_RADIUS} ${EVENT_RADIUS} 0 ${largeArcFlag} 0 ${x2} ${y2}
+                    A ${eventRadius} ${eventRadius} 0 ${largeArcFlag} 0 ${x2} ${y2}
                   `
 
                   return (
@@ -428,7 +434,8 @@ function AnnualEventsClock({ currentDate, events }) {
                     {/* Event marker - different shapes for different event types */}
                     {isSolarEclipse ? (
                       // Star burst for solar eclipses - more prominent
-                      <g style={{ pointerEvents: 'none' }}>
+                      <g>
+                        <g style={{ pointerEvents: 'none' }}>
                         {/* Outer glow */}
                         <circle
                           cx={pos.x}
@@ -471,10 +478,23 @@ function AnnualEventsClock({ currentDate, events }) {
                             />
                           )
                         })}
+                        </g>
+                        {/* Invisible clickable area */}
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "18" : "14"}
+                          fill="transparent"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => setSelectedEvent(event)}
+                        >
+                          <title>{event.name} ({eventDate})</title>
+                        </circle>
                       </g>
                     ) : isLunarEclipse ? (
                       // Crescent for lunar eclipses - more prominent
-                      <g style={{ pointerEvents: 'none' }}>
+                      <g>
+                        <g style={{ pointerEvents: 'none' }}>
                         {/* Outer glow */}
                         <circle
                           cx={pos.x}
@@ -502,74 +522,222 @@ function AnnualEventsClock({ currentDate, events }) {
                           fill="#0a1628"
                           opacity="0.85"
                         />
-                      </g>
-                    ) : isAstronomical ? (
-                      // Diamond shape for solstices and equinoxes - more prominent
-                      <g style={{ pointerEvents: 'none' }}>
-                        {/* Outer glow */}
-                        <rect
-                          x={pos.x}
-                          y={pos.y}
-                          width={isToday ? "26" : "20"}
-                          height={isToday ? "26" : "20"}
-                          transform={`translate(${isToday ? -13 : -10}, ${isToday ? -13 : -10}) rotate(45, ${pos.x}, ${pos.y})`}
-                          fill={event.color}
-                          opacity="0.2"
-                        />
-                        {/* Main diamond */}
-                        <rect
-                          x={pos.x}
-                          y={pos.y}
-                          width={isToday ? "22" : "16"}
-                          height={isToday ? "22" : "16"}
-                          transform={`translate(${isToday ? -11 : -8}, ${isToday ? -11 : -8}) rotate(45, ${pos.x}, ${pos.y})`}
-                          fill={event.color}
-                          stroke="#fff"
-                          strokeWidth={isToday ? "3" : "2.5"}
-                          opacity="1"
-                          filter="drop-shadow(0 0 4px rgba(150, 100, 255, 0.8))"
+                        </g>
+                        {/* Invisible clickable area */}
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "14" : "11"}
+                          fill="transparent"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => setSelectedEvent(event)}
                         >
-                          {/* Pulse animation for today's events */}
-                          {isToday && (
-                            <>
-                              <animate
-                                attributeName="width"
-                                values="22;26;22"
-                                dur="2s"
-                                repeatCount="indefinite"
+                          <title>{event.name} ({eventDate})</title>
+                        </circle>
+                      </g>
+                    ) : isMeteorShower ? (
+                      // Shooting star icon for meteor showers - head near center, tail streams outward
+                      (() => {
+                        // Calculate radial angle from center to event position
+                        const radialAngle = Math.atan2(pos.y - SVG_CENTER, pos.x - SVG_CENTER)
+                        const tailLength = isToday ? 24 : 18
+                        const headInset = isToday ? 8 : 6  // Head slightly toward center
+                        const glowLength = isToday ? 28 : 20
+
+                        // Calculate positions - head toward center, tail streams outward
+                        const headX = pos.x - headInset * Math.cos(radialAngle)
+                        const headY = pos.y - headInset * Math.sin(radialAngle)
+                        const tailEndX = pos.x + tailLength * Math.cos(radialAngle)
+                        const tailEndY = pos.y + tailLength * Math.sin(radialAngle)
+                        const glowEndX = pos.x + glowLength * Math.cos(radialAngle)
+                        const glowEndY = pos.y + glowLength * Math.sin(radialAngle)
+
+                        // Calculate perpendicular angle for sparkle lines
+                        const perpAngle = radialAngle + Math.PI / 2
+                        const sparkleLength = isToday ? 10 : 7
+
+                        return (
+                          <g>
+                            {/* Visual elements - not clickable */}
+                            <g style={{ pointerEvents: 'none' }}>
+                              {/* Outer glow */}
+                              <g opacity="0.3">
+                                <line
+                                  x1={headX}
+                                  y1={headY}
+                                  x2={glowEndX}
+                                  y2={glowEndY}
+                                  stroke={event.color}
+                                  strokeWidth={isToday ? "5" : "4"}
+                                  strokeLinecap="round"
+                                />
+                                <circle
+                                  cx={headX}
+                                  cy={headY}
+                                  r={isToday ? "10" : "8"}
+                                  fill={event.color}
+                                />
+                              </g>
+                              {/* Main streak */}
+                              <line
+                                x1={headX}
+                                y1={headY}
+                                x2={tailEndX}
+                                y2={tailEndY}
+                                stroke={event.color}
+                                strokeWidth={isToday ? "3" : "2"}
+                                strokeLinecap="round"
+                                filter="drop-shadow(0 0 4px rgba(150, 200, 255, 0.9))"
                               />
-                              <animate
-                                attributeName="height"
-                                values="22;26;22"
-                                dur="2s"
-                                repeatCount="indefinite"
-                              />
-                            </>
-                          )}
-                        </rect>
+                              {/* Star at head */}
+                              <circle
+                                cx={headX}
+                                cy={headY}
+                                r={isToday ? "7" : "5"}
+                                fill={event.color}
+                                stroke="#fff"
+                                strokeWidth={isToday ? "2.5" : "2"}
+                                filter="drop-shadow(0 0 6px rgba(255, 255, 255, 0.8))"
+                              >
+                                {/* Pulse animation for today's events */}
+                                {isToday && (
+                                  <animate
+                                    attributeName="r"
+                                    values="7;9;7"
+                                    dur="2s"
+                                    repeatCount="indefinite"
+                                  />
+                                )}
+                              </circle>
+                              {/* Sparkles around the star - perpendicular to radial direction */}
+                              <g opacity="0.8">
+                                <line
+                                  x1={headX - sparkleLength * Math.cos(perpAngle)}
+                                  y1={headY - sparkleLength * Math.sin(perpAngle)}
+                                  x2={headX + sparkleLength * Math.cos(perpAngle)}
+                                  y2={headY + sparkleLength * Math.sin(perpAngle)}
+                                  stroke="#fff"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                />
+                                <line
+                                  x1={headX - sparkleLength * Math.cos(radialAngle)}
+                                  y1={headY - sparkleLength * Math.sin(radialAngle)}
+                                  x2={headX + sparkleLength * Math.cos(radialAngle)}
+                                  y2={headY + sparkleLength * Math.sin(radialAngle)}
+                                  stroke="#fff"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                />
+                              </g>
+                            </g>
+                            {/* Invisible clickable area - only around the star head */}
+                            <circle
+                              cx={headX}
+                              cy={headY}
+                              r={isToday ? "12" : "10"}
+                              fill="transparent"
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => setSelectedEvent(event)}
+                            >
+                              <title>{event.name} ({eventDate})</title>
+                            </circle>
+                          </g>
+                        )
+                      })()
+                    ) : isCelestial ? (
+                      // Diamond shape for solstices, equinoxes, and other celestial events - more prominent
+                      <g>
+                        <g style={{ pointerEvents: 'none' }}>
+                          {/* Outer glow */}
+                          <rect
+                            x={pos.x}
+                            y={pos.y}
+                            width={isToday ? "26" : "20"}
+                            height={isToday ? "26" : "20"}
+                            transform={`translate(${isToday ? -13 : -10}, ${isToday ? -13 : -10}) rotate(45, ${pos.x}, ${pos.y})`}
+                            fill={event.color}
+                            opacity="0.2"
+                          />
+                          {/* Main diamond */}
+                          <rect
+                            x={pos.x}
+                            y={pos.y}
+                            width={isToday ? "22" : "16"}
+                            height={isToday ? "22" : "16"}
+                            transform={`translate(${isToday ? -11 : -8}, ${isToday ? -11 : -8}) rotate(45, ${pos.x}, ${pos.y})`}
+                            fill={event.color}
+                            stroke="#fff"
+                            strokeWidth={isToday ? "3" : "2.5"}
+                            opacity="1"
+                            filter="drop-shadow(0 0 4px rgba(150, 100, 255, 0.8))"
+                          >
+                            {/* Pulse animation for today's events */}
+                            {isToday && (
+                              <>
+                                <animate
+                                  attributeName="width"
+                                  values="22;26;22"
+                                  dur="2s"
+                                  repeatCount="indefinite"
+                                />
+                                <animate
+                                  attributeName="height"
+                                  values="22;26;22"
+                                  dur="2s"
+                                  repeatCount="indefinite"
+                                />
+                              </>
+                            )}
+                          </rect>
+                        </g>
+                        {/* Invisible clickable area */}
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "15" : "12"}
+                          fill="transparent"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => setSelectedEvent(event)}
+                        >
+                          <title>{event.name} ({eventDate})</title>
+                        </circle>
                       </g>
                     ) : (
                       // Circle for personal events
-                      <circle
-                        style={{ pointerEvents: 'none' }}
-                        cx={pos.x}
-                        cy={pos.y}
-                        r={isToday ? "10" : "6"}
-                        fill={event.color}
-                        stroke="#fff"
-                        strokeWidth={isToday ? "3" : "2"}
-                        opacity={isToday ? "1" : "0.9"}
-                      >
-                        {/* Pulse animation for today's events */}
-                        {isToday && (
-                          <animate
-                            attributeName="r"
-                            values="10;12;10"
-                            dur="2s"
-                            repeatCount="indefinite"
-                          />
-                        )}
-                      </circle>
+                      <g>
+                        <circle
+                          style={{ pointerEvents: 'none' }}
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "10" : "6"}
+                          fill={event.color}
+                          stroke="#fff"
+                          strokeWidth={isToday ? "3" : "2"}
+                          opacity={isToday ? "1" : "0.9"}
+                        >
+                          {/* Pulse animation for today's events */}
+                          {isToday && (
+                            <animate
+                              attributeName="r"
+                              values="10;12;10"
+                              dur="2s"
+                              repeatCount="indefinite"
+                            />
+                          )}
+                        </circle>
+                        {/* Invisible clickable area */}
+                        <circle
+                          cx={pos.x}
+                          cy={pos.y}
+                          r={isToday ? "12" : "8"}
+                          fill="transparent"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => setSelectedEvent(event)}
+                        >
+                          <title>{event.name} ({eventDate})</title>
+                        </circle>
+                      </g>
                     )}
 
                     {/* Event label - only visible for today's events */}
@@ -680,65 +848,106 @@ function AnnualEventsClock({ currentDate, events }) {
       )}
 
       {/* Event Info Modal */}
-      {selectedEvent && createPortal(
-        <div
-          className="fixed inset-0 flex items-center justify-center p-4"
-          style={{
-            background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(10px)',
-            zIndex: 9999
-          }}
-          onClick={() => setSelectedEvent(null)}
-        >
+      {selectedEvent && (() => {
+        // Find all events on the same date as the selected event
+        const sameDateEvents = events.filter(e =>
+          e.month === selectedEvent.month && e.day === selectedEvent.day
+        )
+
+        return createPortal(
           <div
-            className="ios-glass-thick max-w-sm w-full"
+            className="fixed inset-0 flex items-center justify-center p-4"
             style={{
-              borderRadius: '24px',
-              padding: '24px',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 9999
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setSelectedEvent(null)}
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {selectedEvent.name}
-                </h2>
-              </div>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="text-slate-400 hover:text-white text-2xl leading-none ml-2"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <div className="text-slate-400 text-sm mb-1">Date</div>
-                <div className="text-white font-semibold">
-                  {selectedEvent.endMonth && selectedEvent.endDay ? (
-                    `${MONTH_NAMES[selectedEvent.month - 1]} ${selectedEvent.day} - ${MONTH_NAMES[selectedEvent.endMonth - 1]} ${selectedEvent.endDay}`
-                  ) : (
-                    `${MONTH_NAMES[selectedEvent.month - 1]} ${selectedEvent.day}`
-                  )}
+            <div
+              className="ios-glass-thick max-w-sm w-full"
+              style={{
+                borderRadius: '24px',
+                padding: '24px',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+                maxHeight: '80vh',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-white">
+                    {MONTH_NAMES[selectedEvent.month - 1]} {selectedEvent.day}
+                  </h2>
+                  <p className="text-slate-400 text-sm mt-1">
+                    {sameDateEvents.length} {sameDateEvents.length === 1 ? 'event' : 'events'}
+                  </p>
                 </div>
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="text-slate-400 hover:text-white text-2xl leading-none ml-2"
+                >
+                  ×
+                </button>
               </div>
 
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: selectedEvent.color }}
-                />
-                <span className="text-slate-300 text-sm">
-                  {selectedEvent.type ? selectedEvent.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Personal Event'}
-                </span>
+              {/* Scrollable event list */}
+              <div className="space-y-4 overflow-y-auto" style={{ flex: 1 }}>
+                {sameDateEvents.map(event => {
+                  const getDescription = () => {
+                    if (event.name.includes('Perihelion')) {
+                      return "Earth's closest approach to the Sun (~147 million km). Despite being closest, this occurs during Northern Hemisphere winter due to Earth's axial tilt being more important for seasons than distance from the Sun."
+                    }
+                    if (event.name.includes('Aphelion')) {
+                      return "Earth's farthest point from the Sun (~152 million km). This occurs during Northern Hemisphere summer, demonstrating that seasons are caused by Earth's tilt, not its distance from the Sun."
+                    }
+                    if (event.type === 'meteor-shower') {
+                      return "Annual meteor shower when Earth passes through debris left by a comet or asteroid. Best viewing typically occurs after midnight when your location rotates into the debris stream."
+                    }
+                    return null
+                  }
+
+                  const description = getDescription()
+
+                  return (
+                    <div
+                      key={event.id}
+                      className="p-4 rounded-xl"
+                      style={{
+                        background: 'rgba(30, 30, 40, 0.5)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)'
+                      }}
+                    >
+                      <h3 className="text-lg font-semibold text-white mb-2">
+                        {event.name}
+                      </h3>
+
+                      <div className="flex items-center gap-2 mb-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: event.color }}
+                        />
+                        <span className="text-slate-300 text-xs">
+                          {event.type ? event.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Personal Event'}
+                        </span>
+                      </div>
+
+                      {description && (
+                        <div className="text-slate-300 text-xs leading-relaxed mt-3">
+                          {description}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body
+        )
+      })()}
     </div>
   )
 }

@@ -19,16 +19,67 @@ function App() {
   const [isEditingLocation, setIsEditingLocation] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [events, setEvents] = useState(() => {
+    // Default celestial events (will be merged with user's saved events)
+    const defaultCelestialEvents = [
+      // Personal/Cultural Events
+      { id: 1, name: 'New Year', month: 1, day: 1, color: '#60a5fa', type: 'personal' },
+      { id: 2, name: 'Valentine\'s Day', month: 2, day: 14, color: '#f472b6', type: 'personal' },
+
+      // Celestial Events - Solstices & Equinoxes
+      { id: 3, name: 'Spring Equinox', month: 3, day: 20, color: '#4ade80', type: 'celestial' },
+      { id: 4, name: 'Summer Solstice', month: 6, day: 21, color: '#fbbf24', type: 'celestial' },
+      { id: 5, name: 'Autumn Equinox', month: 9, day: 22, color: '#fb923c', type: 'celestial' },
+      { id: 6, name: 'Winter Solstice', month: 12, day: 21, color: '#a78bfa', type: 'celestial' },
+
+      // Celestial Events - Meteor Showers
+      { id: 7, name: 'Quadrantids Meteor Shower', month: 1, day: 3, color: '#60a5fa', type: 'meteor-shower' },
+      { id: 8, name: 'Lyrids Meteor Shower', month: 4, day: 22, color: '#fbbf24', type: 'meteor-shower' },
+      { id: 9, name: 'Eta Aquarids Meteor Shower', month: 5, day: 6, color: '#22d3ee', type: 'meteor-shower' },
+      { id: 10, name: 'Perseids Meteor Shower', month: 8, day: 12, color: '#a78bfa', type: 'meteor-shower' },
+      { id: 11, name: 'Orionids Meteor Shower', month: 10, day: 21, color: '#fb923c', type: 'meteor-shower' },
+      { id: 12, name: 'Leonids Meteor Shower', month: 11, day: 17, color: '#fbbf24', type: 'meteor-shower' },
+      { id: 13, name: 'Geminids Meteor Shower', month: 12, day: 13, color: '#60a5fa', type: 'meteor-shower' },
+
+      // Celestial Events - Earth's Orbit
+      { id: 14, name: 'Perihelion', month: 1, day: 3, color: '#fb923c', type: 'celestial' },
+      { id: 15, name: 'Aphelion', month: 7, day: 4, color: '#22d3ee', type: 'celestial' },
+    ]
+
     // Load events from localStorage
     const saved = localStorage.getItem('annualEvents')
-    return saved ? JSON.parse(saved) : [
-      { id: 1, name: 'New Year', month: 1, day: 1, color: '#60a5fa' },
-      { id: 2, name: 'Valentine\'s Day', month: 2, day: 14, color: '#f472b6' },
-      { id: 3, name: 'Spring Equinox', month: 3, day: 20, color: '#4ade80' },
-      { id: 4, name: 'Summer Solstice', month: 6, day: 21, color: '#fbbf24' },
-      { id: 5, name: 'Autumn Equinox', month: 9, day: 22, color: '#fb923c' },
-      { id: 6, name: 'Winter Solstice', month: 12, day: 21, color: '#a78bfa' },
-    ]
+    if (!saved) {
+      // No saved events, use defaults
+      return defaultCelestialEvents
+    }
+
+    const savedEvents = JSON.parse(saved)
+
+    // Migration: Add type field to existing events if missing
+    const migratedEvents = savedEvents.map(event => {
+      if (event.type) return event // Already has type
+
+      // Infer type from name for backwards compatibility
+      if (event.name.includes('Eclipse')) {
+        return { ...event, type: event.name.includes('Solar') ? 'solar-eclipse' : 'lunar-eclipse' }
+      }
+      if (event.name.includes('Solstice') || event.name.includes('Equinox') ||
+          event.name.includes('Perihelion') || event.name.includes('Aphelion')) {
+        return { ...event, type: 'celestial' }
+      }
+      if (event.name.includes('Meteor')) {
+        return { ...event, type: 'meteor-shower' }
+      }
+      return { ...event, type: 'personal' }
+    })
+
+    // Check if we need to add new celestial events
+    const existingIds = new Set(migratedEvents.map(e => e.id))
+    const newCelestialEvents = defaultCelestialEvents.filter(e =>
+      (e.type === 'celestial' || e.type === 'meteor-shower') && !existingIds.has(e.id)
+    )
+
+    // Merge: Keep user's events + add any new celestial events they don't have
+    return [...migratedEvents, ...newCelestialEvents]
   })
 
   // Save events to localStorage whenever they change
