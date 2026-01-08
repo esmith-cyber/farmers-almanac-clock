@@ -182,7 +182,7 @@ function MoonPhaseClock({ location, currentDate }) {
   console.log('Current moon phase:', moonData.phase, 'illumination:', illuminationPercent + '%', 'name:', currentPhaseName)
 
   return (
-    <div className="flex justify-center items-center w-full h-full">
+    <div className="flex justify-center items-center w-full h-full" style={{ pointerEvents: 'none' }}>
       <div className="relative w-full h-full">
         {/* Rotating Moon Phase Disk */}
         <div
@@ -194,11 +194,12 @@ function MoonPhaseClock({ location, currentDate }) {
             className="relative w-full h-full rounded-full clock-glow overflow-hidden"
             style={{
               background: moonGradient,
-              opacity: 0.4
+              opacity: 0.4,
+              pointerEvents: 'none'
             }}
           >
             {/* Quarter Phase Markers - Elegant Visual Representations */}
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 500 500">
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 500 500" style={{ pointerEvents: 'none' }}>
               {/* Calculate positions for each phase marker */}
               {(() => {
                 const radius = 212.5  // Centered in the 75px ring (175 inner + 37.5)

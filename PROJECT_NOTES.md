@@ -1091,3 +1091,35 @@ Added descriptions for celestial events:
   - Modal renders different content based on selectedPhaseMarker vs displayPhaseName
   - Fixed phase marker angles (270° for First Quarter, 90° for Last Quarter)
   - Fixed click-to-phase calculation for counter-clockwise progression
+
+## Pointer Events Bug Fix (2026-01-08)
+
+### Issue
+After adding interactive lunar disc, celestial events on the inner ring (solstices, equinoxes, meteor showers) became unclickable. The MoonPhaseClock component was overlaying the AnnualEventsClock and catching all pointer events, even in transparent areas.
+
+### Root Cause
+Multiple wrapper divs in the layer stack were catching pointer events:
+1. App.jsx wrapper div for MoonPhaseClock (z-10)
+2. MoonPhaseClock root div
+3. MoonPhaseClock gradient background div
+4. MoonPhaseClock SVG container
+
+All these layers were positioned over the AnnualEventsClock (z-0), blocking clicks from reaching events underneath.
+
+### Solution
+Added `pointerEvents: 'none'` to all non-interactive wrapper elements throughout the stack:
+- **App.jsx**: MoonPhaseClock wrapper div gets `pointerEvents: 'none'`
+- **MoonPhaseClock.jsx**:
+  - Root container div: `pointerEvents: 'none'`
+  - Gradient background div: `pointerEvents: 'none'`
+  - SVG container: `pointerEvents: 'none'`
+- **Interactive elements retain** `pointerEvents: 'auto'`:
+  - SVG ring path (donut shape)
+  - Phase marker groups
+  - Modal trigger areas
+
+This allows clicks to pass through transparent areas to the annual events below, while keeping the lunar ring and phase markers fully interactive.
+
+**Files Modified:**
+- `src/App.jsx`: Added `pointerEvents: 'none'` to MoonPhaseClock wrapper div
+- `src/components/MoonPhaseClock.jsx`: Added `pointerEvents: 'none'` to all wrapper divs and SVG
