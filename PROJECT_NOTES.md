@@ -1123,3 +1123,61 @@ This allows clicks to pass through transparent areas to the annual events below,
 **Files Modified:**
 - `src/App.jsx`: Added `pointerEvents: 'none'` to MoonPhaseClock wrapper div
 - `src/components/MoonPhaseClock.jsx`: Added `pointerEvents: 'none'` to all wrapper divs and SVG
+
+## Traditional Full Moon Names (2026-01-08)
+
+### Feature
+Added traditional Full Moon names with historical context for ancient farmers and traders. Each month's Full Moon now displays its traditional name and significance.
+
+### All 12 Traditional Moon Names
+1. **January - Wolf Moon**: Howling wolves in winter depths, time for planning
+2. **February - Snow Moon**: Heaviest snowfalls, also called Hunger Moon
+3. **March - Worm Moon**: Earthworm casts appear, thawing ground signals spring
+4. **April - Pink Moon**: Wild ground phlox blooms, planting season begins
+5. **May - Flower Moon**: Abundant blooms, corn planting, milk production
+6. **June - Strawberry Moon**: Short strawberry harvest season
+7. **July - Buck Moon**: Deer grow new antlers, haying season begins
+8. **August - Sturgeon Moon**: Best sturgeon fishing, early corn harvest
+9. **September - Harvest Moon**: Extra moonlight for harvesting crops
+10. **October - Hunter's Moon**: Bright light for hunting, final preparations
+11. **November - Beaver Moon**: Beaver trapping season, last winter prep
+12. **December - Cold Moon**: Deep winter arrival, longest nights
+
+### Implementation
+**Modal Design:**
+- Clicking Full Moon marker shows simplified modal focused on traditional name
+- Header displays moon emoji, traditional name, and month/year
+- Two content sections:
+  - **📖 Origin**: Etymology and natural phenomena behind the name
+  - **🌾 For Ancient Farmers & Traders**: Historical significance and practical meaning
+- Clean blue-tinted design matching Farmer's Almanac aesthetic
+- Other phase markers (New Moon, First Quarter, Last Quarter) retain detailed astronomical info
+
+**Technical:**
+- `getTraditionalMoonName(month)` function returns name, description, folklore for each month
+- Full Moon marker info includes `traditionalName` property
+- Modal conditionally renders simplified content for Full Moon vs detailed for other phases
+- Also appears in ring segment modal when clicking Full Moon phase area
+
+**Historical Context:**
+Each moon name includes:
+- Origin of the name (Native American, European settler traditions)
+- Natural phenomena associated with that time of year
+- Practical significance for farmers (planting, harvesting, preparation)
+- Relevance for merchants and traders (travel conditions, supply management)
+- Community activities and cultural practices
+
+### User Experience
+- Month automatically determines which traditional name is shown
+- Names rotate throughout the year as months change
+- Provides educational value about agricultural history
+- Connects astronomical events to practical human activities
+- Reinforces Farmer's Almanac theme throughout the application
+
+**Files Modified:**
+- `src/components/MoonPhaseClock.jsx`:
+  - Added `getTraditionalMoonName(month)` with all 12 moon names and folklore
+  - Modified Full Moon marker info to include traditionalName
+  - Created special Full Moon modal layout (simplified, focused on tradition)
+  - Added traditional moon name section to ring segment modal for Full Moon phase
+  - Keeps detailed astronomical info for other three principal phases

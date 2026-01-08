@@ -135,6 +135,73 @@ function MoonPhaseClock({ location, currentDate }) {
   // Format percentage of illumination
   const illuminationPercent = Math.round(moonData.fraction * 100)
 
+  // Traditional Full Moon names by month with historical context
+  const getTraditionalMoonName = (month) => {
+    const moonNames = {
+      1: {
+        name: 'Wolf Moon',
+        description: 'Named for the howling of hungry wolves during the cold depths of winter. Native American tribes and early European settlers heard wolf packs howling more frequently during January\'s long, cold nights. For farmers, this was a time of planning and preparation, as the ground was too frozen for planting.',
+        folklore: 'Ancient farmers used this time to inventory supplies, repair tools, and plan the coming year\'s crops. The Wolf Moon signaled the heart of winter - a reminder to conserve resources and stay vigilant.'
+      },
+      2: {
+        name: 'Snow Moon',
+        description: 'February typically brings the heaviest snowfalls in many regions of North America, giving this moon its name. Also called the Hunger Moon, as hunting became difficult and food stores ran low.',
+        folklore: 'For early settlers and farmers, the Snow Moon was a test of winter preparation. Merchants reduced travel due to dangerous conditions. Communities relied on preserved food and close-knit support to survive the hardest month.'
+      },
+      3: {
+        name: 'Worm Moon',
+        description: 'As temperatures warm, earthworm casts begin to appear, signaling the thawing of the ground. Also called the Crow Moon for the cawing crows that herald spring\'s arrival.',
+        folklore: 'The Worm Moon marked a turning point for farmers - a sign that spring was near and soil would soon be workable. Maple syrup harvesting began. Merchants prepared for renewed trade as winter\'s isolation ended.'
+      },
+      4: {
+        name: 'Pink Moon',
+        description: 'Named for the wild ground phlox (pink moss) that blooms in early spring. One of the first widespread flowers of spring in North America. Also called the Sprouting Grass Moon or Egg Moon.',
+        folklore: 'For farmers, the Pink Moon signaled the beginning of the planting season. Fields were prepared, seeds were sown. Fishermen knew shad and other fish were running. The agricultural year truly began under this moon.'
+      },
+      5: {
+        name: 'Flower Moon',
+        description: 'May brings an abundance of blooming flowers across the landscape. Also called the Corn Planting Moon or Milk Moon, as this was when corn was planted and cows gave plentiful milk on fresh grass.',
+        folklore: 'Ancient farmers planted crops that required warm soil - corn, beans, squash. The Flower Moon meant fertile fields and the promise of harvest. Beekeepers knew flowers meant strong honey production ahead.'
+      },
+      6: {
+        name: 'Strawberry Moon',
+        description: 'Named for the short strawberry harvesting season in June. Native American Algonquin tribes knew this moon signaled the time to gather ripening strawberries.',
+        folklore: 'The Strawberry Moon marked the first major harvest for farmers. Wild strawberries were gathered and preserved. European settlers called it the Rose Moon, as roses bloomed abundantly. A time of plenty after spring\'s work.'
+      },
+      7: {
+        name: 'Buck Moon',
+        description: 'Male deer (bucks) begin growing new antlers in July, covered in velvety fur. Also called the Thunder Moon for summer\'s frequent thunderstorms, or Hay Moon for the hay harvest.',
+        folklore: 'For farmers, the Buck Moon meant haying season - cutting, drying, and storing grass for winter livestock feed. The year\'s first major harvest. Thunderstorms could ruin hay crops, so timing was critical.'
+      },
+      8: {
+        name: 'Sturgeon Moon',
+        description: 'Named for the sturgeon fish that were most readily caught in the Great Lakes and Lake Champlain during August. Also called the Green Corn Moon or Grain Moon.',
+        folklore: 'Ancient fishermen knew August brought the best sturgeon fishing. Farmers began harvesting early corn. This moon signaled the transition from growing to harvesting season - a time of plenty and hard work.'
+      },
+      9: {
+        name: 'Harvest Moon',
+        description: 'The full moon closest to the autumn equinox, rising near sunset for several nights. Its bright light allowed farmers to work late into the evening harvesting crops. A crucial advantage before electricity.',
+        folklore: 'The Harvest Moon was the most important to farmers. Extra moonlight meant extra harvesting time for crops that needed immediate attention. Communities came together for harvest. Merchants prepared for winter trade.'
+      },
+      10: {
+        name: 'Hunter\'s Moon',
+        description: 'Following the Harvest Moon, the Hunter\'s Moon provided bright light for hunting game that had fattened on fallen grains. Fields were clear, making game easier to spot. Also called the Blood Moon or Sanguine Moon.',
+        folklore: 'After harvest, ancient peoples hunted and preserved meat for winter. The bright moon allowed tracking prey at night. Farmers finished field work and prepared livestock for winter. A time of urgent preparation.'
+      },
+      11: {
+        name: 'Beaver Moon',
+        description: 'November was when beavers were most active building winter dams, and when trappers set beaver traps before waters froze. Also called the Frost Moon as cold weather arrived.',
+        folklore: 'Ancient peoples set traps for beaver pelts - valuable for winter clothing and trade. Farmers completed final preparations: storing root vegetables, smoking meat, ensuring livestock had shelter. Last chance before deep winter.'
+      },
+      12: {
+        name: 'Cold Moon',
+        description: 'December\'s full moon marks the arrival of winter\'s coldest period. Also called the Long Nights Moon, as it occurs near the winter solstice when nights are longest.',
+        folklore: 'The Cold Moon signaled deep winter for ancient peoples. All preparation must be complete. Farmers settled in for winter, living on stored food. Communities gathered for winter solstice celebrations, knowing the days would soon lengthen.'
+      }
+    }
+    return moonNames[month]
+  }
+
   // Get detailed information for specific phase markers
   const getPhaseMarkerInfo = (phaseName) => {
     const info = {
@@ -163,7 +230,8 @@ function MoonPhaseClock({ location, currentDate }) {
         timing: 'Occurs approximately 14.75 days after the New Moon, at the midpoint of the lunar cycle.',
         cultural: 'Full Moons have been celebrated across cultures and given names based on seasonal characteristics (Harvest Moon, Hunter\'s Moon, etc.).',
         astronomical: 'Lunar eclipses can only occur during a Full Moon when Earth passes directly between the Sun and Moon, casting its shadow on the lunar surface.',
-        visibility: 'Visible all night - rises at sunset, highest at midnight, sets at sunrise'
+        visibility: 'Visible all night - rises at sunset, highest at midnight, sets at sunrise',
+        traditionalName: getTraditionalMoonName(currentDate.getMonth() + 1)
       },
       'Last Quarter': {
         emoji: '🌗',
@@ -396,6 +464,68 @@ function MoonPhaseClock({ location, currentDate }) {
               // Show specific phase marker information
               (() => {
                 const markerInfo = getPhaseMarkerInfo(selectedPhaseMarker)
+
+                // Special treatment for Full Moon - show only traditional name
+                if (selectedPhaseMarker === 'Full Moon' && markerInfo.traditionalName) {
+                  return (
+                    <>
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-3xl">🌕</span>
+                            <h2 className="text-2xl font-bold text-white">
+                              {markerInfo.traditionalName.name}
+                            </h2>
+                          </div>
+                          <p className="text-blue-300 text-sm">Full Moon · {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                        </div>
+                        <button
+                          onClick={() => setShowModal(false)}
+                          className="text-slate-400 hover:text-white text-2xl leading-none"
+                        >
+                          ×
+                        </button>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Illumination */}
+                        <div className="p-4 rounded-xl" style={{ background: 'rgba(100, 116, 139, 0.1)', border: '1px solid rgba(148, 163, 184, 0.2)' }}>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-slate-400 text-xs mb-1">Illumination</div>
+                              <div className="text-white font-bold text-3xl">100%</div>
+                            </div>
+                            <div className="text-slate-400 text-sm">Fully illuminated</div>
+                          </div>
+                        </div>
+
+                        {/* Moon Name Origin */}
+                        <div className="p-4 rounded-xl" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+                          <h3 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                            <span>📖</span>
+                            Origin
+                          </h3>
+                          <p className="text-slate-300 text-sm leading-relaxed">
+                            {markerInfo.traditionalName.description}
+                          </p>
+                        </div>
+
+                        {/* For Ancient Farmers & Traders */}
+                        <div className="p-4 rounded-xl" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+                          <h3 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                            <span>🌾</span>
+                            For Ancient Farmers & Traders
+                          </h3>
+                          <p className="text-slate-300 text-sm leading-relaxed">
+                            {markerInfo.traditionalName.folklore}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )
+                }
+
+                // Other phases get the detailed info
                 return (
                   <>
                     <div className="flex justify-between items-start mb-4">
@@ -588,6 +718,28 @@ function MoonPhaseClock({ location, currentDate }) {
                   </div>
                 </div>
               </div>
+
+              {/* Traditional Moon Name - for Full Moon */}
+              {(displayPhaseName === 'Full Moon' || currentPhaseName === 'Full Moon') && (() => {
+                const traditionalMoon = getTraditionalMoonName(currentDate.getMonth() + 1)
+                return (
+                  <div className="p-4 rounded-xl" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-2xl">🌾</span>
+                      <h3 className="text-blue-300 font-bold text-lg">{traditionalMoon.name}</h3>
+                    </div>
+                    <p className="text-slate-300 text-sm leading-relaxed mb-3">
+                      {traditionalMoon.description}
+                    </p>
+                    <div className="pt-3 border-t border-slate-600">
+                      <h4 className="text-blue-200 font-semibold text-xs mb-2">FOR ANCIENT FARMERS & TRADERS</h4>
+                      <p className="text-slate-400 text-sm leading-relaxed">
+                        {traditionalMoon.folklore}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })()}
 
               {/* Phase Timing Info - only show for current phase */}
               {(!displayPhaseName || displayPhaseName === currentPhaseName) && (
