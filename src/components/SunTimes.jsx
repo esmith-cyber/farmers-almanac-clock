@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
+import { createPortal } from 'react-dom'
 import SunCalc from 'suncalc'
 
 function SunTimes({ location, currentDate }) {
   const [sunTimes, setSunTimes] = useState(null)
   const [moonData, setMoonData] = useState(null)
+  const [showSunModal, setShowSunModal] = useState(false)
+  const [showMoonModal, setShowMoonModal] = useState(false)
 
   useEffect(() => {
     if (!location) return
@@ -251,11 +254,16 @@ function SunTimes({ location, currentDate }) {
         top: 'max(80px, calc(env(safe-area-inset-top) + 80px))',
         padding: '0 12px'
       }}>
-        <div className="ios-glass" style={{
-          padding: '12px',
-          borderRadius: '16px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-        }}>
+        <div
+          className="ios-glass"
+          style={{
+            padding: '12px',
+            borderRadius: '16px',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+            cursor: 'pointer'
+          }}
+          onClick={() => setShowSunModal(true)}
+        >
           <div className="flex items-center gap-3">
             <div style={{ fontSize: '32px' }}>{period.emoji}</div>
             <div className="flex-1">
@@ -283,11 +291,16 @@ function SunTimes({ location, currentDate }) {
         padding: '12px',
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))'
       }}>
-        <div className="ios-glass" style={{
-          padding: '12px',
-          borderRadius: '16px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-        }}>
+        <div
+          className="ios-glass"
+          style={{
+            padding: '12px',
+            borderRadius: '16px',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+            cursor: 'pointer'
+          }}
+          onClick={() => setShowMoonModal(true)}
+        >
           <div className="flex items-center gap-3">
             <div style={{ fontSize: '32px' }}>{moonEmoji}</div>
             <div className="flex-1">
@@ -311,6 +324,223 @@ function SunTimes({ location, currentDate }) {
           </div>
         </div>
       </div>
+
+      {/* Sun Info Modal */}
+      {showSunModal && createPortal(
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4 md:hidden"
+          style={{
+            background: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 9999
+          }}
+          onClick={() => setShowSunModal(false)}
+        >
+          <div
+            className="ios-glass-thick max-w-sm w-full"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              maxHeight: '80vh',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div style={{ fontSize: '48px', filter: 'drop-shadow(0 0 8px rgba(255, 200, 100, 0.5))' }}>
+                  {period.emoji}
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">{period.name}</h2>
+                  <p className="text-slate-400 text-sm">{format(currentDate, 'MMMM d, yyyy')}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSunModal(false)}
+                className="text-slate-400 hover:text-white text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Primary Times */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-xl" style={{ background: 'rgba(251, 191, 36, 0.1)' }}>
+                  <div className="text-slate-400 text-xs mb-1">Sunrise</div>
+                  <div className="text-amber-400 font-bold text-lg">{formatTime(sunTimes.sunrise)}</div>
+                </div>
+                <div className="p-3 rounded-xl" style={{ background: 'rgba(251, 146, 60, 0.1)' }}>
+                  <div className="text-slate-400 text-xs mb-1">Sunset</div>
+                  <div className="text-orange-400 font-bold text-lg">{formatTime(sunTimes.sunset)}</div>
+                </div>
+              </div>
+
+              {/* Day Length */}
+              <div className="p-4 rounded-xl" style={{ background: 'rgba(100, 116, 139, 0.1)', border: '1px solid rgba(148, 163, 184, 0.2)' }}>
+                <div className="text-slate-400 text-xs mb-1">Day Length</div>
+                <div className="text-white font-bold text-xl">
+                  {(() => {
+                    const duration = sunTimes.sunset - sunTimes.sunrise
+                    const hours = Math.floor(duration / (1000 * 60 * 60))
+                    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
+                    return `${hours}h ${minutes}m`
+                  })()}
+                </div>
+              </div>
+
+              {/* Additional Times */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <span className="text-slate-400 text-sm">Solar Noon</span>
+                  <span className="text-white font-semibold">{formatTime(sunTimes.solarNoon)}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <span className="text-slate-400 text-sm">Dawn (Civil)</span>
+                  <span className="text-slate-300">{formatTime(sunTimes.dawn)}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <span className="text-slate-400 text-sm">Dusk (Civil)</span>
+                  <span className="text-slate-300">{formatTime(sunTimes.dusk)}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <span className="text-slate-400 text-sm">Nautical Dawn</span>
+                  <span className="text-slate-300">{formatTime(sunTimes.nauticalDawn)}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <span className="text-slate-400 text-sm">Nautical Dusk</span>
+                  <span className="text-slate-300">{formatTime(sunTimes.nauticalDusk)}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <span className="text-slate-400 text-sm">Night Begins</span>
+                  <span className="text-slate-300">{formatTime(sunTimes.night)}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <span className="text-slate-400 text-sm">Night Ends</span>
+                  <span className="text-slate-300">{formatTime(sunTimes.nightEnd)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Moon Info Modal */}
+      {showMoonModal && createPortal(
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4 md:hidden"
+          style={{
+            background: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 9999
+          }}
+          onClick={() => setShowMoonModal(false)}
+        >
+          <div
+            className="ios-glass-thick max-w-sm w-full"
+            style={{
+              borderRadius: '24px',
+              padding: '24px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              maxHeight: '80vh',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div style={{ fontSize: '48px', filter: 'drop-shadow(0 0 8px rgba(200, 200, 255, 0.4))' }}>
+                  {moonEmoji}
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">{moonName}</h2>
+                  <p className="text-slate-400 text-sm">{moonPhaseName}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowMoonModal(false)}
+                className="text-slate-400 hover:text-white text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Illumination */}
+              <div className="p-4 rounded-xl" style={{ background: 'rgba(100, 116, 139, 0.1)', border: '1px solid rgba(148, 163, 184, 0.2)' }}>
+                <div className="text-slate-400 text-xs mb-1">Illumination</div>
+                <div className="flex items-baseline gap-2">
+                  <div className="text-white font-bold text-3xl">{illuminationPercent}</div>
+                  <div className="text-slate-400 text-xl">%</div>
+                </div>
+              </div>
+
+              {/* Phase Progress */}
+              <div className="p-4 rounded-xl" style={{ background: 'rgba(100, 116, 139, 0.1)', border: '1px solid rgba(148, 163, 184, 0.2)' }}>
+                <div className="text-slate-400 text-xs mb-2">Lunar Cycle Progress</div>
+                <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-400 transition-all duration-300"
+                    style={{ width: `${moonData.phase * 100}%` }}
+                  />
+                </div>
+                <div className="text-slate-400 text-xs mt-1">
+                  {Math.round(moonData.phase * 100)}% through cycle
+                </div>
+              </div>
+
+              {/* Times */}
+              <div className="space-y-3">
+                {moonData.rise && (
+                  <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                    <span className="text-slate-400 text-sm">Moonrise</span>
+                    <span className="text-white font-semibold">{formatTime(moonData.rise)}</span>
+                  </div>
+                )}
+                {moonData.set && (
+                  <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                    <span className="text-slate-400 text-sm">Moonset</span>
+                    <span className="text-white font-semibold">{formatTime(moonData.set)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Position */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <div className="text-slate-400 text-xs mb-1">Altitude</div>
+                  <div className="text-white font-semibold text-lg">
+                    {Math.round(moonData.altitude * (180 / Math.PI))}°
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                  <div className="text-slate-400 text-xs mb-1">Azimuth</div>
+                  <div className="text-white font-semibold text-lg">
+                    {Math.round(moonData.azimuth * (180 / Math.PI))}°
+                  </div>
+                </div>
+              </div>
+
+              {/* Distance (approximate) */}
+              <div className="p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
+                <div className="text-slate-400 text-xs mb-1">Distance from Earth</div>
+                <div className="text-slate-300 text-sm">
+                  {(() => {
+                    // Moon distance varies between ~356,500 km and ~406,700 km
+                    // Average is about 384,400 km
+                    const avgDistance = 384400
+                    return `~${avgDistance.toLocaleString()} km`
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   )
 }
