@@ -181,6 +181,15 @@ function EventManager({ events, onEventsChange }) {
                 <button
                   onClick={() => setIsOpen(false)}
                   className="text-slate-400 hover:text-white text-2xl leading-none"
+                  style={{
+                    minWidth: '44px',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '-8px',
+                    marginRight: '-8px'
+                  }}
                 >
                   ×
                 </button>

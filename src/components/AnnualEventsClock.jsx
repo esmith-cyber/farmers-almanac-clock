@@ -823,6 +823,15 @@ function AnnualEventsClock({ currentDate, events }) {
               <button
                 onClick={() => setSelectedZodiac(null)}
                 className="text-slate-400 hover:text-white text-2xl leading-none"
+                style={{
+                  minWidth: '44px',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: '-8px',
+                  marginRight: '-8px'
+                }}
               >
                 ×
               </button>
@@ -888,6 +897,15 @@ function AnnualEventsClock({ currentDate, events }) {
                 <button
                   onClick={() => setSelectedEvent(null)}
                   className="text-slate-400 hover:text-white text-2xl leading-none ml-2"
+                  style={{
+                    minWidth: '44px',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '-8px',
+                    marginRight: '-8px'
+                  }}
                 >
                   ×
                 </button>
