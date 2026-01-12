@@ -142,6 +142,12 @@ All layout dimensions are extracted to named constants:
 
 ## Recent Updates
 
+### Clock Border Enhancement (2026-01-12)
+- Extended visual boundary styling from mobile-only to all screen sizes
+- Glowing border and shadow effects now apply on desktop displays
+- Prevents annual events ring from getting lost in cosmic starfield background
+- Improved visual hierarchy and clarity across all devices
+
 ### EventManager Modal Fixes (2026-01-07)
 - Fixed modal rendering using React Portal at document.body level
 - Resolved z-index stacking issues where modal appeared behind clock layers
