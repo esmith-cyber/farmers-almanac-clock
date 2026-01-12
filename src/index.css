@@ -311,3 +311,16 @@ body::before {
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
 }
+
+/* Faster transitions for modal close responsiveness */
+.fixed * {
+  transition: background-color 0.1s ease, border-color 0.1s ease, opacity 0.1s ease !important;
+}
+
+/* Reduce backdrop blur on mobile for better performance */
+@media (max-width: 768px) {
+  .fixed {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+}
