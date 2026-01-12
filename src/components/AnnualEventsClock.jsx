@@ -11,13 +11,9 @@ const INNER_RADIUS = 250
 const OUTER_RADIUS = 450
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-function AnnualEventsClock({ currentDate, events }) {
-  const [rotation, setRotation] = useState(0)
-  const [selectedZodiac, setSelectedZodiac] = useState(null)
-  const [selectedEvent, setSelectedEvent] = useState(null)
-
-  // Zodiac sign data with date ranges, colors, and astronomical/mythological descriptions
-  const zodiacSigns = [
+// Zodiac sign data with date ranges, colors, and astronomical/mythological descriptions
+// Moved outside component to prevent recreation on every render
+const ZODIAC_SIGNS = [
     { name: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, color: '#ef4444', element: 'Fire', symbol: '♈', description: 'The Ram - Named for the golden ram of Greek mythology. Contains the bright star Hamal, known to ancient astronomers.' },
     { name: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20, color: '#4ade80', element: 'Earth', symbol: '♉', description: 'The Bull - Home to the Pleiades star cluster and Aldebaran, the "Eye of the Bull." One of the oldest recognized constellations.' },
     { name: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20, color: '#fbbf24', element: 'Air', symbol: '♊', description: 'The Twins - Represents Castor and Pollux from Greek mythology. Contains two of the brightest stars in the night sky.' },
@@ -30,7 +26,31 @@ function AnnualEventsClock({ currentDate, events }) {
     { name: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19, color: '#94a3b8', element: 'Earth', symbol: '♑', description: 'The Sea-Goat - One of the oldest identified constellations, dating to Bronze Age Mesopotamia. Marks the winter solstice position.' },
     { name: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18, color: '#22d3ee', element: 'Air', symbol: '♒', description: 'The Water Bearer - Associated with the rainy season in ancient times. Contains the Helix Nebula, the closest planetary nebula to Earth.' },
     { name: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20, color: '#2dd4bf', element: 'Water', symbol: '♓', description: 'The Fish - Contains the vernal equinox point. Represents Aphrodite and Eros transformed into fish in Greek mythology.' },
-  ]
+]
+
+// Constellation patterns - simplified star maps
+// Moved outside component to prevent recreation on every render
+const CONSTELLATIONS = {
+    Aries: <g><circle cx="0" cy="-8" r="1.5" fill="currentColor" /><circle cx="2" cy="-4" r="1.5" fill="currentColor" /><circle cx="0" cy="0" r="2" fill="currentColor" /><circle cx="-2" cy="4" r="1.5" fill="currentColor" /><line x1="0" y1="-8" x2="2" y2="-4" stroke="currentColor" strokeWidth="0.5" /><line x1="2" y1="-4" x2="0" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="-2" y2="4" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Taurus: <g><circle cx="0" cy="6" r="2" fill="currentColor" /><circle cx="-5" cy="-4" r="1.5" fill="currentColor" /><circle cx="5" cy="-4" r="1.5" fill="currentColor" /><circle cx="-6" cy="-8" r="1" fill="currentColor" /><circle cx="6" cy="-8" r="1" fill="currentColor" /><line x1="-5" y1="-4" x2="0" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-4" x2="0" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-4" x2="-6" y2="-8" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-4" x2="6" y2="-8" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Gemini: <g><circle cx="-4" cy="-8" r="1.5" fill="currentColor" /><circle cx="-4" cy="0" r="1.5" fill="currentColor" /><circle cx="-4" cy="8" r="1.5" fill="currentColor" /><circle cx="4" cy="-8" r="1.5" fill="currentColor" /><circle cx="4" cy="0" r="1.5" fill="currentColor" /><circle cx="4" cy="8" r="1.5" fill="currentColor" /><line x1="-4" y1="-8" x2="-4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="4" y1="-8" x2="4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="-4" y1="8" x2="4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="-4" y1="-8" x2="4" y2="-8" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Cancer: <g><circle cx="0" cy="0" r="2" fill="currentColor" /><circle cx="-5" cy="-3" r="1.5" fill="currentColor" /><circle cx="5" cy="-3" r="1.5" fill="currentColor" /><circle cx="-7" cy="-6" r="1" fill="currentColor" /><circle cx="7" cy="-6" r="1" fill="currentColor" /><circle cx="0" cy="5" r="1.5" fill="currentColor" /><line x1="0" y1="0" x2="-5" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-3" x2="-7" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-3" x2="7" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Leo: <g><circle cx="0" cy="-6" r="2" fill="currentColor" /><circle cx="-4" cy="-3" r="1.5" fill="currentColor" /><circle cx="4" cy="-3" r="1.5" fill="currentColor" /><circle cx="0" cy="2" r="1.5" fill="currentColor" /><circle cx="-3" cy="6" r="1.5" fill="currentColor" /><circle cx="3" cy="6" r="1.5" fill="currentColor" /><line x1="0" y1="-6" x2="-4" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-6" x2="4" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-6" x2="0" y2="2" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="-3" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Virgo: <g><circle cx="-6" cy="-6" r="1.5" fill="currentColor" /><circle cx="-3" cy="-2" r="1.5" fill="currentColor" /><circle cx="0" cy="2" r="1.5" fill="currentColor" /><circle cx="3" cy="6" r="1.5" fill="currentColor" /><circle cx="6" cy="4" r="1" fill="currentColor" /><line x1="-6" y1="-6" x2="-3" y2="-2" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="-2" x2="0" y2="2" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="6" x2="6" y2="4" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Libra: <g><circle cx="-5" cy="3" r="1.5" fill="currentColor" /><circle cx="5" cy="3" r="1.5" fill="currentColor" /><circle cx="0" cy="-5" r="1.5" fill="currentColor" /><circle cx="-6" cy="6" r="1" fill="currentColor" /><circle cx="6" cy="6" r="1" fill="currentColor" /><line x1="-5" y1="3" x2="5" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-5" x2="0" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="3" x2="-6" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="3" x2="6" y2="6" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Scorpio: <g><circle cx="-6" cy="-4" r="1.5" fill="currentColor" /><circle cx="-3" cy="0" r="1.5" fill="currentColor" /><circle cx="0" cy="3" r="1.5" fill="currentColor" /><circle cx="3" cy="5" r="1.5" fill="currentColor" /><circle cx="6" cy="3" r="1.5" fill="currentColor" /><line x1="-6" y1="-4" x2="-3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="3" x2="3" y2="5" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="5" x2="6" y2="3" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Sagittarius: <g><circle cx="-6" cy="6" r="1.5" fill="currentColor" /><circle cx="-2" cy="2" r="1.5" fill="currentColor" /><circle cx="2" cy="-2" r="1.5" fill="currentColor" /><circle cx="6" cy="-6" r="1.5" fill="currentColor" /><circle cx="4" cy="-8" r="1" fill="currentColor" /><circle cx="8" cy="-4" r="1" fill="currentColor" /><line x1="-6" y1="6" x2="6" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="6" y1="-6" x2="4" y2="-8" stroke="currentColor" strokeWidth="0.5" /><line x1="6" y1="-6" x2="8" y2="-4" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Capricorn: <g><circle cx="-5" cy="-5" r="1.5" fill="currentColor" /><circle cx="0" cy="-3" r="1.5" fill="currentColor" /><circle cx="3" cy="0" r="1.5" fill="currentColor" /><circle cx="5" cy="4" r="1.5" fill="currentColor" /><circle cx="2" cy="7" r="1" fill="currentColor" /><line x1="-5" y1="-5" x2="0" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="0" x2="5" y2="4" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="4" x2="2" y2="7" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Aquarius: <g><circle cx="-6" cy="-3" r="1.5" fill="currentColor" /><circle cx="-3" cy="0" r="1.5" fill="currentColor" /><circle cx="0" cy="-3" r="1.5" fill="currentColor" /><circle cx="3" cy="0" r="1.5" fill="currentColor" /><circle cx="6" cy="-3" r="1.5" fill="currentColor" /><circle cx="-3" cy="5" r="1.5" fill="currentColor" /><circle cx="3" cy="5" r="1.5" fill="currentColor" /><line x1="-6" y1="-3" x2="-3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="0" x2="6" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="5" x2="3" y2="5" stroke="currentColor" strokeWidth="0.5" /></g>,
+    Pisces: <g><circle cx="-5" cy="-5" r="1.5" fill="currentColor" /><circle cx="-3" cy="-2" r="1" fill="currentColor" /><circle cx="0" cy="0" r="1.5" fill="currentColor" /><circle cx="3" cy="2" r="1" fill="currentColor" /><circle cx="5" cy="5" r="1.5" fill="currentColor" /><circle cx="-6" cy="-7" r="1" fill="currentColor" /><circle cx="6" cy="7" r="1" fill="currentColor" /><line x1="-5" y1="-5" x2="0" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="5" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-5" x2="-6" y2="-7" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="5" x2="6" y2="7" stroke="currentColor" strokeWidth="0.5" /></g>,
+}
+
+function AnnualEventsClock({ currentDate, events }) {
+  const [rotation, setRotation] = useState(0)
+  const [selectedZodiac, setSelectedZodiac] = useState(null)
+  const [selectedEvent, setSelectedEvent] = useState(null)
+
+
 
   // Helper functions
   const isLeapYear = (year) => {
@@ -47,7 +67,7 @@ function AnnualEventsClock({ currentDate, events }) {
     const month = currentDate.getMonth() + 1
     const day = currentDate.getDate()
 
-    return zodiacSigns.find(s => {
+    return ZODIAC_SIGNS.find(s => {
       if (s.startMonth === s.endMonth) {
         return month === s.startMonth && day >= s.startDay && day <= s.endDay
       } else if (s.startMonth < s.endMonth) {
@@ -99,21 +119,7 @@ function AnnualEventsClock({ currentDate, events }) {
     }
   }
 
-  // Constellation patterns - simplified star maps
-  const constellations = {
-    Aries: <g><circle cx="0" cy="-8" r="1.5" fill="currentColor" /><circle cx="2" cy="-4" r="1.5" fill="currentColor" /><circle cx="0" cy="0" r="2" fill="currentColor" /><circle cx="-2" cy="4" r="1.5" fill="currentColor" /><line x1="0" y1="-8" x2="2" y2="-4" stroke="currentColor" strokeWidth="0.5" /><line x1="2" y1="-4" x2="0" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="-2" y2="4" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Taurus: <g><circle cx="0" cy="6" r="2" fill="currentColor" /><circle cx="-5" cy="-4" r="1.5" fill="currentColor" /><circle cx="5" cy="-4" r="1.5" fill="currentColor" /><circle cx="-6" cy="-8" r="1" fill="currentColor" /><circle cx="6" cy="-8" r="1" fill="currentColor" /><line x1="-5" y1="-4" x2="0" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-4" x2="0" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-4" x2="-6" y2="-8" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-4" x2="6" y2="-8" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Gemini: <g><circle cx="-4" cy="-8" r="1.5" fill="currentColor" /><circle cx="-4" cy="0" r="1.5" fill="currentColor" /><circle cx="-4" cy="8" r="1.5" fill="currentColor" /><circle cx="4" cy="-8" r="1.5" fill="currentColor" /><circle cx="4" cy="0" r="1.5" fill="currentColor" /><circle cx="4" cy="8" r="1.5" fill="currentColor" /><line x1="-4" y1="-8" x2="-4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="4" y1="-8" x2="4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="-4" y1="8" x2="4" y2="8" stroke="currentColor" strokeWidth="0.5" /><line x1="-4" y1="-8" x2="4" y2="-8" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Cancer: <g><circle cx="0" cy="0" r="2" fill="currentColor" /><circle cx="-5" cy="-3" r="1.5" fill="currentColor" /><circle cx="5" cy="-3" r="1.5" fill="currentColor" /><circle cx="-7" cy="-6" r="1" fill="currentColor" /><circle cx="7" cy="-6" r="1" fill="currentColor" /><circle cx="0" cy="5" r="1.5" fill="currentColor" /><line x1="0" y1="0" x2="-5" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-3" x2="-7" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="-3" x2="7" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Leo: <g><circle cx="0" cy="-6" r="2" fill="currentColor" /><circle cx="-4" cy="-3" r="1.5" fill="currentColor" /><circle cx="4" cy="-3" r="1.5" fill="currentColor" /><circle cx="0" cy="2" r="1.5" fill="currentColor" /><circle cx="-3" cy="6" r="1.5" fill="currentColor" /><circle cx="3" cy="6" r="1.5" fill="currentColor" /><line x1="0" y1="-6" x2="-4" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-6" x2="4" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-6" x2="0" y2="2" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="-3" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Virgo: <g><circle cx="-6" cy="-6" r="1.5" fill="currentColor" /><circle cx="-3" cy="-2" r="1.5" fill="currentColor" /><circle cx="0" cy="2" r="1.5" fill="currentColor" /><circle cx="3" cy="6" r="1.5" fill="currentColor" /><circle cx="6" cy="4" r="1" fill="currentColor" /><line x1="-6" y1="-6" x2="-3" y2="-2" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="-2" x2="0" y2="2" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="2" x2="3" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="6" x2="6" y2="4" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Libra: <g><circle cx="-5" cy="3" r="1.5" fill="currentColor" /><circle cx="5" cy="3" r="1.5" fill="currentColor" /><circle cx="0" cy="-5" r="1.5" fill="currentColor" /><circle cx="-6" cy="6" r="1" fill="currentColor" /><circle cx="6" cy="6" r="1" fill="currentColor" /><line x1="-5" y1="3" x2="5" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-5" x2="0" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="3" x2="-6" y2="6" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="3" x2="6" y2="6" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Scorpio: <g><circle cx="-6" cy="-4" r="1.5" fill="currentColor" /><circle cx="-3" cy="0" r="1.5" fill="currentColor" /><circle cx="0" cy="3" r="1.5" fill="currentColor" /><circle cx="3" cy="5" r="1.5" fill="currentColor" /><circle cx="6" cy="3" r="1.5" fill="currentColor" /><line x1="-6" y1="-4" x2="-3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="3" x2="3" y2="5" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="5" x2="6" y2="3" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Sagittarius: <g><circle cx="-6" cy="6" r="1.5" fill="currentColor" /><circle cx="-2" cy="2" r="1.5" fill="currentColor" /><circle cx="2" cy="-2" r="1.5" fill="currentColor" /><circle cx="6" cy="-6" r="1.5" fill="currentColor" /><circle cx="4" cy="-8" r="1" fill="currentColor" /><circle cx="8" cy="-4" r="1" fill="currentColor" /><line x1="-6" y1="6" x2="6" y2="-6" stroke="currentColor" strokeWidth="0.5" /><line x1="6" y1="-6" x2="4" y2="-8" stroke="currentColor" strokeWidth="0.5" /><line x1="6" y1="-6" x2="8" y2="-4" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Capricorn: <g><circle cx="-5" cy="-5" r="1.5" fill="currentColor" /><circle cx="0" cy="-3" r="1.5" fill="currentColor" /><circle cx="3" cy="0" r="1.5" fill="currentColor" /><circle cx="5" cy="4" r="1.5" fill="currentColor" /><circle cx="2" cy="7" r="1" fill="currentColor" /><line x1="-5" y1="-5" x2="0" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="0" x2="5" y2="4" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="4" x2="2" y2="7" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Aquarius: <g><circle cx="-6" cy="-3" r="1.5" fill="currentColor" /><circle cx="-3" cy="0" r="1.5" fill="currentColor" /><circle cx="0" cy="-3" r="1.5" fill="currentColor" /><circle cx="3" cy="0" r="1.5" fill="currentColor" /><circle cx="6" cy="-3" r="1.5" fill="currentColor" /><circle cx="-3" cy="5" r="1.5" fill="currentColor" /><circle cx="3" cy="5" r="1.5" fill="currentColor" /><line x1="-6" y1="-3" x2="-3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="0" x2="0" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="-3" x2="3" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="3" y1="0" x2="6" y2="-3" stroke="currentColor" strokeWidth="0.5" /><line x1="-3" y1="5" x2="3" y2="5" stroke="currentColor" strokeWidth="0.5" /></g>,
-    Pisces: <g><circle cx="-5" cy="-5" r="1.5" fill="currentColor" /><circle cx="-3" cy="-2" r="1" fill="currentColor" /><circle cx="0" cy="0" r="1.5" fill="currentColor" /><circle cx="3" cy="2" r="1" fill="currentColor" /><circle cx="5" cy="5" r="1.5" fill="currentColor" /><circle cx="-6" cy="-7" r="1" fill="currentColor" /><circle cx="6" cy="7" r="1" fill="currentColor" /><line x1="-5" y1="-5" x2="0" y2="0" stroke="currentColor" strokeWidth="0.5" /><line x1="0" y1="0" x2="5" y2="5" stroke="currentColor" strokeWidth="0.5" /><line x1="-5" y1="-5" x2="-6" y2="-7" stroke="currentColor" strokeWidth="0.5" /><line x1="5" y1="5" x2="6" y2="7" stroke="currentColor" strokeWidth="0.5" /></g>,
-  }
+
 
 
   return (
@@ -131,7 +137,7 @@ function AnnualEventsClock({ currentDate, events }) {
             <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}>
 
               {/* Zodiac division markers - subtle lines at sign boundaries */}
-              {zodiacSigns.map((sign, i) => {
+              {ZODIAC_SIGNS.map((sign, i) => {
                 // Draw line at the START of each zodiac sign
                 const angle = dateToAngle(sign.startMonth, sign.startDay)
                 const rad = ((angle - 90) * Math.PI) / 180
@@ -156,7 +162,7 @@ function AnnualEventsClock({ currentDate, events }) {
               })}
 
               {/* Zodiac Constellations with wedge-shaped hover areas */}
-              {zodiacSigns.map((sign) => {
+              {ZODIAC_SIGNS.map((sign) => {
                 // Calculate the midpoint date of this zodiac sign for positioning
                 const year = currentDate.getFullYear()
                 const startDate = new Date(year, sign.startMonth - 1, sign.startDay)
@@ -260,7 +266,7 @@ function AnnualEventsClock({ currentDate, events }) {
                       style={{ color: sign.color, pointerEvents: 'none' }}
                       className="zodiac-sign"
                     >
-                      {constellations[sign.name]}
+                      {CONSTELLATIONS[sign.name]}
                     </g>
 
                     {/* Wedge-shaped hover area */}
