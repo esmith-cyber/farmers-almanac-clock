@@ -142,6 +142,14 @@ All layout dimensions are extracted to named constants:
 
 ## Recent Updates
 
+### Performance Optimization (2026-01-12)
+- Fixed 3-second modal close lag on mobile devices
+- Moved ZODIAC_SIGNS and CONSTELLATIONS outside component to prevent recreation on every render
+- Improved touch target size for all modal close buttons (44x44px)
+- Reduced backdrop blur on mobile from 10px to 4px for faster rendering
+- Faster CSS transitions for modal elements (100ms vs 300ms)
+- Modal close now instant instead of multi-second delay
+
 ### Clock Border Enhancement (2026-01-12)
 - Extended visual boundary styling from mobile-only to all screen sizes
 - Glowing border and shadow effects now apply on desktop displays
