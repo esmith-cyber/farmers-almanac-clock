@@ -204,8 +204,11 @@ function MoonPhaseClock({ location, currentDate }) {
 
   // Blue Moon detection - occurs when there are 2 full moons in a calendar month
   const isBlueMoon = () => {
-    // TESTING MODE: Uncomment the line below to test blue moon visuals on any full moon
-    // if (currentPhaseName === 'Full Moon') return true
+    // TESTING MODE: Add ?bluemoon=true to URL to test blue moon visuals on any full moon
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('bluemoon') === 'true' && currentPhaseName === 'Full Moon') {
+      return true
+    }
 
     if (!moonData || currentPhaseName !== 'Full Moon') return false
 
