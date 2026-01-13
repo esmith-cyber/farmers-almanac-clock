@@ -130,10 +130,14 @@ function MoonPhaseClock({ location, currentDate }) {
     return 'Waning Crescent'
   }
 
-  const currentPhaseName = getPhaseName(moonData.phase)
+  // Check for testing mode
+  const urlParams = new URLSearchParams(window.location.search)
+  const isTestingBlueMoon = urlParams.get('bluemoon') === 'true'
+
+  const currentPhaseName = isTestingBlueMoon ? 'Full Moon' : getPhaseName(moonData.phase)
 
   // Format percentage of illumination
-  const illuminationPercent = Math.round(moonData.fraction * 100)
+  const illuminationPercent = isTestingBlueMoon ? 100 : Math.round(moonData.fraction * 100)
 
   // Traditional Full Moon names by month with historical context
   const getTraditionalMoonName = (month) => {
@@ -203,20 +207,19 @@ function MoonPhaseClock({ location, currentDate }) {
   }
 
   // Blue Moon detection - occurs when there are 2 full moons in a calendar month
+  // Returns true for the ENTIRE month that contains 2 full moons
   const isBlueMoon = () => {
-    // TESTING MODE: Add ?bluemoon=true to URL to test blue moon visuals on any full moon
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('bluemoon') === 'true' && currentPhaseName === 'Full Moon') {
+    // TESTING MODE: URL parameter forces blue moon mode
+    if (isTestingBlueMoon) {
       return true
     }
 
-    if (!moonData || currentPhaseName !== 'Full Moon') return false
+    if (!moonData) return false
 
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
 
     // Get first and last day of the month
-    const firstDay = new Date(year, month, 1)
     const lastDay = new Date(year, month + 1, 0)
 
     // Find all full moons in this month
@@ -235,14 +238,8 @@ function MoonPhaseClock({ location, currentDate }) {
       }
     }
 
-    // If there are 2 full moons and we're currently at/near the second one
-    if (fullMoonDates.length >= 2) {
-      const secondFullMoon = fullMoonDates[fullMoonDates.length - 1]
-      const daysDiff = Math.abs(currentDate.getDate() - secondFullMoon.getDate())
-      return daysDiff <= 1 // Within 1 day of the second full moon
-    }
-
-    return false
+    // If there are 2 full moons in this month, it's a blue moon month!
+    return fullMoonDates.length >= 2
   }
 
   const blueMoon = isBlueMoon()
@@ -306,9 +303,14 @@ function MoonPhaseClock({ location, currentDate }) {
           <div
             className="relative w-full h-full rounded-full clock-glow overflow-hidden"
             style={{
-              background: moonGradient,
+              background: blueMoon
+                ? 'radial-gradient(circle at center, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 50%, rgba(30, 64, 175, 0.1) 100%)'
+                : moonGradient,
               opacity: 0.4,
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              boxShadow: blueMoon
+                ? '0 0 60px rgba(59, 130, 246, 0.6), inset 0 0 100px rgba(59, 130, 246, 0.3)'
+                : undefined
             }}
           >
             {/* Quarter Phase Markers - Elegant Visual Representations */}
@@ -490,6 +492,42 @@ function MoonPhaseClock({ location, currentDate }) {
           </div>
         </div>
       </div>
+
+      {/* Blue Moon Month Badge - shows throughout the entire month with 2 full moons */}
+      {blueMoon && (
+        <div
+          className="absolute"
+          style={{
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -180px)',
+            pointerEvents: 'auto',
+            zIndex: 30
+          }}
+        >
+          <div
+            className="px-6 py-3 rounded-full text-lg font-black flex items-center gap-3"
+            style={{
+              background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)',
+              color: 'white',
+              boxShadow: `
+                0 0 60px rgba(59, 130, 246, 1),
+                0 0 120px rgba(59, 130, 246, 0.6),
+                0 8px 32px rgba(0, 0, 0, 0.6),
+                inset 0 2px 8px rgba(255, 255, 255, 0.3)
+              `,
+              border: '3px solid rgba(147, 197, 253, 0.8)',
+              animation: 'blueMoonPulse 2s ease-in-out infinite',
+              letterSpacing: '0.1em',
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
+            }}
+          >
+            <span className="text-2xl" style={{ filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.8))' }}>🔵</span>
+            <span>BLUE MOON MONTH</span>
+            <span className="text-xl">✨</span>
+          </div>
+        </div>
+      )}
 
       {/* Moon Phase Info Modal */}
       {showModal && createPortal(
