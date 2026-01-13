@@ -202,6 +202,48 @@ function MoonPhaseClock({ location, currentDate }) {
     return moonNames[month]
   }
 
+  // Blue Moon detection - occurs when there are 2 full moons in a calendar month
+  const isBlueMoon = () => {
+    // TESTING MODE: Uncomment the line below to test blue moon visuals on any full moon
+    // if (currentPhaseName === 'Full Moon') return true
+
+    if (!moonData || currentPhaseName !== 'Full Moon') return false
+
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth()
+
+    // Get first and last day of the month
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+
+    // Find all full moons in this month
+    const fullMoonDates = []
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const date = new Date(year, month, day, 12, 0, 0) // Check at noon
+      const moonPhase = SunCalc.getMoonIllumination(date)
+
+      // Full moon is around phase 0.5 (actually between 0.47-0.53)
+      if (moonPhase.phase >= 0.47 && moonPhase.phase <= 0.53) {
+        // Check if we haven't already added a date within 1 day (to avoid duplicates)
+        const isDuplicate = fullMoonDates.some(d => Math.abs(d.getDate() - day) <= 1)
+        if (!isDuplicate) {
+          fullMoonDates.push(new Date(year, month, day))
+        }
+      }
+    }
+
+    // If there are 2 full moons and we're currently at/near the second one
+    if (fullMoonDates.length >= 2) {
+      const secondFullMoon = fullMoonDates[fullMoonDates.length - 1]
+      const daysDiff = Math.abs(currentDate.getDate() - secondFullMoon.getDate())
+      return daysDiff <= 1 // Within 1 day of the second full moon
+    }
+
+    return false
+  }
+
+  const blueMoon = isBlueMoon()
+
   // Get detailed information for specific phase markers
   const getPhaseMarkerInfo = (phaseName) => {
     const info = {
@@ -375,7 +417,15 @@ function MoonPhaseClock({ location, currentDate }) {
                       onClick={(e) => handlePhaseMarkerClick(e, 'Full Moon')}
                     >
                       <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 8} fill="transparent" />
-                      <circle cx={fullPos.x} cy={fullPos.y} r={moonSize} fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="1.5" />
+                      {blueMoon && (
+                        <>
+                          {/* Blue glow for Blue Moon */}
+                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 12} fill="none" stroke="#3b82f6" strokeWidth="2" opacity="0.6" />
+                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 15} fill="none" stroke="#60a5fa" strokeWidth="1.5" opacity="0.4" />
+                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 18} fill="none" stroke="#93c5fd" strokeWidth="1" opacity="0.2" />
+                        </>
+                      )}
+                      <circle cx={fullPos.x} cy={fullPos.y} r={moonSize} fill={blueMoon ? "#dbeafe" : "#f1f5f9"} stroke={blueMoon ? "#3b82f6" : "#cbd5e1"} strokeWidth="1.5" />
                       <circle cx={fullPos.x} cy={fullPos.y} r={moonSize - 3} fill="#e2e8f0" />
                       {/* Maria (dark patches) */}
                       <ellipse cx={fullPos.x - 8} cy={fullPos.y - 6} rx="5" ry="4" fill="#cbd5e1" opacity="0.5" />
@@ -472,12 +522,30 @@ function MoonPhaseClock({ location, currentDate }) {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-3xl">🌕</span>
+                            <span className="text-3xl">{blueMoon ? '🔵' : '🌕'}</span>
                             <h2 className="text-2xl font-bold text-white">
-                              {markerInfo.traditionalName.name}
+                              {blueMoon ? 'Blue Moon' : markerInfo.traditionalName.name}
                             </h2>
+                            {blueMoon && (
+                              <span className="px-2 py-1 text-xs font-semibold rounded-full"
+                                    style={{
+                                      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                                      color: 'white',
+                                      boxShadow: '0 0 20px rgba(59, 130, 246, 0.6)'
+                                    }}>
+                                RARE
+                              </span>
+                            )}
                           </div>
-                          <p className="text-blue-300 text-sm">Full Moon · {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                          <p className={`text-sm ${blueMoon ? 'text-blue-400' : 'text-blue-300'}`}>
+                            {blueMoon ? 'Second Full Moon of the Month · ' : 'Full Moon · '}
+                            {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          </p>
+                          {blueMoon && (
+                            <p className="text-slate-400 text-xs mt-1 italic">
+                              Also known as: {markerInfo.traditionalName.name}
+                            </p>
+                          )}
                         </div>
                         <button
                           onClick={() => setShowModal(false)}
@@ -508,11 +576,31 @@ function MoonPhaseClock({ location, currentDate }) {
                           </div>
                         </div>
 
+                        {/* Blue Moon Special Info */}
+                        {blueMoon && (
+                          <div className="p-4 rounded-xl" style={{
+                            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(29, 78, 216, 0.15) 100%)',
+                            border: '2px solid rgba(59, 130, 246, 0.4)',
+                            boxShadow: '0 0 30px rgba(59, 130, 246, 0.3)'
+                          }}>
+                            <h3 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                              <span>🔵</span>
+                              What is a Blue Moon?
+                            </h3>
+                            <p className="text-slate-300 text-sm leading-relaxed mb-3">
+                              A Blue Moon occurs when two full moons happen in the same calendar month. This rare event happens approximately once every 2-3 years, giving rise to the phrase "once in a blue moon" to describe something that rarely occurs.
+                            </p>
+                            <p className="text-blue-200 text-xs italic">
+                              Despite the name, blue moons don't actually appear blue! The name comes from an old English phrase meaning "betrayer moon," referring to an extra moon that disrupted the regular naming pattern.
+                            </p>
+                          </div>
+                        )}
+
                         {/* Moon Name Origin */}
                         <div className="p-4 rounded-xl" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
                           <h3 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
                             <span>📖</span>
-                            Origin
+                            {blueMoon ? `${markerInfo.traditionalName.name} Origin` : 'Origin'}
                           </h3>
                           <p className="text-slate-300 text-sm leading-relaxed">
                             {markerInfo.traditionalName.description}
