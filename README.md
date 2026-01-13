@@ -33,6 +33,12 @@ A beautiful, interactive astronomical clock visualizing the annual cycle, moon p
 - Accurate sun times (sunrise, sunset, twilight periods)
 - Location-based calculations
 - Visual moon phase representations with detailed textures
+- **Blue Moon Celebration** - Automatic detection and celebration of rare blue moons
+  - Occurs when 2 full moons happen in the same calendar month (~every 2-3 years)
+  - Full moon marker glows blue and pulses with animated emanation
+  - Lunar ring gradient responds with blue tones radiating from full moon
+  - Modal displays educational content and calculates next blue moon occurrence
+  - Testing mode available via `?bluemoon=true` URL parameter
 
 ### 📍 Location Features
 - Search locations worldwide with autocomplete
@@ -141,6 +147,19 @@ All layout dimensions are extracted to named constants:
 - Maintains proper event isolation with `stopPropagation`
 
 ## Recent Updates
+
+### Blue Moon Celebration Feature (2026-01-13)
+- Implemented rare blue moon detection and celebration
+- Detects when 2 full moons occur in the same calendar month (~every 2-3 years)
+- Full moon marker glows blue with pulsing animation during blue moon months
+- Blue emanation radiates from full moon into lunar ring gradient
+- Ring gradient responds with blue tones at full moon position (135°-225°)
+- Modal displays "Blue Moon" title with RARE badge
+- Educational content explaining blue moon origin and rarity
+- Calculates and displays next blue moon occurrence (searches up to 3 years ahead)
+- Testing mode via `?bluemoon=true` URL parameter
+- Performance optimized with React useMemo for calculation caching
+- Elegant, subtle design maintains clock aesthetic without distraction
 
 ### Performance Optimization (2026-01-12)
 - Fixed 3-second modal close lag on mobile devices
