@@ -304,13 +304,14 @@ function MoonPhaseClock({ location, currentDate }) {
             className="relative w-full h-full rounded-full clock-glow overflow-hidden"
             style={{
               background: blueMoon
-                ? 'radial-gradient(circle at center, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 50%, rgba(30, 64, 175, 0.1) 100%)'
+                ? 'radial-gradient(circle at center, rgba(59, 130, 246, 0.4) 0%, rgba(37, 99, 235, 0.3) 50%, rgba(30, 64, 175, 0.15) 100%)'
                 : moonGradient,
               opacity: 0.4,
               pointerEvents: 'none',
               boxShadow: blueMoon
-                ? '0 0 60px rgba(59, 130, 246, 0.6), inset 0 0 100px rgba(59, 130, 246, 0.3)'
-                : undefined
+                ? '0 0 80px rgba(59, 130, 246, 0.7), inset 0 0 120px rgba(59, 130, 246, 0.4)'
+                : undefined,
+              animation: blueMoon ? 'blueMoonRingPulse 3s ease-in-out infinite' : undefined
             }}
           >
             {/* Quarter Phase Markers - Elegant Visual Representations */}
@@ -492,42 +493,6 @@ function MoonPhaseClock({ location, currentDate }) {
           </div>
         </div>
       </div>
-
-      {/* Blue Moon Month Badge - shows throughout the entire month with 2 full moons */}
-      {blueMoon && (
-        <div
-          className="absolute"
-          style={{
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -180px)',
-            pointerEvents: 'auto',
-            zIndex: 30
-          }}
-        >
-          <div
-            className="px-6 py-3 rounded-full text-lg font-black flex items-center gap-3"
-            style={{
-              background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)',
-              color: 'white',
-              boxShadow: `
-                0 0 60px rgba(59, 130, 246, 1),
-                0 0 120px rgba(59, 130, 246, 0.6),
-                0 8px 32px rgba(0, 0, 0, 0.6),
-                inset 0 2px 8px rgba(255, 255, 255, 0.3)
-              `,
-              border: '3px solid rgba(147, 197, 253, 0.8)',
-              animation: 'blueMoonPulse 2s ease-in-out infinite',
-              letterSpacing: '0.1em',
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
-            }}
-          >
-            <span className="text-2xl" style={{ filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.8))' }}>🔵</span>
-            <span>BLUE MOON MONTH</span>
-            <span className="text-xl">✨</span>
-          </div>
-        </div>
-      )}
 
       {/* Moon Phase Info Modal */}
       {showModal && createPortal(

@@ -251,23 +251,17 @@ body::before {
   }
 }
 
-/* Blue Moon pulse animation */
-@keyframes blueMoonPulse {
+/* Blue Moon ring pulse animation - subtle breathing effect */
+@keyframes blueMoonRingPulse {
   0%, 100% {
-    transform: scale(1);
     box-shadow:
-      0 0 60px rgba(59, 130, 246, 1),
-      0 0 120px rgba(59, 130, 246, 0.6),
-      0 8px 32px rgba(0, 0, 0, 0.6),
-      inset 0 2px 8px rgba(255, 255, 255, 0.3);
+      0 0 60px rgba(59, 130, 246, 0.5),
+      inset 0 0 100px rgba(59, 130, 246, 0.3);
   }
   50% {
-    transform: scale(1.05);
     box-shadow:
-      0 0 80px rgba(59, 130, 246, 1),
-      0 0 160px rgba(59, 130, 246, 0.8),
-      0 12px 40px rgba(0, 0, 0, 0.6),
-      inset 0 2px 12px rgba(255, 255, 255, 0.4);
+      0 0 100px rgba(59, 130, 246, 0.8),
+      inset 0 0 140px rgba(59, 130, 246, 0.5);
   }
 }
 
