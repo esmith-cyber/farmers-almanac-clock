@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import SunCalc from 'suncalc'
 
@@ -64,6 +64,41 @@ function MoonPhaseClock({ location, currentDate }) {
     }
   }, [location, currentDate])
 
+  // Calculate when the next blue moon will occur - memoized for performance
+  // MUST be called before any early returns to satisfy React hooks rules
+  const nextBlueMoon = useMemo(() => {
+    const startYear = currentDate.getFullYear()
+    const startMonth = currentDate.getMonth()
+
+    // Start searching from next month (skip current month)
+    for (let monthOffset = 1; monthOffset <= 36; monthOffset++) {
+      const checkDate = new Date(startYear, startMonth + monthOffset, 15)
+      const year = checkDate.getFullYear()
+      const month = checkDate.getMonth()
+
+      const lastDay = new Date(year, month + 1, 0)
+      const fullMoonDates = []
+
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day, 12, 0, 0)
+        const moonPhase = SunCalc.getMoonIllumination(date)
+
+        if (moonPhase.phase >= 0.47 && moonPhase.phase <= 0.53) {
+          const isDuplicate = fullMoonDates.some(d => Math.abs(d.getDate() - day) <= 1)
+          if (!isDuplicate) {
+            fullMoonDates.push(new Date(year, month, day))
+          }
+        }
+      }
+
+      if (fullMoonDates.length >= 2) {
+        return new Date(year, month, 15) // Return mid-month date
+      }
+    }
+
+    return null
+  }, [currentDate])
+
   useEffect(() => {
     if (!moonData) return
 
@@ -92,31 +127,6 @@ function MoonPhaseClock({ location, currentDate }) {
   const firstQuarterAngle = 270   // Phase 0.25 (90° counter-clockwise from new)
   const fullMoonAngle = 180      // Phase 0.5 (180° from new)
   const lastQuarterAngle = 90   // Phase 0.75 (90° clockwise from new = 270° counter-clockwise)
-
-  // Create gradient that's synced to the phase positions
-  // The gradient rotates WITH the disk, so phases stay in their gradient zones
-  const createMoonGradient = () => {
-    const stops = [
-      { angle: 0, color: '#0f172a' },      // New moon position - darkest
-      { angle: 45, color: '#1e293b' },     // Waxing crescent
-      { angle: 90, color: '#334155' },     // First quarter position
-      { angle: 135, color: '#475569' },    // Waxing gibbous
-      { angle: 180, color: '#64748b' },    // Full moon position - lightest
-      { angle: 225, color: '#475569' },    // Waning gibbous
-      { angle: 270, color: '#334155' },    // Last quarter position
-      { angle: 315, color: '#1e293b' },    // Waning crescent
-      // Fill the gap between 315° and 360° with intermediate stops
-      { angle: 326.25, color: '#1a2534' },
-      { angle: 337.5, color: '#17212f' },
-      { angle: 348.75, color: '#131c2a' },
-      { angle: 360, color: '#0f172a' },    // Back to new moon
-    ]
-
-    const stopStrings = stops.map(stop => `${stop.color} ${stop.angle}deg`)
-    return `conic-gradient(${stopStrings.join(', ')})`
-  }
-
-  const moonGradient = createMoonGradient()
 
   // Get moon phase name
   const getPhaseName = (phase) => {
@@ -244,6 +254,31 @@ function MoonPhaseClock({ location, currentDate }) {
 
   const blueMoon = isBlueMoon()
 
+  // Create gradient that's synced to the phase positions
+  // The gradient rotates WITH the disk, so phases stay in their gradient zones
+  const createMoonGradient = (isBlueMoon) => {
+    const stops = [
+      { angle: 0, color: '#0f172a' },      // New moon position - darkest
+      { angle: 45, color: '#1e293b' },     // Waxing crescent
+      { angle: 90, color: '#334155' },     // First quarter position
+      { angle: 135, color: isBlueMoon ? '#3b5a7d' : '#475569' },    // Waxing gibbous - blue tint during blue moon
+      { angle: 180, color: isBlueMoon ? '#4a7db8' : '#64748b' },    // Full moon position - blue during blue moon
+      { angle: 225, color: isBlueMoon ? '#3b5a7d' : '#475569' },    // Waning gibbous - blue tint during blue moon
+      { angle: 270, color: '#334155' },    // Last quarter position
+      { angle: 315, color: '#1e293b' },    // Waning crescent
+      // Fill the gap between 315° and 360° with intermediate stops
+      { angle: 326.25, color: '#1a2534' },
+      { angle: 337.5, color: '#17212f' },
+      { angle: 348.75, color: '#131c2a' },
+      { angle: 360, color: '#0f172a' },    // Back to new moon
+    ]
+
+    const stopStrings = stops.map(stop => `${stop.color} ${stop.angle}deg`)
+    return `conic-gradient(${stopStrings.join(', ')})`
+  }
+
+  const moonGradient = createMoonGradient(blueMoon)
+
   // Get detailed information for specific phase markers
   const getPhaseMarkerInfo = (phaseName) => {
     const info = {
@@ -303,15 +338,9 @@ function MoonPhaseClock({ location, currentDate }) {
           <div
             className="relative w-full h-full rounded-full clock-glow overflow-hidden"
             style={{
-              background: blueMoon
-                ? 'radial-gradient(circle at center, rgba(59, 130, 246, 0.4) 0%, rgba(37, 99, 235, 0.3) 50%, rgba(30, 64, 175, 0.15) 100%)'
-                : moonGradient,
+              background: moonGradient,
               opacity: 0.4,
-              pointerEvents: 'none',
-              boxShadow: blueMoon
-                ? '0 0 80px rgba(59, 130, 246, 0.7), inset 0 0 120px rgba(59, 130, 246, 0.4)'
-                : undefined,
-              animation: blueMoon ? 'blueMoonRingPulse 3s ease-in-out infinite' : undefined
+              pointerEvents: 'none'
             }}
           >
             {/* Quarter Phase Markers - Elegant Visual Representations */}
@@ -349,6 +378,14 @@ function MoonPhaseClock({ location, currentDate }) {
                       <clipPath id="lastQuarterClip">
                         <rect x={lastPos.x - moonSize} y={lastPos.y - moonSize} width={moonSize} height={moonSize * 2} />
                       </clipPath>
+                      {/* Radial gradient for blue moon glow */}
+                      {blueMoon && (
+                        <radialGradient id="blueMoonGlow" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stopColor="rgba(59, 130, 246, 0.4)" />
+                          <stop offset="50%" stopColor="rgba(59, 130, 246, 0.2)" />
+                          <stop offset="100%" stopColor="rgba(59, 130, 246, 0)" />
+                        </radialGradient>
+                      )}
                     </defs>
 
                     {/* Clickable ring area - only the outer ring, not the center */}
@@ -425,14 +462,27 @@ function MoonPhaseClock({ location, currentDate }) {
                       <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 8} fill="transparent" />
                       {blueMoon && (
                         <>
-                          {/* Blue glow for Blue Moon */}
-                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 12} fill="none" stroke="#3b82f6" strokeWidth="2" opacity="0.6" />
-                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 15} fill="none" stroke="#60a5fa" strokeWidth="1.5" opacity="0.4" />
-                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 18} fill="none" stroke="#93c5fd" strokeWidth="1" opacity="0.2" />
+                          {/* Blue glow radiating from Full Moon - the source of blue in the ring */}
+                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 50} fill="url(#blueMoonGlow)" opacity="0.5">
+                            <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" />
+                          </circle>
+                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 35} fill="rgba(59, 130, 246, 0.2)" opacity="0.6">
+                            <animate attributeName="r" values={`${moonSize + 35};${moonSize + 40};${moonSize + 35}`} dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3s" repeatCount="indefinite" />
+                          </circle>
+                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 20} fill="rgba(96, 165, 250, 0.25)" opacity="0.5">
+                            <animate attributeName="r" values={`${moonSize + 20};${moonSize + 25};${moonSize + 20}`} dur="3s" repeatCount="indefinite" />
+                          </circle>
+                          <circle cx={fullPos.x} cy={fullPos.y} r={moonSize + 10} fill="rgba(147, 197, 253, 0.3)" opacity="0.6" />
                         </>
                       )}
-                      <circle cx={fullPos.x} cy={fullPos.y} r={moonSize} fill={blueMoon ? "#dbeafe" : "#f1f5f9"} stroke={blueMoon ? "#3b82f6" : "#cbd5e1"} strokeWidth="1.5" />
-                      <circle cx={fullPos.x} cy={fullPos.y} r={moonSize - 3} fill="#e2e8f0" />
+                      {/* Full moon marker - glows blue during blue moon */}
+                      <circle cx={fullPos.x} cy={fullPos.y} r={moonSize} fill={blueMoon ? "#3b82f6" : "#f1f5f9"} stroke={blueMoon ? "#60a5fa" : "#cbd5e1"} strokeWidth="2">
+                        {blueMoon && <animate attributeName="fill" values="#3b82f6;#60a5fa;#3b82f6" dur="3s" repeatCount="indefinite" />}
+                      </circle>
+                      <circle cx={fullPos.x} cy={fullPos.y} r={moonSize - 3} fill={blueMoon ? "#60a5fa" : "#e2e8f0"}>
+                        {blueMoon && <animate attributeName="fill" values="#60a5fa;#93c5fd;#60a5fa" dur="3s" repeatCount="indefinite" />}
+                      </circle>
                       {/* Maria (dark patches) */}
                       <ellipse cx={fullPos.x - 8} cy={fullPos.y - 6} rx="5" ry="4" fill="#cbd5e1" opacity="0.5" />
                       <ellipse cx={fullPos.x + 6} cy={fullPos.y + 8} rx="4" ry="3.5" fill="#cbd5e1" opacity="0.5" />
@@ -599,6 +649,14 @@ function MoonPhaseClock({ location, currentDate }) {
                             <p className="text-blue-200 text-xs italic">
                               Despite the name, blue moons don't actually appear blue! The name comes from an old English phrase meaning "betrayer moon," referring to an extra moon that disrupted the regular naming pattern.
                             </p>
+                            {nextBlueMoon && (
+                              <div className="mt-3 pt-3 border-t border-blue-400/30">
+                                <p className="text-blue-200 text-xs font-semibold mb-1">Next Blue Moon:</p>
+                                <p className="text-slate-300 text-sm">
+                                  {nextBlueMoon.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         )}
 
