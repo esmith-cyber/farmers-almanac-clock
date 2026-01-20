@@ -1181,3 +1181,72 @@ Each moon name includes:
   - Created special Full Moon modal layout (simplified, focused on tradition)
   - Added traditional moon name section to ring segment modal for Full Moon phase
   - Keeps detailed astronomical info for other three principal phases
+
+## Lunar Month Naming System (2026-01-20)
+
+### Issue
+Traditional moon names (Wolf Moon, Snow Moon, etc.) were updating based on calendar months rather than lunar months. When the new moon occurred on January 17, the display still showed "Wolf Moon" even though the lunar cycle had begun for February's "Snow Moon."
+
+### Research Findings
+According to traditional farmer's almanac conventions:
+- **Traditional moon names apply to entire lunar months**, not just to the full moon itself
+- **Lunar months begin with the new moon** (or full moon, depending on culture)
+- The span between one new moon and the next is ~29.53 days
+- When a new moon occurs, it marks the beginning of a new lunar month and the traditional name should update to reflect the upcoming full moon
+
+### Solution
+Changed moon name calculation from calendar-based to lunar-based:
+
+**Previous behavior:**
+```javascript
+const month = currentDate.getMonth()  // 0-11 for Jan-Dec
+return moonNames[month]  // Always showed calendar month's name
+```
+
+**New behavior:**
+```javascript
+// Find the next full moon (search up to 45 days ahead)
+// Use the month of that full moon to determine the traditional name
+const targetMonth = nextFullMoon.getMonth()
+return moonNames[targetMonth]
+```
+
+### Implementation Details
+
+**Components Modified:**
+1. **SunTimes.jsx** (side panel moon display):
+   - Modified `getMoonName()` to search for next full moon
+   - Uses SunCalc to find dates with phase 0.47-0.53 (full moon range)
+   - Returns traditional name based on full moon's month
+
+2. **MoonPhaseClock.jsx** (lunar disc and modals):
+   - Added `getCurrentLunarMonth()` helper function
+   - Returns month (1-12) of next upcoming full moon
+   - Updated all calls to `getTraditionalMoonName()` to use lunar month instead of calendar month
+   - Added `getLunarMonthDateRange()` to display actual date range
+
+**Date Range Display:**
+- Shows the actual span of the current lunar month (new moon to new moon)
+- Format: "Lunar Month: Jan 17 - Feb 15, 2026"
+- Appears in Full Moon modal to clarify which lunar cycle we're in
+- Prevents confusion between full moon date and lunar month period
+
+### User Experience Impact
+**Before:** Moon card showed "Wolf Moon" through January 31, even after new moon on Jan 17
+**After:** Moon card shows "Snow Moon" starting Jan 17 (when new lunar month begins)
+
+This ensures the app accurately reflects traditional farmer's almanac conventions where moon names track the lunar cycle, not the calendar.
+
+### Technical Notes
+- Search range: 45 days forward (covers >1.5 lunar cycles)
+- Phase detection: 0.47-0.53 range ensures reliable full moon detection
+- Fallback: Uses current calendar month if no full moon found (edge case)
+- Backward compatibility: Existing code continues to work; only calculation method changed
+
+**Files Modified:**
+- `src/components/SunTimes.jsx`: Updated getMoonName() function (lines 78-113)
+- `src/components/MoonPhaseClock.jsx`:
+  - Added getCurrentLunarMonth() (lines 153-170)
+  - Added getLunarMonthDateRange() (lines 172-220)
+  - Updated traditionalName lookups to use lunar month (lines 332, 906)
+  - Updated modal date display to show lunar month range (line 653)
