@@ -76,7 +76,31 @@ function SunTimes({ location, currentDate }) {
   }
 
   const getMoonName = () => {
-    const month = currentDate.getMonth()
+    // Traditional moon names apply to the lunar month that contains that full moon
+    // To find which lunar month we're in, we find the next full moon from today
+    // and use the traditional name for the month that full moon occurs in
+
+    // Search forward up to 45 days to find the next full moon
+    let searchDate = new Date(currentDate)
+    let nextFullMoon = null
+
+    for (let daysAhead = 0; daysAhead <= 45; daysAhead++) {
+      const checkDate = new Date(currentDate)
+      checkDate.setDate(checkDate.getDate() + daysAhead)
+
+      const moonPhase = SunCalc.getMoonIllumination(checkDate)
+
+      // Full moon is between phase 0.47-0.53
+      if (moonPhase.phase >= 0.47 && moonPhase.phase <= 0.53) {
+        nextFullMoon = checkDate
+        break
+      }
+    }
+
+    // If we found a full moon, use the month of that full moon
+    // Otherwise fall back to current month
+    const targetMonth = nextFullMoon ? nextFullMoon.getMonth() : currentDate.getMonth()
+
     const moonNames = [
       'Wolf Moon',
       'Snow Moon',
@@ -91,7 +115,7 @@ function SunTimes({ location, currentDate }) {
       'Beaver Moon',
       'Cold Moon'
     ]
-    return moonNames[month]
+    return moonNames[targetMonth]
   }
 
   // Get moon emoji based on phase

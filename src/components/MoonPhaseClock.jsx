@@ -149,6 +149,70 @@ function MoonPhaseClock({ location, currentDate }) {
   // Format percentage of illumination
   const illuminationPercent = isTestingBlueMoon ? 100 : Math.round(moonData.fraction * 100)
 
+  // Get the current lunar month (based on next full moon)
+  // This determines which traditional moon name to display
+  const getCurrentLunarMonth = () => {
+    // Search forward up to 45 days to find the next full moon
+    for (let daysAhead = 0; daysAhead <= 45; daysAhead++) {
+      const checkDate = new Date(currentDate)
+      checkDate.setDate(checkDate.getDate() + daysAhead)
+
+      const moonPhase = SunCalc.getMoonIllumination(checkDate)
+
+      // Full moon is between phase 0.47-0.53
+      if (moonPhase.phase >= 0.47 && moonPhase.phase <= 0.53) {
+        // Return the month (1-12) of the next full moon
+        return checkDate.getMonth() + 1
+      }
+    }
+
+    // Fallback to current month if no full moon found
+    return currentDate.getMonth() + 1
+  }
+
+  // Get the date range of the current lunar month (new moon to new moon)
+  const getLunarMonthDateRange = () => {
+    let previousNewMoon = null
+    let nextNewMoon = null
+
+    // Search backward up to 45 days to find the previous new moon
+    for (let daysBack = 0; daysBack <= 45; daysBack++) {
+      const checkDate = new Date(currentDate)
+      checkDate.setDate(checkDate.getDate() - daysBack)
+
+      const moonPhase = SunCalc.getMoonIllumination(checkDate)
+
+      // New moon is phase < 0.03 or > 0.97
+      if (moonPhase.phase < 0.03 || moonPhase.phase > 0.97) {
+        previousNewMoon = checkDate
+        break
+      }
+    }
+
+    // Search forward up to 45 days to find the next new moon
+    for (let daysAhead = 1; daysAhead <= 45; daysAhead++) {
+      const checkDate = new Date(currentDate)
+      checkDate.setDate(checkDate.getDate() + daysAhead)
+
+      const moonPhase = SunCalc.getMoonIllumination(checkDate)
+
+      // New moon is phase < 0.03 or > 0.97
+      if (moonPhase.phase < 0.03 || moonPhase.phase > 0.97) {
+        nextNewMoon = checkDate
+        break
+      }
+    }
+
+    if (previousNewMoon && nextNewMoon) {
+      const startStr = previousNewMoon.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      const endStr = nextNewMoon.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      return `${startStr} - ${endStr}`
+    }
+
+    // Fallback to current month if we can't find the range
+    return currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  }
+
   // Traditional Full Moon names by month with historical context
   const getTraditionalMoonName = (month) => {
     const moonNames = {
@@ -308,7 +372,7 @@ function MoonPhaseClock({ location, currentDate }) {
         cultural: 'Full Moons have been celebrated across cultures and given names based on seasonal characteristics (Harvest Moon, Hunter\'s Moon, etc.).',
         astronomical: 'Lunar eclipses can only occur during a Full Moon when Earth passes directly between the Sun and Moon, casting its shadow on the lunar surface.',
         visibility: 'Visible all night - rises at sunset, highest at midnight, sets at sunrise',
-        traditionalName: getTraditionalMoonName(currentDate.getMonth() + 1)
+        traditionalName: getTraditionalMoonName(getCurrentLunarMonth())
       },
       'Last Quarter': {
         emoji: '🌗',
@@ -594,8 +658,8 @@ function MoonPhaseClock({ location, currentDate }) {
                             )}
                           </div>
                           <p className={`text-sm ${blueMoon ? 'text-blue-400' : 'text-blue-300'}`}>
-                            {blueMoon ? 'Second Full Moon of the Month · ' : 'Full Moon · '}
-                            {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            {blueMoon ? 'Second Full Moon of the Month · Lunar Month: ' : 'Lunar Month: '}
+                            {getLunarMonthDateRange()}
                           </p>
                           {blueMoon && (
                             <p className="text-slate-400 text-xs mt-1 italic">
@@ -882,7 +946,7 @@ function MoonPhaseClock({ location, currentDate }) {
 
               {/* Traditional Moon Name - for Full Moon */}
               {(displayPhaseName === 'Full Moon' || currentPhaseName === 'Full Moon') && (() => {
-                const traditionalMoon = getTraditionalMoonName(currentDate.getMonth() + 1)
+                const traditionalMoon = getTraditionalMoonName(getCurrentLunarMonth())
                 return (
                   <div className="p-4 rounded-xl" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
                     <div className="flex items-center gap-2 mb-3">
