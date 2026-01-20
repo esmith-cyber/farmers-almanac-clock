@@ -33,6 +33,11 @@ A beautiful, interactive astronomical clock visualizing the annual cycle, moon p
 - Accurate sun times (sunrise, sunset, twilight periods)
 - Location-based calculations
 - Visual moon phase representations with detailed textures
+- **Traditional Moon Names** - Displays historical farmer's almanac moon names
+  - 12 traditional full moon names (Wolf Moon, Snow Moon, Worm Moon, etc.)
+  - Names update based on lunar months (~29.5 days) not calendar months
+  - Shows actual lunar month date range (new moon to new moon)
+  - Educational content about historical significance for farmers and traders
 - **Blue Moon Celebration** - Automatic detection and celebration of rare blue moons
   - Occurs when 2 full moons happen in the same calendar month (~every 2-3 years)
   - Full moon marker glows blue and pulses with animated emanation
@@ -147,6 +152,15 @@ All layout dimensions are extracted to named constants:
 - Maintains proper event isolation with `stopPropagation`
 
 ## Recent Updates
+
+### Lunar Month Naming System (2026-01-20)
+- Fixed traditional moon names to update based on lunar cycles instead of calendar months
+- Moon names now reflect the current lunar month (new moon to new moon)
+- When a new moon occurs, the name updates to the upcoming full moon's traditional name
+- Added date range display showing actual lunar month period (e.g., "Lunar Month: Jan 17 - Feb 15, 2026")
+- Honors traditional farmer's almanac conventions where moon names track the ~29.5 day lunar cycle
+- Ensures accurate representation: after new moon on Jan 17, display shows "Snow Moon" instead of "Wolf Moon"
+- Updated both side panel and modal displays for consistency
 
 ### Blue Moon Celebration Feature (2026-01-13)
 - Implemented rare blue moon detection and celebration
