@@ -256,9 +256,9 @@ function App() {
         )}
       </div>
 
-      {/* View Tabs - Top Center (desktop only; mobile uses swipe) */}
+      {/* View Tabs - Top Center */}
       {location && (
-        <div className="fixed z-50 hidden md:block" style={{
+        <div className="fixed z-50" style={{
           top: 'max(12px, env(safe-area-inset-top))',
           left: '50%',
           transform: 'translateX(-50%)'
