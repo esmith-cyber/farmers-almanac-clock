@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import SunTimes from './components/SunTimes'
 import LocationInput from './components/LocationInput'
 import AlmanacClock from './components/AlmanacClock'
@@ -182,10 +182,32 @@ function App() {
     setLocationError(null)
   }
 
+  const views = ['clock', 'analemma']
+  const touchStart = useRef(null)
+
+  const handleTouchStart = (e) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+
+  const handleTouchEnd = (e) => {
+    if (!touchStart.current) return
+    const dx = e.changedTouches[0].clientX - touchStart.current.x
+    const dy = e.changedTouches[0].clientY - touchStart.current.y
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      const idx = views.indexOf(view)
+      if (dx < 0 && idx < views.length - 1) setView(views[idx + 1])
+      if (dx > 0 && idx > 0) setView(views[idx - 1])
+    }
+    touchStart.current = null
+  }
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center relative" style={{
       padding: 'min(2vw, 16px)'
-    }}>
+    }}
+    onTouchStart={handleTouchStart}
+    onTouchEnd={handleTouchEnd}
+    >
       {/* Cosmic Background Effects */}
       <CosmicBackground />
 
@@ -229,9 +251,9 @@ function App() {
         )}
       </div>
 
-      {/* View Tabs - Top Center */}
+      {/* View Tabs - Top Center (desktop only; mobile uses swipe) */}
       {location && (
-        <div className="fixed z-50" style={{
+        <div className="fixed z-50 hidden md:block" style={{
           top: 'max(12px, env(safe-area-inset-top))',
           left: '50%',
           transform: 'translateX(-50%)'

@@ -126,6 +126,8 @@ export default function AnalemmaCalendar({ location, currentDate }) {
     return Math.floor((currentDate - start) / 86400000)
   }, [year, currentDate])
 
+  const tomorrowDOY = (todayDOY + 1) % days.length
+
   // Special dates
   const specialDOYs = useMemo(() => {
     return SPECIAL_DATES.map(({ month, day, label }) => {
@@ -168,35 +170,60 @@ export default function AnalemmaCalendar({ location, currentDate }) {
             const y = toY(d.alt)
             const t = maxLen > minLen ? (d.dayLen - minLen) / (maxLen - minLen) : 0.5
             const color = dayLengthColor(t)
+            // Animation runs from tomorrow → wrapping around the year → ending on today
+            const seqPos = (d.dayOfYear - tomorrowDOY + days.length) % days.length
+            const fadeDelay = `${(seqPos / (days.length - 1)) * 1.2}s`
+            const todayDelay = '1.2s'
 
             return (
               <g key={i}>
                 {special && (
                   <>
-                    <circle cx={x} cy={y} r={10} fill={color} opacity="0.15" />
-                    <circle cx={x} cy={y} r={6} fill={color} opacity="0.2" />
+                    <circle cx={x} cy={y} r={10} fill={color} opacity="0">
+                      <animate attributeName="opacity" from="0" to="0.15"
+                        begin={fadeDelay} dur="0.3s" fill="freeze" />
+                    </circle>
+                    <circle cx={x} cy={y} r={6} fill={color} opacity="0">
+                      <animate attributeName="opacity" from="0" to="0.2"
+                        begin={fadeDelay} dur="0.3s" fill="freeze" />
+                    </circle>
                   </>
                 )}
                 {isToday ? (
                   <>
-                    <circle cx={x} cy={y} r={10} fill="none" stroke={color} strokeWidth="1.5" opacity="0.5">
-                      <animate attributeName="r" values="7;13;7" dur="2.5s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.5;0.05;0.5" dur="2.5s" repeatCount="indefinite" />
+                    {/* One-shot burst ring on arrival */}
+                    <circle cx={x} cy={y} r={5} fill="none" stroke={color} strokeWidth="1.5" opacity="0">
+                      <animate attributeName="r" values="5;35" begin={todayDelay} dur="0.9s" fill="freeze" repeatCount="1" />
+                      <animate attributeName="opacity" values="0.7;0" begin={todayDelay} dur="0.9s" fill="freeze" repeatCount="1" />
                     </circle>
-                    <circle cx={x} cy={y} r={5.5} fill={color} />
+                    {/* Regular gentle pulse — starts after burst */}
+                    <circle cx={x} cy={y} r={10} fill="none" stroke={color} strokeWidth="1.5" opacity="0">
+                      <animate attributeName="opacity" from="0" to="0.5"
+                        begin={`${parseFloat(todayDelay) + 0.9}s`} dur="0.01s" fill="freeze" />
+                      <animate attributeName="r" values="7;13;7"
+                        begin={`${parseFloat(todayDelay) + 0.9}s`} dur="2.5s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.5;0.05;0.5"
+                        begin={`${parseFloat(todayDelay) + 0.9}s`} dur="2.5s" repeatCount="indefinite" />
+                    </circle>
+                    {/* Dot itself */}
+                    <circle cx={x} cy={y} r={5.5} fill={color} opacity="0">
+                      <animate attributeName="opacity" from="0" to="1"
+                        begin={todayDelay} dur="0.2s" fill="freeze" />
+                    </circle>
                     <circle cx={x} cy={y} r={10} fill="transparent"
                       style={{ cursor: 'pointer' }}
                       onMouseEnter={e => handleMouseEnter(e, d)}
                       onMouseLeave={() => setHoveredDay(null)} />
                   </>
                 ) : (
-                  <circle
-                    cx={x} cy={y} r={2.8}
-                    fill={color}
+                  <circle cx={x} cy={y} r={2.8} fill={color} opacity="0"
                     style={{ cursor: 'pointer' }}
                     onMouseEnter={e => handleMouseEnter(e, d)}
                     onMouseLeave={() => setHoveredDay(null)}
-                  />
+                  >
+                    <animate attributeName="opacity" from="0" to="1"
+                      begin={fadeDelay} dur="0.3s" fill="freeze" />
+                  </circle>
                 )}
               </g>
             )

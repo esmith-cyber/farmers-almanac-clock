@@ -75,47 +75,54 @@ function SunTimes({ location, currentDate }) {
     return 'Waning Crescent'
   }
 
+  const traditionalMoonData = [
+    { name: 'Wolf Moon', description: 'Named for the howling of hungry wolves during the cold depths of winter. Native American tribes and early European settlers heard wolf packs howling more frequently during January\'s long, cold nights. For farmers, this was a time of planning and preparation, as the ground was too frozen for planting.', folklore: 'Ancient farmers used this time to inventory supplies, repair tools, and plan the coming year\'s crops. The Wolf Moon signaled the heart of winter - a reminder to conserve resources and stay vigilant.' },
+    { name: 'Snow Moon', description: 'February typically brings the heaviest snowfalls in many regions of North America, giving this moon its name. Also called the Hunger Moon, as hunting became difficult and food stores ran low.', folklore: 'For early settlers and farmers, the Snow Moon was a test of winter preparation. Merchants reduced travel due to dangerous conditions. Communities relied on preserved food and close-knit support to survive the hardest month.' },
+    { name: 'Worm Moon', description: 'As temperatures warm, earthworm casts begin to appear, signaling the thawing of the ground. Also called the Crow Moon for the cawing crows that herald spring\'s arrival.', folklore: 'The Worm Moon marked a turning point for farmers - a sign that spring was near and soil would soon be workable. Maple syrup harvesting began. Merchants prepared for renewed trade as winter\'s isolation ended.' },
+    { name: 'Pink Moon', description: 'Named for the wild ground phlox (pink moss) that blooms in early spring. One of the first widespread flowers of spring in North America. Also called the Sprouting Grass Moon or Egg Moon.', folklore: 'For farmers, the Pink Moon signaled the beginning of the planting season. Fields were prepared, seeds were sown. Fishermen knew shad and other fish were running. The agricultural year truly began under this moon.' },
+    { name: 'Flower Moon', description: 'May brings an abundance of blooming flowers across the landscape. Also called the Corn Planting Moon or Milk Moon, as this was when corn was planted and cows gave plentiful milk on fresh grass.', folklore: 'Ancient farmers planted crops that required warm soil - corn, beans, squash. The Flower Moon meant fertile fields and the promise of harvest. Beekeepers knew flowers meant strong honey production ahead.' },
+    { name: 'Strawberry Moon', description: 'Named for the short strawberry harvesting season in June. Native American Algonquin tribes knew this moon signaled the time to gather ripening strawberries.', folklore: 'The Strawberry Moon marked the first major harvest for farmers. Wild strawberries were gathered and preserved. European settlers called it the Rose Moon, as roses bloomed abundantly. A time of plenty after spring\'s work.' },
+    { name: 'Buck Moon', description: 'Male deer (bucks) begin growing new antlers in July, covered in velvety fur. Also called the Thunder Moon for summer\'s frequent thunderstorms, or Hay Moon for the hay harvest.', folklore: 'For farmers, the Buck Moon meant haying season - cutting, drying, and storing grass for winter livestock feed. The year\'s first major harvest. Thunderstorms could ruin hay crops, so timing was critical.' },
+    { name: 'Sturgeon Moon', description: 'Named for the sturgeon fish that were most readily caught in the Great Lakes and Lake Champlain during August. Also called the Green Corn Moon or Grain Moon.', folklore: 'Ancient fishermen knew August brought the best sturgeon fishing. Farmers began harvesting early corn. This moon signaled the transition from growing to harvesting season - a time of plenty and hard work.' },
+    { name: 'Harvest Moon', description: 'The full moon closest to the autumn equinox, rising near sunset for several nights. Its bright light allowed farmers to work late into the evening harvesting crops. A crucial advantage before electricity.', folklore: 'The Harvest Moon was the most important to farmers. Extra moonlight meant extra harvesting time for crops that needed immediate attention. Communities came together for harvest. Merchants prepared for winter trade.' },
+    { name: "Hunter's Moon", description: 'Following the Harvest Moon, the Hunter\'s Moon provided bright light for hunting game that had fattened on fallen grains. Fields were clear, making game easier to spot. Also called the Blood Moon or Sanguine Moon.', folklore: 'After harvest, ancient peoples hunted and preserved meat for winter. The bright moon allowed tracking prey at night. Farmers finished field work and prepared livestock for winter. A time of urgent preparation.' },
+    { name: 'Beaver Moon', description: 'November was when beavers were most active building winter dams, and when trappers set beaver traps before waters froze. Also called the Frost Moon as cold weather arrived.', folklore: 'Ancient peoples set traps for beaver pelts - valuable for winter clothing and trade. Farmers completed final preparations: storing root vegetables, smoking meat, ensuring livestock had shelter. Last chance before deep winter.' },
+    { name: 'Cold Moon', description: 'December\'s full moon marks the arrival of winter\'s coldest period. Also called the Long Nights Moon, as it occurs near the winter solstice when nights are longest.', folklore: 'The Cold Moon signaled deep winter for ancient peoples. All preparation must be complete. Farmers settled in for winter, living on stored food. Communities gathered for winter solstice celebrations, knowing the days would soon lengthen.' },
+  ]
+
   const getMoonName = () => {
-    // Traditional moon names apply to the lunar month that contains that full moon
-    // To find which lunar month we're in, we find the next full moon from today
-    // and use the traditional name for the month that full moon occurs in
+    return getMoonInfo().name
+  }
 
-    // Search forward up to 45 days to find the next full moon
-    let searchDate = new Date(currentDate)
+  const getMoonInfo = () => {
     let nextFullMoon = null
-
     for (let daysAhead = 0; daysAhead <= 45; daysAhead++) {
       const checkDate = new Date(currentDate)
       checkDate.setDate(checkDate.getDate() + daysAhead)
-
       const moonPhase = SunCalc.getMoonIllumination(checkDate)
-
-      // Full moon is between phase 0.47-0.53
       if (moonPhase.phase >= 0.47 && moonPhase.phase <= 0.53) {
         nextFullMoon = checkDate
         break
       }
     }
-
-    // If we found a full moon, use the month of that full moon
-    // Otherwise fall back to current month
     const targetMonth = nextFullMoon ? nextFullMoon.getMonth() : currentDate.getMonth()
+    return traditionalMoonData[targetMonth]
+  }
 
-    const moonNames = [
-      'Wolf Moon',
-      'Snow Moon',
-      'Worm Moon',
-      'Pink Moon',
-      'Flower Moon',
-      'Strawberry Moon',
-      'Buck Moon',
-      'Sturgeon Moon',
-      'Harvest Moon',
-      "Hunter's Moon",
-      'Beaver Moon',
-      'Cold Moon'
-    ]
-    return moonNames[targetMonth]
+  const isBlueMoon = () => {
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth()
+    const lastDay = new Date(year, month + 1, 0)
+    const fullMoonDates = []
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const date = new Date(year, month, day, 12, 0, 0)
+      const moonPhase = SunCalc.getMoonIllumination(date)
+      if (moonPhase.phase >= 0.47 && moonPhase.phase <= 0.53) {
+        const isDuplicate = fullMoonDates.some(d => Math.abs(d.getDate() - day) <= 1)
+        if (!isDuplicate) fullMoonDates.push(new Date(year, month, day))
+      }
+    }
+    return fullMoonDates.length >= 2
   }
 
   // Get moon emoji based on phase
@@ -133,7 +140,9 @@ function SunTimes({ location, currentDate }) {
 
   const period = getCurrentPeriod()
   const moonPhaseName = getMoonPhaseName()
-  const moonName = getMoonName()
+  const moonInfo = getMoonInfo()
+  const moonName = moonInfo.name
+  const blueMoon = isBlueMoon()
   const moonEmoji = getMoonEmoji()
   const illuminationPercent = Math.round(moonData.fraction * 100)
 
@@ -214,8 +223,11 @@ function SunTimes({ location, currentDate }) {
         padding: 'min(1.5vw, 20px)',
         borderTopLeftRadius: '20px',
         borderBottomLeftRadius: '20px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
-      }}>
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+        cursor: 'pointer'
+      }}
+      onClick={() => setShowMoonModal(true)}
+      >
         <div style={{ marginBottom: 'min(1.2vw, 12px)' }}>
           <div style={{
             fontSize: 'min(3vw, 32px)',
@@ -464,7 +476,7 @@ function SunTimes({ location, currentDate }) {
       {/* Moon Info Modal */}
       {showMoonModal && createPortal(
         <div
-          className="fixed inset-0 flex items-center justify-center p-4 md:hidden"
+          className="fixed inset-0 flex items-center justify-center p-4"
           style={{
             background: 'rgba(0, 0, 0, 0.7)',
             backdropFilter: 'blur(10px)',
@@ -566,17 +578,48 @@ function SunTimes({ location, currentDate }) {
                 </div>
               </div>
 
-              {/* Distance (approximate) */}
+              {/* Distance */}
               <div className="p-3 rounded-xl" style={{ background: 'rgba(30, 30, 40, 0.3)' }}>
                 <div className="text-slate-400 text-xs mb-1">Distance from Earth</div>
                 <div className="text-slate-300 text-sm">
-                  {(() => {
-                    // Moon distance varies between ~356,500 km and ~406,700 km
-                    // Average is about 384,400 km
-                    const avgDistance = 384400
-                    return `~${avgDistance.toLocaleString()} km`
-                  })()}
+                  {Math.round(moonData.distance).toLocaleString()} km
                 </div>
+              </div>
+
+              {/* Blue Moon info */}
+              {blueMoon && (
+                <div className="p-4 rounded-xl" style={{
+                  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(29, 78, 216, 0.15) 100%)',
+                  border: '2px solid rgba(59, 130, 246, 0.4)',
+                  boxShadow: '0 0 30px rgba(59, 130, 246, 0.3)'
+                }}>
+                  <h3 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                    <span>🔵</span> What is a Blue Moon?
+                  </h3>
+                  <p className="text-slate-300 text-sm leading-relaxed">
+                    A Blue Moon occurs when two full moons happen in the same calendar month — approximately once every 2–3 years, giving rise to the phrase "once in a blue moon."
+                  </p>
+                </div>
+              )}
+
+              {/* Moon Name Origin */}
+              <div className="p-4 rounded-xl" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+                <h3 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                  <span>📖</span> Origin
+                </h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  {moonInfo.description}
+                </p>
+              </div>
+
+              {/* Folklore */}
+              <div className="p-4 rounded-xl" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+                <h3 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                  <span>🌾</span> For Ancient Farmers & Traders
+                </h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  {moonInfo.folklore}
+                </p>
               </div>
             </div>
           </div>
