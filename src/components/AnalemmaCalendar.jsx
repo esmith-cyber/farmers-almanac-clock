@@ -175,55 +175,50 @@ export default function AnalemmaCalendar({ location, currentDate }) {
             const fadeDelay = `${(seqPos / (days.length - 1)) * 1.2}s`
             const todayDelay = '1.2s'
 
+            const pulseDelay = `${parseFloat(todayDelay) + 0.9}s`
+
             return (
               <g key={i}>
                 {special && (
                   <>
-                    <circle cx={x} cy={y} r={10} fill={color} opacity="0">
-                      <animate attributeName="opacity" from="0" to="0.15"
-                        begin={fadeDelay} dur="0.3s" fill="freeze" />
-                    </circle>
-                    <circle cx={x} cy={y} r={6} fill={color} opacity="0">
-                      <animate attributeName="opacity" from="0" to="0.2"
-                        begin={fadeDelay} dur="0.3s" fill="freeze" />
-                    </circle>
+                    <circle cx={x} cy={y} r={10} fill={color}
+                      style={{ opacity: 0, animation: 'dotFadeIn 0.3s ease-out forwards', animationDelay: fadeDelay }} />
+                    <circle cx={x} cy={y} r={6} fill={color}
+                      style={{ opacity: 0, animation: 'dotFadeIn 0.3s ease-out forwards', animationDelay: fadeDelay }} />
                   </>
                 )}
                 {isToday ? (
                   <>
-                    {/* One-shot burst ring on arrival */}
-                    <circle cx={x} cy={y} r={5} fill="none" stroke={color} strokeWidth="1.5" opacity="0">
-                      <animate attributeName="r" values="5;35" begin={todayDelay} dur="0.9s" fill="freeze" repeatCount="1" />
-                      <animate attributeName="opacity" values="0.7;0" begin={todayDelay} dur="0.9s" fill="freeze" repeatCount="1" />
-                    </circle>
-                    {/* Regular gentle pulse — starts after burst */}
-                    <circle cx={x} cy={y} r={10} fill="none" stroke={color} strokeWidth="1.5" opacity="0">
-                      <animate attributeName="opacity" from="0" to="0.5"
-                        begin={`${parseFloat(todayDelay) + 0.9}s`} dur="0.01s" fill="freeze" />
-                      <animate attributeName="r" values="7;13;7"
-                        begin={`${parseFloat(todayDelay) + 0.9}s`} dur="2.5s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.5;0.05;0.5"
-                        begin={`${parseFloat(todayDelay) + 0.9}s`} dur="2.5s" repeatCount="indefinite" />
-                    </circle>
-                    {/* Dot itself */}
-                    <circle cx={x} cy={y} r={5.5} fill={color} opacity="0">
-                      <animate attributeName="opacity" from="0" to="1"
-                        begin={todayDelay} dur="0.2s" fill="freeze" />
-                    </circle>
+                    {/* One-shot burst ring */}
+                    <circle cx={x} cy={y} r={5} fill="none" stroke={color} strokeWidth="1.5"
+                      style={{
+                        opacity: 0,
+                        transformBox: 'fill-box', transformOrigin: 'center',
+                        animation: 'sonarBurst 0.9s ease-out forwards',
+                        animationDelay: todayDelay,
+                      }} />
+                    {/* Gentle pulse — starts after burst */}
+                    <circle cx={x} cy={y} r={5} fill="none" stroke={color} strokeWidth="1.5"
+                      style={{
+                        opacity: 0,
+                        transformBox: 'fill-box', transformOrigin: 'center',
+                        animation: `dotFadeIn 0.01s forwards, sonarPulse 2.5s ease-in-out infinite`,
+                        animationDelay: `${pulseDelay}, ${pulseDelay}`,
+                      }} />
+                    {/* Dot */}
+                    <circle cx={x} cy={y} r={5.5} fill={color}
+                      style={{ opacity: 0, animation: 'dotFadeIn 0.2s ease-out forwards', animationDelay: todayDelay }} />
                     <circle cx={x} cy={y} r={10} fill="transparent"
                       style={{ cursor: 'pointer' }}
                       onMouseEnter={e => handleMouseEnter(e, d)}
                       onMouseLeave={() => setHoveredDay(null)} />
                   </>
                 ) : (
-                  <circle cx={x} cy={y} r={2.8} fill={color} opacity="0"
-                    style={{ cursor: 'pointer' }}
+                  <circle cx={x} cy={y} r={2.8} fill={color}
+                    style={{ opacity: 0, cursor: 'pointer', animation: 'dotFadeIn 0.3s ease-out forwards', animationDelay: fadeDelay }}
                     onMouseEnter={e => handleMouseEnter(e, d)}
                     onMouseLeave={() => setHoveredDay(null)}
-                  >
-                    <animate attributeName="opacity" from="0" to="1"
-                      begin={fadeDelay} dur="0.3s" fill="freeze" />
-                  </circle>
+                  />
                 )}
               </g>
             )

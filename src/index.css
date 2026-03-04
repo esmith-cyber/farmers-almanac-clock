@@ -322,13 +322,29 @@ body::before {
 }
 
 /* iOS-style smooth transitions */
-* {
+*:not(circle):not(line):not(path):not(rect):not(ellipse) {
   transition: background-color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
 }
 
 /* Faster transitions for modal close responsiveness */
 .fixed * {
   transition: background-color 0.1s ease, border-color 0.1s ease, opacity 0.1s ease !important;
+}
+
+/* Analemma dot animations */
+@keyframes dotFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes sonarBurst {
+  from { opacity: 0.7; transform: scale(1); }
+  to   { opacity: 0;   transform: scale(7); }
+}
+
+@keyframes sonarPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1.4); }
+  50%       { opacity: 0.05; transform: scale(2.6); }
 }
 
 /* Reduce backdrop blur on mobile for better performance */
