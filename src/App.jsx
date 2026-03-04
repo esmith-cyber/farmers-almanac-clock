@@ -6,10 +6,12 @@ import MoonPhaseClock from './components/MoonPhaseClock'
 import AnnualEventsClock from './components/AnnualEventsClock'
 import EventManager from './components/EventManager'
 import CosmicBackground from './components/CosmicBackground'
+import AnalemmaCalendar from './components/AnalemmaCalendar'
 import { getEclipsesForYear } from './utils/eclipseCalculator'
 import './App.css'
 
 function App() {
+  const [view, setView] = useState('clock')
   const [location, setLocation] = useState(() => {
     // Load location from localStorage
     const saved = localStorage.getItem('userLocation')
@@ -227,6 +229,42 @@ function App() {
         )}
       </div>
 
+      {/* View Tabs - Top Center */}
+      {location && (
+        <div className="fixed z-50" style={{
+          top: 'max(12px, env(safe-area-inset-top))',
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}>
+          <div className="ios-glass flex items-center" style={{
+            padding: '4px',
+            borderRadius: '14px',
+            gap: '2px'
+          }}>
+            {['clock', 'analemma'].map(v => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                style={{
+                  fontSize: '13px',
+                  padding: '6px 14px',
+                  borderRadius: '10px',
+                  fontWeight: '600',
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: view === v ? 'rgba(10, 132, 255, 0.8)' : 'transparent',
+                  color: 'white',
+                  textTransform: 'capitalize',
+                  transition: 'background 0.2s'
+                }}
+              >
+                {v === 'clock' ? 'Clock' : 'Analemma'}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Event Manager - Top Right */}
       {location && (
         <div className="fixed z-50" style={{
@@ -241,8 +279,15 @@ function App() {
       )}
 
       <div className="w-full" style={{ position: 'relative', zIndex: 10 }}>
+        {/* Analemma Calendar View */}
+        {location && view === 'analemma' && (
+          <div style={{ width: '100%', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '70px' }}>
+            <AnalemmaCalendar location={location} currentDate={currentDate} />
+          </div>
+        )}
+
         {/* Main Clock Display */}
-        {location ? (
+        {location && view === 'clock' ? (
           <div className="relative flex items-center justify-center" style={{
             width: '100%',
             height: '100vh',
@@ -313,7 +358,7 @@ function App() {
               currentDate={currentDate}
             />
           </div>
-        ) : (
+        ) : (!location && (
           <div className="text-center text-slate-400 py-12">
             {locationError ? (
               <p>{locationError}</p>
@@ -321,7 +366,7 @@ function App() {
               <p>Detecting your location...</p>
             )}
           </div>
-        )}
+        ))}
       </div>
     </div>
   )
