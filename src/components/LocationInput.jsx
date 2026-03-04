@@ -340,7 +340,7 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
               fontWeight: '600'
             }}
           >
-            {isSearching ? 'Detecting...' : 'Auto Detect'}
+            {isSearching ? 'Detecting...' : 'Current Location'}
           </button>
         </form>
       </div>
