@@ -92,18 +92,13 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
   const handleSelectSuggestion = (suggestion) => {
     const lat = parseFloat(suggestion.lat)
     const lon = parseFloat(suggestion.lon)
+    const name = suggestion.display_name.split(',').slice(0, 2).join(',')
 
-    // Fill in the form fields
-    setLatitude(lat.toFixed(4))
-    setLongitude(lon.toFixed(4))
-    setLocationName(suggestion.display_name.split(',').slice(0, 2).join(','))
-
-    // Clear any errors
     setInputError('')
-
-    // Hide suggestions
     setSuggestions([])
     setShowSuggestions(false)
+
+    onLocationUpdate({ latitude: lat, longitude: lon, name })
   }
 
   const handleAutoDetect = () => {
