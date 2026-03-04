@@ -256,9 +256,9 @@ function App() {
         )}
       </div>
 
-      {/* View Tabs - Top Center */}
+      {/* View Tabs - Top Center (non-touch devices only; mobile uses swipe) */}
       {location && (
-        <div className="fixed z-50" style={{
+        <div className="fixed z-50 pointer-only" style={{
           top: 'max(12px, env(safe-area-inset-top))',
           left: '50%',
           transform: 'translateX(-50%)'

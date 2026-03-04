@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Only show on non-touch (pointer+hover capable) devices */
+.pointer-only {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .pointer-only {
+    display: block;
+  }
+}
+
 /* iOS-style system font stack */
 body {
   margin: 0;
