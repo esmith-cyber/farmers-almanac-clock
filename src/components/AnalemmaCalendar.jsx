@@ -193,7 +193,6 @@ export default function AnalemmaCalendar({ location, currentDate }) {
                     <circle cx={x} cy={y} r={5} fill="none" stroke={color} strokeWidth="1.5"
                       style={{
                         opacity: 0,
-                        transformBox: 'fill-box', transformOrigin: 'center',
                         animation: 'sonarBurst 0.9s ease-out forwards',
                         animationDelay: todayDelay,
                       }} />
@@ -201,7 +200,6 @@ export default function AnalemmaCalendar({ location, currentDate }) {
                     <circle cx={x} cy={y} r={5} fill="none" stroke={color} strokeWidth="1.5"
                       style={{
                         opacity: 0,
-                        transformBox: 'fill-box', transformOrigin: 'center',
                         animation: `dotFadeIn 0.01s forwards, sonarPulse 2.5s ease-in-out infinite`,
                         animationDelay: `${pulseDelay}, ${pulseDelay}`,
                       }} />
