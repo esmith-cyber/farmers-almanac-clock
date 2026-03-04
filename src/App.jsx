@@ -21,6 +21,7 @@ function App() {
   const [locationError, setLocationError] = useState(null)
   const [isEditingLocation, setIsEditingLocation] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date())
+  const locationCardRef = useRef(null)
   const [events, setEvents] = useState(() => {
     // Default celestial events (will be merged with user's saved events)
     const defaultCelestialEvents = [
@@ -170,6 +171,22 @@ function App() {
     return () => clearInterval(timer)
   }, [])
 
+  // Close location card when tapping/clicking outside of it
+  useEffect(() => {
+    if (!isEditingLocation) return
+    const handleOutside = (e) => {
+      if (locationCardRef.current && !locationCardRef.current.contains(e.target)) {
+        if (location) setIsEditingLocation(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    document.addEventListener('touchend', handleOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+      document.removeEventListener('touchend', handleOutside)
+    }
+  }, [isEditingLocation, location])
+
   const handleLocationUpdate = (newLocation) => {
     setLocation(newLocation)
     setIsEditingLocation(false)
@@ -228,20 +245,13 @@ function App() {
             {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
           </button>
         ) : (
-          <>
-            {/* Backdrop — click/tap outside to dismiss */}
-            <div
-              className="fixed inset-0"
-              style={{ zIndex: -1 }}
-              onClick={() => location && setIsEditingLocation(false)}
-              onTouchEnd={() => location && setIsEditingLocation(false)}
-            />
+          <div ref={locationCardRef}>
             <LocationInput
               onLocationUpdate={handleLocationUpdate}
               initialLocation={location}
               error={locationError}
             />
-          </>
+          </div>
         )}
       </div>
 
