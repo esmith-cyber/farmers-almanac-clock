@@ -9,15 +9,27 @@ const SPECIAL_DATES = [
   { month: 12, day: 21, label: 'Winter\nSolstice' },
 ]
 
-function dayLengthColor(t) {
-  // deep navy → purple → warm gold
-  if (t < 0.5) {
-    const s = t * 2
-    return `rgb(${lerp(0x1e, 0x7c, s)},${lerp(0x3a, 0x3a, s)},${lerp(0x8a, 0xed, s)})`
-  } else {
-    const s = (t - 0.5) * 2
-    return `rgb(${lerp(0x7c, 0xf5, s)},${lerp(0x3a, 0x9e, s)},${lerp(0xed, 0x0b, s)})`
-  }
+// Color by position in the seasonal cycle, anchored to solstices & equinoxes.
+// Stops: winter solstice (Dec 21, ~DOY 355) → spring equinox (Mar 20, ~DOY 79)
+//        → summer solstice (Jun 21, ~DOY 172) → autumn equinox (Sep 22, ~DOY 265) → back to winter
+function seasonColor(dayOfYear, totalDays) {
+  const winterSolsticeDOY = 355
+  // Normalise DOY so that winter solstice = 0, cycling 0→1 through the year
+  const t = ((dayOfYear - winterSolsticeDOY + totalDays) % totalDays) / totalDays
+  // Season stops at t = 0, 0.25, 0.5, 0.75, 1.0
+  const stops = [
+    [0x1a, 0x6f, 0xa8], // winter  — glacier blue
+    [0x4a, 0xde, 0x80], // spring  — spring green
+    [0xfb, 0xbf, 0x24], // summer  — harvest gold
+    [0xf9, 0x73, 0x16], // autumn  — fall orange
+    [0x1a, 0x6f, 0xa8], // winter  — glacier blue (wrap)
+  ]
+  const scaled = t * (stops.length - 1)
+  const i = Math.min(Math.floor(scaled), stops.length - 2)
+  const s = scaled - i
+  const [r1, g1, b1] = stops[i]
+  const [r2, g2, b2] = stops[i + 1]
+  return `rgb(${lerp(r1, r2, s)},${lerp(g1, g2, s)},${lerp(b1, b2, s)})`
 }
 
 function lerp(a, b, t) { return Math.round(a + (b - a) * t) }
@@ -168,8 +180,7 @@ export default function AnalemmaCalendar({ location, currentDate }) {
 
             const x = toX(d.az)
             const y = toY(d.alt)
-            const t = maxLen > minLen ? (d.dayLen - minLen) / (maxLen - minLen) : 0.5
-            const color = dayLengthColor(t)
+            const color = seasonColor(d.dayOfYear, days.length)
             // Animation runs from tomorrow → wrapping around the year → ending on today
             const seqPos = (d.dayOfYear - tomorrowDOY + days.length) % days.length
             const fadeDelay = `${(seqPos / (days.length - 1)) * 1.2}s`
