@@ -235,11 +235,12 @@ function App() {
           </button>
         ) : (
           <>
-            {/* Backdrop — click outside to dismiss */}
+            {/* Backdrop — click/tap outside to dismiss */}
             <div
               className="fixed inset-0"
               style={{ zIndex: -1 }}
               onClick={() => location && setIsEditingLocation(false)}
+              onTouchEnd={() => location && setIsEditingLocation(false)}
             />
             <LocationInput
               onLocationUpdate={handleLocationUpdate}
