@@ -217,37 +217,36 @@ function App() {
         left: '12px'
       }}>
         {location && !isEditingLocation ? (
-          <div className="ios-glass flex items-center gap-2 md:gap-3" style={{
-            padding: '12px 16px',
-            borderRadius: '16px',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
-          }}>
-            <div className="text-white font-semibold truncate max-w-[100px] md:max-w-none" style={{
-              fontSize: '13px'
-            }}>
-              {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
-            </div>
-            <button
-              onClick={() => setIsEditingLocation(true)}
-              className="text-white hover:opacity-80 transition-opacity whitespace-nowrap"
-              style={{
-                fontSize: '13px',
-                padding: '6px 12px',
-                background: 'rgba(10, 132, 255, 0.8)',
-                borderRadius: '12px',
-                fontWeight: '600',
-                border: 'none'
-              }}
-            >
-              Change
-            </button>
-          </div>
+          <button
+            className="ios-glass flex items-center"
+            onClick={() => setIsEditingLocation(true)}
+            style={{
+              padding: '12px 16px',
+              borderRadius: '16px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+              cursor: 'pointer',
+              border: 'none',
+              color: 'white',
+              fontSize: '13px',
+              fontWeight: '600',
+            }}
+          >
+            {location.name || `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`}
+          </button>
         ) : (
-          <LocationInput
-            onLocationUpdate={handleLocationUpdate}
-            initialLocation={location}
-            error={locationError}
-          />
+          <>
+            {/* Backdrop — click outside to dismiss */}
+            <div
+              className="fixed inset-0"
+              style={{ zIndex: -1 }}
+              onClick={() => location && setIsEditingLocation(false)}
+            />
+            <LocationInput
+              onLocationUpdate={handleLocationUpdate}
+              initialLocation={location}
+              error={locationError}
+            />
+          </>
         )}
       </div>
 

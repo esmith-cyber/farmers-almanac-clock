@@ -330,40 +330,22 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              className="flex-1 text-white font-semibold transition-opacity hover:opacity-80"
-              style={{
-                padding: '14px',
-                background: 'rgba(10, 132, 255, 0.8)',
-                borderRadius: '14px',
-                border: 'none',
-                fontSize: '15px',
-                fontWeight: '600'
-              }}
-            >
-              Use This Location
-            </button>
-            <button
-              type="button"
-              onClick={handleAutoDetect}
-              disabled={isSearching}
-              className="flex-1 text-white font-semibold transition-opacity disabled:opacity-50"
-              style={{
-                padding: '14px',
-                background: isSearching ? 'rgba(88, 86, 214, 0.5)' : 'rgba(88, 86, 214, 0.8)',
-                borderRadius: '14px',
-                border: 'none',
-                fontSize: '15px',
-                fontWeight: '600'
-              }}
-              onMouseEnter={(e) => !isSearching && (e.currentTarget.style.opacity = '0.8')}
-              onMouseLeave={(e) => !isSearching && (e.currentTarget.style.opacity = '1')}
-            >
-              {isSearching ? 'Detecting...' : 'Auto Detect'}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleAutoDetect}
+            disabled={isSearching}
+            className="w-full text-white font-semibold transition-opacity disabled:opacity-50"
+            style={{
+              padding: '14px',
+              background: isSearching ? 'rgba(88, 86, 214, 0.5)' : 'rgba(88, 86, 214, 0.8)',
+              borderRadius: '14px',
+              border: 'none',
+              fontSize: '15px',
+              fontWeight: '600'
+            }}
+          >
+            {isSearching ? 'Detecting...' : 'Auto Detect'}
+          </button>
         </form>
       </div>
     </div>
