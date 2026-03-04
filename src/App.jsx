@@ -179,11 +179,12 @@ function App() {
         if (location) setIsEditingLocation(false)
       }
     }
-    document.addEventListener('mousedown', handleOutside)
-    document.addEventListener('touchend', handleOutside)
+    // Use capture phase so we fire before any child element handler can stop propagation
+    document.addEventListener('mousedown', handleOutside, true)
+    document.addEventListener('touchstart', handleOutside, true)
     return () => {
-      document.removeEventListener('mousedown', handleOutside)
-      document.removeEventListener('touchend', handleOutside)
+      document.removeEventListener('mousedown', handleOutside, true)
+      document.removeEventListener('touchstart', handleOutside, true)
     }
   }, [isEditingLocation, location])
 
