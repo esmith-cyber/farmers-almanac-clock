@@ -336,6 +336,14 @@ body::before {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+@keyframes haloFadeIn1 {
+  from { opacity: 0; }
+  to   { opacity: 0.15; }
+}
+@keyframes haloFadeIn2 {
+  from { opacity: 0; }
+  to   { opacity: 0.2; }
+}
 
 @keyframes sonarBurst {
   from { opacity: 0.7; transform: scale(1); }

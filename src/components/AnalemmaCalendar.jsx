@@ -182,9 +182,9 @@ export default function AnalemmaCalendar({ location, currentDate }) {
                 {special && (
                   <>
                     <circle cx={x} cy={y} r={10} fill={color}
-                      style={{ opacity: 0, animation: 'dotFadeIn 0.3s ease-out forwards', animationDelay: fadeDelay }} />
+                      style={{ opacity: 0, animation: 'haloFadeIn1 0.3s ease-out forwards', animationDelay: fadeDelay }} />
                     <circle cx={x} cy={y} r={6} fill={color}
-                      style={{ opacity: 0, animation: 'dotFadeIn 0.3s ease-out forwards', animationDelay: fadeDelay }} />
+                      style={{ opacity: 0, animation: 'haloFadeIn2 0.3s ease-out forwards', animationDelay: fadeDelay }} />
                   </>
                 )}
                 {isToday ? (
