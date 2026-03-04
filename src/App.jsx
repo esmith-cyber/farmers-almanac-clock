@@ -8,6 +8,7 @@ import EventManager from './components/EventManager'
 import CosmicBackground from './components/CosmicBackground'
 import AnalemmaCalendar from './components/AnalemmaCalendar'
 import { getEclipsesForYear } from './utils/eclipseCalculator'
+import { fetchTimezone } from './utils/timezone'
 import './App.css'
 
 function App() {
@@ -140,19 +141,12 @@ function App() {
               locationName = 'Your Location'
             }
 
-            setLocation({
-              latitude: lat,
-              longitude: lng,
-              name: locationName
-            })
+            const timezone = await fetchTimezone(lat, lng)
+            setLocation({ latitude: lat, longitude: lng, name: locationName, timezone })
           } catch (error) {
             console.error('Geocoding error:', error)
-            // Fallback to generic name if geocoding fails
-            setLocation({
-              latitude: lat,
-              longitude: lng,
-              name: 'Your Location'
-            })
+            const timezone = await fetchTimezone(lat, lng)
+            setLocation({ latitude: lat, longitude: lng, name: 'Your Location', timezone })
           }
 
           setLocationError(null)

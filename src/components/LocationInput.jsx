@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { fetchTimezone } from '../utils/timezone'
 
 function LocationInput({ onLocationUpdate, initialLocation, error }) {
   const [latitude, setLatitude] = useState(initialLocation?.latitude || '')
@@ -89,7 +90,7 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
   }, [locationName])
 
   // Handle selecting a suggestion
-  const handleSelectSuggestion = (suggestion) => {
+  const handleSelectSuggestion = async (suggestion) => {
     const lat = parseFloat(suggestion.lat)
     const lon = parseFloat(suggestion.lon)
     const name = suggestion.display_name.split(',').slice(0, 2).join(',')
@@ -98,7 +99,8 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
     setSuggestions([])
     setShowSuggestions(false)
 
-    onLocationUpdate({ latitude: lat, longitude: lon, name })
+    const timezone = await fetchTimezone(lat, lon)
+    onLocationUpdate({ latitude: lat, longitude: lon, name, timezone })
   }
 
   const handleAutoDetect = () => {
@@ -143,18 +145,12 @@ function LocationInput({ onLocationUpdate, initialLocation, error }) {
               locationName = 'Your Location'
             }
 
-            onLocationUpdate({
-              latitude: lat,
-              longitude: lng,
-              name: locationName
-            })
+            const timezone = await fetchTimezone(lat, lng)
+            onLocationUpdate({ latitude: lat, longitude: lng, name: locationName, timezone })
           } catch (error) {
             console.error('Geocoding error:', error)
-            onLocationUpdate({
-              latitude: lat,
-              longitude: lng,
-              name: 'Your Location'
-            })
+            const timezone = await fetchTimezone(lat, lng)
+            onLocationUpdate({ latitude: lat, longitude: lng, name: 'Your Location', timezone })
           }
 
           setIsSearching(false)

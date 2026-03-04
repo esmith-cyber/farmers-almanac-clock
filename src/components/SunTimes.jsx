@@ -23,28 +23,23 @@ function SunTimes({ location, currentDate }) {
 
   if (!sunTimes || !moonData) return null
 
-  // Convert UTC time to local display time using the browser's actual timezone.
-  // Note: this is exact for the user's own location; for manually-entered
-  // locations it still shows in the user's local timezone (a full per-location
-  // timezone lookup would require an external API).
-  const toLocalTime = (date) => {
-    const offsetMs = -currentDate.getTimezoneOffset() * 60 * 1000
-    return new Date(date.getTime() + offsetMs)
-  }
-
   const formatTime = (date) => {
-    const localDate = toLocalTime(date)
-
-    // Get UTC hours/minutes from the adjusted date (which represents local time at target)
-    const hours = localDate.getUTCHours()
-    const minutes = localDate.getUTCMinutes()
-
-    // Format as 12-hour time
+    const tz = location.timezone
+    if (tz) {
+      return new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(date)
+    }
+    // Fallback: browser local timezone (correct for own location, approximate for others)
+    const offsetMs = -currentDate.getTimezoneOffset() * 60 * 1000
+    const local = new Date(date.getTime() + offsetMs)
+    const hours = local.getUTCHours()
+    const minutes = local.getUTCMinutes()
     const period = hours >= 12 ? 'PM' : 'AM'
-    const displayHours = hours % 12 || 12
-    const displayMinutes = minutes.toString().padStart(2, '0')
-
-    return `${displayHours}:${displayMinutes} ${period}`
+    return `${hours % 12 || 12}:${minutes.toString().padStart(2, '0')} ${period}`
   }
 
   const getCurrentPeriod = () => {
