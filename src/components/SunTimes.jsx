@@ -23,14 +23,13 @@ function SunTimes({ location, currentDate }) {
 
   if (!sunTimes || !moonData) return null
 
-  // Helper to convert UTC time to local time at target location
+  // Convert UTC time to local display time using the browser's actual timezone.
+  // Note: this is exact for the user's own location; for manually-entered
+  // locations it still shows in the user's local timezone (a full per-location
+  // timezone lookup would require an external API).
   const toLocalTime = (date) => {
-    // Calculate timezone offset from longitude (15 degrees = 1 hour)
-    const timezoneOffsetHours = location.longitude / 15
-    const offsetMilliseconds = timezoneOffsetHours * 60 * 60 * 1000
-
-    // Create new date with adjusted time
-    return new Date(date.getTime() + offsetMilliseconds)
+    const offsetMs = -currentDate.getTimezoneOffset() * 60 * 1000
+    return new Date(date.getTime() + offsetMs)
   }
 
   const formatTime = (date) => {
